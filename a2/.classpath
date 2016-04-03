@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Spencer/Documents/Spencer School/csc165/javagaming/jinput/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Spencer/Documents/Spencer School/csc165/jogl/jogamp-all-platforms/jar/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Spencer/Documents/Spencer School/csc165/jogl/jogamp-all-platforms/jar/jogl-all.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Spencer/Documents/Spencer School/csc165/javagaming/graphicslib3D/graphicslib3D.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Spencer/Documents/Spencer School/csc165/javagaming/jbullet/jbullet.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Spencer/Documents/Spencer School/csc165/javagaming/jinput/jinput.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Spencer/Documents/Spencer School/csc165/javagaming/sage/sage.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>
