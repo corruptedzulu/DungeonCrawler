@@ -15,8 +15,6 @@ public class MySquare extends Square implements IEventListener
 	public boolean handleEvent(IGameEvent event) 
 	{
 		//CrashEvent, aka the Camera hit us
-		
-		
 		return false;
 	}
 	

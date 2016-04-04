@@ -1,10 +1,8 @@
 package myGameEngine;
 
-import com.sun.security.auth.NTDomainPrincipal;
-
 import graphicslib3D.Point3D;
 import graphicslib3D.Vector3D;
-import net.java.games.input.Component.Identifier.Axis;
+
 import net.java.games.input.Event;
 import sage.camera.ICamera;
 import sage.input.IInputManager;
@@ -91,8 +89,6 @@ public class Camera3PController
 
 			 IAction zoomOutAction = new ZoomCameraAction(-1.0);
 			 im.associateAction(cn, net.java.games.input.Component.Identifier.Button._6, zoomOutAction, IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-
-			 
 		 }
 		 		 
 	 }
@@ -126,7 +122,6 @@ public class Camera3PController
 				 { 
 					 zoomAmount=0.0f; 
 				 }
-			 
 			 }
 			 
 			 cameraDistanceFromTarget += zoomAmount * value ;
@@ -139,12 +134,7 @@ public class Camera3PController
 			 {
 				 cameraDistanceFromTarget = 10;
 			 }
-			 		 
-			 
 		 }
-		 
-		
-		
 	 }
 	 
 	 private class OrbitAroundAction extends AbstractInputAction

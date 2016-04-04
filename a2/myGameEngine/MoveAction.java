@@ -9,7 +9,6 @@ import sage.input.action.AbstractInputAction;
 
 public class MoveAction extends AbstractInputAction 
 {
-	
 	protected ICamera camera;
 	protected float speed;
 	
@@ -53,5 +52,4 @@ public class MoveAction extends AbstractInputAction
 		Point3D newLoc = new Point3D(newX, newY, newZ);
 		camera.setLocation(newLoc);
 	}
-
 }

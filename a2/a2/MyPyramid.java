@@ -15,8 +15,7 @@ public class MyPyramid extends Pyramid
 	private boolean isRemoved = false;
 	
 	public MyPyramid()
-	{ 
-		int i;
+	{
 		FloatBuffer vertBuf = com.jogamp.common.nio.Buffers.newDirectFloatBuffer(vrts);
 		FloatBuffer colorBuf = com.jogamp.common.nio.Buffers.newDirectFloatBuffer(cl);
 		IntBuffer triangleBuf = com.jogamp.common.nio.Buffers.newDirectIntBuffer(triangles);
