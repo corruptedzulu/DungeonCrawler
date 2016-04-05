@@ -1,18 +1,18 @@
 
 package myGameEngine;
 
-import a2.DogCatcher3D;
+import a2.DungeonCrawler3DSoonTM;
 import net.java.games.input.Event;
 import sage.input.action.AbstractInputAction;
 
 public class QuitGameAction extends AbstractInputAction 
 {
-	private DogCatcher3D dg;
+	private DungeonCrawler3DSoonTM dg;
 	
-	public QuitGameAction(DogCatcher3D dogCatcher3D)
+	public QuitGameAction(DungeonCrawler3DSoonTM dungeonCrawlerSoon3D)
 	{
 		super();
-		dg = dogCatcher3D;
+		dg = dungeonCrawlerSoon3D;
 	}
 
 	@Override

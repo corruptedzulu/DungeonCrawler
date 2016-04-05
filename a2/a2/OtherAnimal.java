@@ -6,7 +6,6 @@ import sage.event.IGameEvent;
 
 public class OtherAnimal implements IEventListener
 {
-
 	@Override
 	public boolean handleEvent(IGameEvent event) 
 	{

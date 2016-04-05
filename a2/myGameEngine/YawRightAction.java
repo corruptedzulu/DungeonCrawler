@@ -132,9 +132,7 @@ public class YawRightAction extends RollAction
 			camera.setRightAxis(rightDir);
 			camera.setUpAxis(upDir);
 			camera.setViewDirection(viewDir);
-				
 		}
-		
 	}
 	
 	public void setAvatar(SceneNode n) 

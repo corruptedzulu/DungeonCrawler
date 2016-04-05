@@ -20,7 +20,6 @@ public class MoveLeftAction extends MoveAction
 		super(c, s);
 		moveAmount = moveAmount * -1;
 	}
-
 	
 	public void performAction(float time, Event event)
 	{
@@ -57,5 +56,4 @@ public class MoveLeftAction extends MoveAction
 	{ 
 		avatar = n; 
 	}
-	
 }
