@@ -25,7 +25,6 @@ import myGameEngine.MoveBackAction;
 import myGameEngine.MoveForwardAction;
 import myGameEngine.MoveLeftAction;
 import myGameEngine.MoveRightAction;
-import myGameEngine.MoveDownAction;
 import myGameEngine.MoveUpAction;
 import myGameEngine.MyDisplaySystem;
 import myGameEngine.PitchDownAction;
@@ -34,9 +33,7 @@ import myGameEngine.QuitGameAction;
 import myGameEngine.YawLeftAction;
 import myGameEngine.YawRightAction;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 import java.awt.Color;
 import java.text.DecimalFormat;
@@ -55,15 +52,15 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private int scorePTwo = 0;
     private float time;
     private HUDString player1ID;
-    private HUDString player2ID;
+
     private HUDString timeStringPOne;
-    private HUDString timeStringPTwo;
+
     private int numCrashes = 0;
     private int numStandardShapes = 10;
     private Random random;
 
     private MyPyramid avatarOne;
-    private Cylinder avatarTwo;
+
     //private Sphere avatarOne;
     //private Sphere avatarTwo;
     private PyramidGroup pyramids;
@@ -77,31 +74,35 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private int maxZDistanceAbsolute = 10;
 
     // ### TJ
-    private SkyBox sky;
+    private SkyBox skyBox;
     private TerrainBlock theTerrain;
     private Group background;
 
+    // use File.separator later
     private String zagDrivePath = "C:\\Users\\Zagak\\Google Drive\\CSC165\\DungeonCrawler\\assets\\";
     private String zuluDrivePath = "your path here";
     private String tjDrivePath = "your path here";
     private String googleDrivePath = zagDrivePath;
 
     // http://www.farmpeeps.com/fp_skyboxes.html
-    private String groundTexturePath = googleDrivePath + "Skyboxs\\farmpeeps_skybox_countrypaths\\skybox_country_paths_bottom.jpg";
-    private String skyboxTexturePath = googleDrivePath + "Skyboxs\\farmpeeps_skybox_countrypaths\\skybox_country_paths_top.jpg";
-    // use File.separator later
-
+    private String terrainTexture = googleDrivePath + "Skyboxs\\0\\down.jpg";
+    private String skyboxDown = googleDrivePath + "Skyboxs\\0\\down.jpg";
+    private String skyboxEast = googleDrivePath + "Skyboxs\\0\\east.jpg";
+    private String skyboxNorth = googleDrivePath + "Skyboxs\\0\\north.jpg";
+    private String skyboxSouth = googleDrivePath + "Skyboxs\\0\\south.jpg";
+    private String skyboxWest = googleDrivePath + "Skyboxs\\0\\west.jpg";
+    private String skyboxUp = googleDrivePath + "Skyboxs\\0\\up.jpg";
 
     private boolean connected;
     // ### TJ
 
     IDisplaySystem display;
     IRenderer renderer;
-    ICamera cameraOne, cameraTwo;
+    ICamera cameraOne;
     IInputManager im;
     IEventManager eventManager;
 
-    Camera3PController camOne, camTwo;
+    Camera3PController camOne;
 
     protected void initGame()
     {
@@ -121,11 +122,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
         camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
 
-        if (gpName != null)
-        {
-            camTwo = new Camera3PController(cameraTwo, avatarTwo, im, gpName, "G");
-        }
-
         super.update((float) 0.0);
     }
 
@@ -138,7 +134,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         im = new InputManager();
         setInputManager(im);
         //create an (empty) gameworld
-        ArrayList<SceneNode> gameWorld = new ArrayList<SceneNode>();
+        ArrayList<SceneNode> gameWorld = new ArrayList<>();
         setGameWorld(gameWorld);
         //super.initSystem();
     }
@@ -180,26 +176,13 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private void createPlayers()
     {
         avatarOne = new MyPyramid("PLAYER1");
-        //avatarOne = new Sphere();
         avatarOne.translate(0, 1, 50);
         avatarOne.rotate(180, new Vector3D(0, 1, 0));
         addGameWorldObject(avatarOne);
         cameraOne = new JOGLCamera(renderer);
         cameraOne.setPerspectiveFrustum(60, 2, 1, 1000);
-        cameraOne.setViewport(0.0, 1.0, 0.0, 0.45);
-        cameraOne.setLocation(new Point3D(0, 1, 50));
-
-        avatarTwo = new Cylinder("PLAYER2");
-        //avatarTwo = new Sphere();
-        avatarTwo.translate(50, 1, 0);
-        avatarTwo.rotate(-90, new Vector3D(0, 1, 0));
-        addGameWorldObject(avatarTwo);
-        cameraTwo = new JOGLCamera(renderer);
-        cameraTwo.setPerspectiveFrustum(60, 2, 1, 1000);
-        cameraTwo.setViewport(0.0, 1.0, 0.55, 1.0);
-        cameraTwo.setLocation(new Point3D(50, 1, 0));
-
-        createPlayerHUDs();
+        cameraOne.setViewport(0.0, 1.0, 0.0, 1);
+        cameraOne.setLocation(new Point3D(0, 0, 0));
     }
 
     private void createPlayerHUDs()
@@ -208,16 +191,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         timeStringPOne.setLocation(0, 0.05);
         cameraOne.addToHUD(timeStringPOne);
 
-        timeStringPTwo = new HUDString("Time = ");
-        timeStringPTwo.setLocation(0, 0.05);
-        cameraTwo.addToHUD(timeStringPTwo);
-
-        //scoreStringOne = new HUDString("Score = " + score);
-        //addGameWorldObject(scoreStringOne);
-
-        //scoreStringOne = new HUDString("0");
-        //scoreStringTwo = new HUDString("0");
-
         player1ID = new HUDString("Player 1: ");// + scorePOne);
         player1ID.setName("Player1ID");
         player1ID.setLocation(0, 0.10);
@@ -225,14 +198,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         player1ID.setColor(Color.red);
         player1ID.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
         cameraOne.addToHUD(player1ID);
-
-        player2ID = new HUDString("Player 2: ");// + scorePTwo);
-        player2ID.setName("Player2ID");
-        player2ID.setLocation(0, 0.10);
-        player2ID.setRenderMode(sage.scene.SceneNode.RENDER_MODE.ORTHO);
-        player2ID.setColor(Color.yellow);
-        player2ID.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
-        cameraTwo.addToHUD(player2ID);
     }
 
     private void initEnvironment()
@@ -245,15 +210,15 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private void initGameObjects()
     {
         // ### TJ skybox
-        sky = new SkyBox("skybox",20,20,20);
-        Texture skyBoxTexture = TextureManager.loadTexture2D(skyboxTexturePath);
-        sky.setTexture(SkyBox.Face.Up, skyBoxTexture);
-        sky.setTexture(SkyBox.Face.Down, skyBoxTexture);
-        sky.setTexture(SkyBox.Face.North, skyBoxTexture);
-        sky.setTexture(SkyBox.Face.South, skyBoxTexture);
-        sky.setTexture(SkyBox.Face.East, skyBoxTexture);
-        sky.setTexture(SkyBox.Face.West, skyBoxTexture);
-        addGameWorldObject(sky);
+        skyBox = new SkyBox("skybox", 200, 200, 200);
+        skyBox.setTexture(SkyBox.Face.Up,  TextureManager.loadTexture2D(skyboxUp));
+        skyBox.setTexture(SkyBox.Face.Down, TextureManager.loadTexture2D(skyboxDown));
+        skyBox.setTexture(SkyBox.Face.North, TextureManager.loadTexture2D(skyboxNorth));
+        skyBox.setTexture(SkyBox.Face.South, TextureManager.loadTexture2D(skyboxSouth));
+        skyBox.setTexture(SkyBox.Face.East, TextureManager.loadTexture2D(skyboxEast));
+        skyBox.setTexture(SkyBox.Face.West, TextureManager.loadTexture2D(skyboxWest));
+        skyBox.setZBufferStateEnabled(false);
+        addGameWorldObject(skyBox);
 
         theTerrain = initTerrain();
         theTerrain.scale(2, 1, 2);
@@ -283,20 +248,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         addGameWorldObject(dg1);
         dg1.updateWorldBound();
 
-
-        //code goes here to insert other gameworld objects, axes
-        //avatarOne = new MyPyramid();
-        //Matrix3D pyrT = avatarOne.getLocalTranslation();
-        //pyrT.translate(2,0,2);
-        //avatarOne.setLocalTranslation(pyrT);
-        //Matrix3D pyrR = new Matrix3D();
-        //pyrR.rotateY(45.0); // rotation is the direction avatar faces
-        //avatarOne.setLocalRotation(pyrR);
-        //addGameWorldObject(avatarOne);
-
         initWorldAxes();
-
-        //eventManager.addListener(object, eventClass)
     }
 
     // ### TJ terrain
@@ -314,9 +266,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
         // create a terrain block using the height map
         String name = "Terrain:" + heightMap.getClass().getSimpleName();
-        TerrainBlock tb = new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
 
-        return tb;
+        return new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
     }
 
     private TerrainBlock initTerrain()
@@ -327,11 +278,10 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         TerrainBlock hillTerrain = createTerBlock(myHillHeightMap);
 
         // create texture and texture state to color the terrain
-        TextureState groundState;
-        Texture groundTexture = TextureManager.loadTexture2D(groundTexturePath);
-
+        Texture groundTexture = TextureManager.loadTexture2D(terrainTexture);
         groundTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
-        groundState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
+
+        TextureState groundState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
         groundState.setTexture(groundTexture, 0);
         groundState.setEnabled(true);
 
@@ -372,11 +322,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         kbName = im.getKeyboardName();
 
         initPlayerOneControls();
-
-        if (gpName != null)
-        {
-            initPlayerTwoControls();
-        }
     }
 
 
@@ -571,135 +516,33 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     }
 
-    private void initPlayerTwoControls()
+
+
+    private void updateSkybox()
     {
-        QuitGameAction quitActionPTwo = new QuitGameAction(this);
-
-        MoveForwardAction mvFwdActionPTwo = new MoveForwardAction(cameraTwo, (float) 0.1);
-        MoveLeftAction mvLeftActionPTwo = new MoveLeftAction(cameraTwo, (float) 0.1);
-        MoveRightAction mvRightActionPTwo = new MoveRightAction(cameraTwo, (float) 0.1);
-        MoveBackAction mvBackActionPTwo = new MoveBackAction(cameraTwo, (float) 0.1);
-        //MoveUpAction mvUpActionPTwo = new MoveUpAction(cameraTwo, (float) 0.1);
-        //MoveDownAction mvDownActionPTwo = new MoveDownAction(cameraTwo, (float) 0.1);
-
-        PitchUpAction pitchUpActionPTwo = new PitchUpAction(cameraTwo, (float) 0.1);
-        //PitchDownAction pitchDownActionPTwo = new PitchDownAction(cameraTwo, (float) 0.1);
-        //RollRightAction rollRightActionPTwo = new RollRightAction(cameraTwo, (float) 0.1);
-        //RollLeftAction rollLeftActionPTwo = new RollLeftAction(cameraTwo, (float) 0.1);
-        YawRightAction yawRightActionPTwo = new YawRightAction(cameraTwo, (float) 0.1);
-        YawLeftAction yawLeftActionPTwo = new YawLeftAction(cameraTwo, (float) 0.1);
-
-
-        mvFwdActionPTwo.setAvatar(avatarTwo);
-        mvBackActionPTwo.setAvatar(avatarTwo);
-        mvLeftActionPTwo.setAvatar(avatarTwo);
-        mvRightActionPTwo.setAvatar(avatarTwo);
-
-        yawLeftActionPTwo.setAvatar(avatarTwo);
-        yawRightActionPTwo.setAvatar(avatarTwo);
-
-        //TODO: Switch all of the actions over to the correct objects
-
-
-        //QUIT
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.ESCAPE,
-                           quitActionPTwo,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-
-        //MOVE FORWARD
-        im.associateAction(gpName,
-                           net.java.games.input.Component.Identifier.Axis.Y,
-                           mvFwdActionPTwo,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-        //MOVE BACKWARD
-        //		im.associateAction(gpName,
-        //			net.java.games.input.Component.Identifier.Axis.Y,
-        //			mvFwdActionPTwo,
-        //			IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-        //MOVE LEFT
-        //		im.associateAction(gpName,
-        //			net.java.games.input.Component.Identifier.Axis.X,
-        //			mvRightActionPTwo,
-        //			IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-        //
-        //MOVE RIGHT
-        im.associateAction(gpName,
-                           net.java.games.input.Component.Identifier.Axis.X,
-                           mvRightActionPTwo,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-        //MOVE UP
-
-        //		//MOVE DOWN
-        //		im.associateAction(kbName,
-        //				net.java.games.input.Component.Identifier.Key.F,
-        //				mvDownAction,
-        //				IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        //		im.associateAction(kbName,
-        //				net.java.games.input.Component.Identifier.Key.F,
-        //				mvDownAction,
-        //				IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-
-        //TODO: Note - Roll should be mapped to Left/Right and Yaw should be Q/E to match cockpit controls
-
-        //YAW
-        //ROTATE LEFT
-        im.associateAction(gpName,
-                           net.java.games.input.Component.Identifier.Axis.RX,
-                           yawRightActionPTwo,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-        //ROTATE RIGHT
-        im.associateAction(gpName,
-                           net.java.games.input.Component.Identifier.Axis.RX,
-                           yawRightActionPTwo,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-        //PITCH -- TODO: Pitch commands should be switched to match actual cockpit controls
-        //ROTATE UP
-        im.associateAction(gpName,
-                           net.java.games.input.Component.Identifier.Axis.RY,
-                           pitchUpActionPTwo,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-        //ROTATE DOWN
-        im.associateAction(gpName,
-                           net.java.games.input.Component.Identifier.Axis.RY,
-                           pitchUpActionPTwo,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-        //ROLL
-        //ROTATE COUNTERCLOCKWISE
-
-        //ROTATE CLOCKWISE
-
+        Point3D camLoc1 = cameraOne.getLocation();
+        Matrix3D camTrans = new Matrix3D();
+        camTrans.translate(camLoc1.getX(),camLoc1.getY(),camLoc1.getZ());
+        skyBox.setLocalTranslation(camTrans);
+        // not 2
     }
+
 
     public void update(float elapsedTimeMS)
     {
-
-
         //scoreString.setText("Score = " + score);
         time += elapsedTimeMS;
         DecimalFormat df = new DecimalFormat("0.0");
         timeStringPOne.setText("Time = " + df.format(time / 1000));
-        timeStringPTwo.setText("Time = " + df.format(time / 1000));
 
+        updateSkybox();
         camOne.update(elapsedTimeMS);
-        camTwo.update(elapsedTimeMS);
         super.update(elapsedTimeMS);
     }
 
     protected void render()
     {
         renderer.setCamera(cameraOne);
-        super.render();
-
-        renderer.setCamera(cameraTwo);
         super.render();
     }
 
