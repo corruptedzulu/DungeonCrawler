@@ -1,6 +1,10 @@
 package a2;
 
 import a2.newdc.GhostAvatar;
+import a2.newdc.assets.AssetInfo;
+import a2.newdc.assets.PlayableAsset;
+import a2.newdc.assets.TileAsset;
+import graphicslib3D.Quaternion;
 import sage.app.BaseGame;
 
 import sage.display.*;
@@ -33,9 +37,9 @@ import myGameEngine.QuitGameAction;
 import myGameEngine.YawLeftAction;
 import myGameEngine.YawRightAction;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
-import java.awt.Color;
 import java.text.DecimalFormat;
 
 import sage.scene.state.RenderState;
@@ -61,17 +65,19 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private MyPyramid avatarOne;
 
-    //private Sphere avatarOne;
-    //private Sphere avatarTwo;
     private PyramidGroup pyramids;
     private RotationController rotational;
-    //private IDisplaySystem display;
+
 
     private String kbName, gpName;
 
     private int maxXDistanceAbsolute = 10;
     private int maxYDistanceAbsolute = 10;
     private int maxZDistanceAbsolute = 10;
+
+    // ### Zag
+    private AssetInfo assetInfo;
+    // ### Zag
 
     // ### TJ
     private SkyBox skyBox;
@@ -92,17 +98,19 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private String skyboxSouth = googleDrivePath + "Skyboxs\\0\\south.jpg";
     private String skyboxWest = googleDrivePath + "Skyboxs\\0\\west.jpg";
     private String skyboxUp = googleDrivePath + "Skyboxs\\0\\up.jpg";
+    // TODO move skybox into assetInfo
 
     private boolean connected;
     // ### TJ
 
-    IDisplaySystem display;
-    IRenderer renderer;
-    ICamera cameraOne;
-    IInputManager im;
-    IEventManager eventManager;
+    //private IDisplaySystem display;
+    private IDisplaySystem display;
+    private IRenderer renderer;
+    private ICamera cameraOne;
+    private IInputManager im;
+    private IEventManager eventManager;
 
-    Camera3PController camOne;
+    private Camera3PController camOne;
 
     protected void initGame()
     {
@@ -113,6 +121,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         display.setTitle("Dog Catcher!");
 
         renderer = display.getRenderer();
+
+        assetInfo = new AssetInfo(googleDrivePath);
 
         createPlayers();
         createPlayerHUDs();
@@ -175,6 +185,20 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private void createPlayers()
     {
+        SceneNode wizard = assetInfo.playables.get("wizard")
+                .make(new Point3D(0, .3, 0), new Point3D(.01, .01, .01), new Quaternion(1, new double[]{0, 0, 0}));
+        addGameWorldObject(wizard);
+
+        TileAsset tile =assetInfo.tiles.get("Tile");
+        addGameWorldObject(tile.make(new Point3D(0,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        addGameWorldObject(tile.make(new Point3D(0,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        addGameWorldObject(tile.make(new Point3D(0,0,4),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        addGameWorldObject(tile.make(new Point3D(0,0,6),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        addGameWorldObject(tile.make(new Point3D(2,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        addGameWorldObject(tile.make(new Point3D(4,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        addGameWorldObject(tile.make(new Point3D(6,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        addGameWorldObject(tile.make(new Point3D(6,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+
         avatarOne = new MyPyramid("PLAYER1");
         avatarOne.translate(0, 1, 50);
         avatarOne.rotate(180, new Vector3D(0, 1, 0));
@@ -262,7 +286,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
         // specify terrain origin so heightmap (0,0) is at world origin
         float cornerHeight = heightMap.getTrueHeightAtPoint(0, 0) * heightScale;
-        Point3D terrainOrigin = new Point3D(-64.5, -cornerHeight, -64.5);
+        Point3D terrainOrigin = new Point3D(-64.5, -cornerHeight-2, -64.5);
 
         // create a terrain block using the height map
         String name = "Terrain:" + heightMap.getClass().getSimpleName();
