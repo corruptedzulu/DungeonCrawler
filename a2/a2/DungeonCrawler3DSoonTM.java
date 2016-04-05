@@ -61,7 +61,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private int numCrashes = 0;
     private int numStandardShapes = 10;
     private Random random;
-    private Doghouse doghouse;
+
     private MyPyramid avatarOne;
     private Cylinder avatarTwo;
     //private Sphere avatarOne;
@@ -80,14 +80,17 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private SkyBox sky;
     private TerrainBlock theTerrain;
     private Group background;
-    private String texFolder;
 
-    // TODO next to adjust path here else it doesn't run!
+    private String zagDrivePath = "C:\\Users\\Zagak\\Google Drive\\CSC165\\DungeonCrawler\\assets\\";
+    private String zuluDrivePath = "your path here";
+    private String tjDrivePath = "your path here";
+    private String googleDrivePath = zagDrivePath;
+
     // http://www.farmpeeps.com/fp_skyboxes.html
-    private String groundTexturePath = "C:\\Users\\Zagak\\Google Drive\\CSC165\\DungeonCrawler\\assets\\Skyboxs\\farmpeeps_skybox_countrypaths\\skybox_country_paths_bottom.jpg";
-    private String skyboxTexturePath = "C:\\Users\\Zagak\\Google Drive\\CSC165\\DungeonCrawler\\assets\\Skyboxs\\farmpeeps_skybox_countrypaths\\skybox_country_paths_top.jpg";
-    //private String groundTexturePath = texFolder + File.separator + "redrock.jpg";
-    //private String skyboxTexturePath = texFolder + File.separator + "space.jpg";
+    private String groundTexturePath = googleDrivePath + "Skyboxs\\farmpeeps_skybox_countrypaths\\skybox_country_paths_bottom.jpg";
+    private String skyboxTexturePath = googleDrivePath + "Skyboxs\\farmpeeps_skybox_countrypaths\\skybox_country_paths_top.jpg";
+    // use File.separator later
+
 
     private boolean connected;
     // ### TJ
@@ -242,7 +245,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private void initGameObjects()
     {
         // ### TJ skybox
-        sky = new SkyBox();
+        sky = new SkyBox("skybox",20,20,20);
         Texture skyBoxTexture = TextureManager.loadTexture2D(skyboxTexturePath);
         sky.setTexture(SkyBox.Face.Up, skyBoxTexture);
         sky.setTexture(SkyBox.Face.Down, skyBoxTexture);
@@ -280,16 +283,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         addGameWorldObject(dg1);
         dg1.updateWorldBound();
 
-        doghouse = new Doghouse();
-        Matrix3D dg2M = doghouse.getLocalTranslation();
-        dg2M.translate(0, 0, 0);
-        doghouse.setLocalTranslation(dg2M);
-        addGameWorldObject(doghouse);
-        doghouse.updateWorldBound();
-
-        DoghouseColorController colorController = new DoghouseColorController();
-        colorController.addControlledNode(doghouse);
-        doghouse.addController(colorController);
 
         //code goes here to insert other gameworld objects, axes
         //avatarOne = new MyPyramid();
@@ -301,28 +294,9 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         //avatarOne.setLocalRotation(pyrR);
         //addGameWorldObject(avatarOne);
 
-
-        initWorldBoundaries();
         initWorldAxes();
-        initStandardShapes();
-
-        eventManager.addListener(doghouse, MoveToDoghouseEvent.class);
 
         //eventManager.addListener(object, eventClass)
-    }
-
-    private void initWorldBoundaries()
-    {
-        // TODO Auto-generated method stub
-
-        Rectangle floor = new Rectangle(200, 200);
-        Matrix3D flr = new Matrix3D();
-        flr.rotate(90, 0, 0);
-        floor.setLocalRotation(flr);
-
-        floor.translate(0, 0, 0);
-        floor.setColor(Color.GRAY);
-        addGameWorldObject(floor);
     }
 
     // ### TJ terrain
@@ -335,8 +309,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         int terrainSize = heightMap.getSize();
 
         // specify terrain origin so heightmap (0,0) is at world origin
-        float cornerHeight =
-                heightMap.getTrueHeightAtPoint(0, 0) * heightScale;
+        float cornerHeight = heightMap.getTrueHeightAtPoint(0, 0) * heightScale;
         Point3D terrainOrigin = new Point3D(-64.5, -cornerHeight, -64.5);
 
         // create a terrain block using the height map
@@ -349,8 +322,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private TerrainBlock initTerrain()
     {
         // create height map and terrain block
-        HillHeightMap myHillHeightMap =
-                new HillHeightMap(129, 2000, 5.0f, 20.0f, (byte) 2, 12345);
+        HillHeightMap myHillHeightMap = new HillHeightMap(129, 2000, 5.0f, 20.0f, (byte) 2, 12345);
         myHillHeightMap.setHeightScale(0.1f);
         TerrainBlock hillTerrain = createTerBlock(myHillHeightMap);
 
@@ -369,115 +341,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     }
     // ### TJ end terrain
 
-    private void initStandardShapes()
-    {
-        for (int x = 0; x < numStandardShapes; x++)
-        {
-            MySphere sq1 = new MySphere();
-            Matrix3D sq1M = sq1.getLocalTranslation();
 
-            int tempX, tempY, tempZ;
-
-            //put an 8 spread away from the center. keeps them from overlapping the doghouse
-            if (random.nextBoolean())
-            {
-                tempX = random.nextInt(maxXDistanceAbsolute + 15);
-            } else
-            {
-                tempX = -(random.nextInt(maxXDistanceAbsolute + 15));
-            }
-
-            //tempY = 0;
-
-            //if(random.nextBoolean())
-            //{
-            tempY = random.nextInt(2);
-            //}
-            //else
-            //{
-            //tempY = -(random.nextInt(maxXDistanceAbsolute + 15));
-            //}
-
-            if (random.nextBoolean())
-            {
-                tempZ = random.nextInt(maxXDistanceAbsolute + 15);
-            } else
-            {
-                tempZ = -(random.nextInt(maxXDistanceAbsolute + 15));
-            }
-
-            sq1M.translate(tempX, tempY, tempZ);
-            sq1.scale(random.nextFloat() + 1, random.nextFloat() + 1, random.nextFloat() + 1);
-            sq1.setLocalTranslation(sq1M);
-            addGameWorldObject(sq1);
-            sq1.setColor(Color.WHITE);
-            sq1.updateLocalBound();
-            sq1.updateWorldBound();
-
-            //eventManager.addListener(sq1, CrashEvent.class);
-        }
-
-
-        pyramids = new PyramidGroup();
-        addGameWorldObject(pyramids);
-        rotational = new RotationController();
-        rotational.addControlledNode(pyramids);
-        pyramids.addController(rotational);
-
-        for (int x = 0; x < numStandardShapes; x++)
-        {
-            MyPyramid sq1 = new MyPyramid();
-            Matrix3D sq1M = sq1.getLocalTranslation();
-
-            int tempX, tempY, tempZ;
-
-
-            //put an 8 spread away from the center. keeps them from overlapping the doghouse
-            if (random.nextBoolean())
-            {
-                tempX = random.nextInt(maxXDistanceAbsolute + 8);
-            } else
-            {
-                tempX = -(random.nextInt(maxXDistanceAbsolute + 8));
-            }
-
-            tempY = random.nextInt(2);
-            //			if(random.nextBoolean())
-            //			{
-            //				tempY = random.nextInt(maxXDistanceAbsolute + 8);
-            //			}
-            //			else
-            //			{
-            //				tempY = -(random.nextInt(maxXDistanceAbsolute + 8));
-            //			}
-
-            if (random.nextBoolean())
-            {
-                tempZ = random.nextInt(maxXDistanceAbsolute + 8);
-            } else
-            {
-                tempZ = -(random.nextInt(maxXDistanceAbsolute + 8));
-            }
-
-
-            sq1M.translate(tempX, tempY, tempZ);
-            sq1.scale(random.nextFloat() + 1, random.nextFloat() + 1, random.nextFloat() + 1);
-            sq1.setLocalTranslation(sq1M);
-            pyramids.addChild(sq1);
-            //addGameWorldObject(sq1);
-            //float[] buff = new float[] {0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1,
-            //							0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1,
-            //						0,0,0,1, 0,0,0,1, 0,0,0,1, 0,0,0,1};
-            //FloatBuffer clr = com.jogamp.common.nio.Buffers.newDirectFloatBuffer(buff);
-            //sq1.setColorBuffer(clr);
-            //sq1.setColor(Color.WHITE);
-            sq1.updateLocalBound();
-            sq1.updateWorldBound();
-
-            //eventManager.addListener(sq1, CrashEvent.class);
-        }
-
-    }
 
     private void initWorldAxes()
     {
@@ -817,181 +681,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     public void update(float elapsedTimeMS)
     {
-        ArrayList<SceneNode> toRemove = new ArrayList<>();
 
-        for (SceneNode s : getGameWorld())
-        {
-
-            if (s instanceof Dog || s instanceof MySquare || s instanceof MySphere)
-            {
-                //s.getWorldBound().intersects(avatarOne.getWorldBound())
-                if (s.getWorldBound().contains(
-                        cameraOne.getLocation()))// s.getWorldBound().intersects(avatarOne.getWorldBound()))
-                {
-                    if (s instanceof Dog)
-                    {
-                        if (((Dog) s).getRemoved())
-                        {
-                            continue;
-                        } else
-                        {
-                            ((Dog) s).setRemoved(true);
-                        }
-                    }
-                    if (s instanceof MySquare)
-                    {
-                        if (((MySquare) s).getRemoved())
-                        {
-                            continue;
-                        } else
-                        {
-                            ((MySquare) s).setRemoved(true);
-                        }
-                    }
-                    if (s instanceof MySphere)
-                    {
-                        if (((MySphere) s).getRemoved())
-                        {
-                            continue;
-                        } else
-                        {
-                            ((MySphere) s).setRemoved(true);
-                        }
-                    }
-                    // always false
-                    if (s instanceof MyPyramid)
-                    {
-                        if (((MyPyramid) s).getRemoved())
-                        {
-                            continue;
-                        } else
-                        {
-                            ((MyPyramid) s).setRemoved(true);
-                        }
-                    }
-
-                    numCrashes++;
-                    scorePOne++;
-                    System.out.println("Player 1: " + scorePOne);
-                    player1ID.setText("Player 1: " + scorePOne);
-                    toRemove.add(s);
-                    //crash
-                    MoveToDoghouseEvent newMTDhE = new MoveToDoghouseEvent(s);
-                    eventManager.triggerEvent(newMTDhE);
-                }
-
-                if (s.getWorldBound().contains(
-                        cameraTwo.getLocation()))// s.getWorldBound().intersects(avatarTwo.getWorldBound()))
-                {
-                    System.out.println("Camera two intersection");
-                    if (s instanceof Dog)
-                    {
-                        if (((Dog) s).getRemoved())
-                        {
-                            continue;
-                        } else
-                        {
-                            ((Dog) s).setRemoved(true);
-                        }
-                    }
-                    if (s instanceof MySquare)
-                    {
-                        if (((MySquare) s).getRemoved())
-                        {
-                            continue;
-                        } else
-                        {
-                            ((MySquare) s).setRemoved(true);
-                        }
-                    }
-                    if (s instanceof MySphere)
-                    {
-                        if (((MySphere) s).getRemoved())
-                        {
-                            continue;
-                        } else
-                        {
-                            ((MySphere) s).setRemoved(true);
-                        }
-                    }
-                    // always false
-                    if (s instanceof MyPyramid)
-                    {
-                        if (((MyPyramid) s).getRemoved())
-                        {
-                            continue;
-                        } else
-                        {
-                            ((MyPyramid) s).setRemoved(true);
-                        }
-                    }
-
-                    numCrashes++;
-                    scorePTwo++;
-                    System.out.println("Player 2: " + scorePTwo);
-                    player2ID.setText("Player 2: " + scorePTwo);
-                    toRemove.add(s);
-                    //crash
-                    MoveToDoghouseEvent newMTDhE = new MoveToDoghouseEvent(s);
-                    eventManager.triggerEvent(newMTDhE);
-                }
-            }
-
-            if (s instanceof Doghouse)
-            {
-                ((Doghouse) s).updateGameWorldObject(elapsedTimeMS);
-            }
-
-            if (s instanceof PyramidGroup)
-            {
-                Iterator k = ((PyramidGroup) s).getChildren();
-                while (k.hasNext())
-                {
-                    SceneNode n = (SceneNode) k.next();
-
-                    if (n.getWorldBound().contains(cameraOne.getLocation()) ||
-                            n.getWorldBound().contains(cameraTwo.getLocation()))
-                    {
-                        if (((MyPyramid) n).getRemoved() == true)
-                        {
-                            continue;
-                        } else
-                        {
-                            ((MyPyramid) n).setRemoved(true);
-                        }
-
-                        numCrashes++;
-                        //scorePOne++;
-                        //System.out.println(scorePOne);
-
-                        if (n.getWorldBound().contains(cameraOne.getLocation()))
-                        {
-                            scorePOne++;
-                            System.out.println("Player 1: " + scorePOne);
-                            player1ID.setText("Player 1: " + scorePOne);
-                        } else if (n.getWorldBound().contains(cameraTwo.getLocation()))
-                        {
-                            scorePTwo++;
-                            System.out.println("Player 2: " + scorePTwo);
-                            player2ID.setText("Player 2: " + scorePTwo);
-                        }
-
-                        toRemove.add(n);
-
-                        //crash
-                        MoveToDoghouseEvent newMTDhE = new MoveToDoghouseEvent(n);
-                        eventManager.triggerEvent(newMTDhE);
-                    }
-                }
-            }
-        }
-
-        for (int x = 0; x < toRemove.size(); x++)
-        {
-            // removeGameWorldObject(toRemove.get(x));
-        }
-
-        toRemove.clear();
 
         //scoreString.setText("Score = " + score);
         time += elapsedTimeMS;
