@@ -1,1 +1,7 @@
-# DungeonCrawler
+DungeonCrawler
+==============
+
+Running the game
+----------------
+
+...
