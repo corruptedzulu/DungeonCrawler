@@ -1,4 +1,4 @@
-package World;
+package World.WorldObjects;
 
 public class WorldObject 
 {

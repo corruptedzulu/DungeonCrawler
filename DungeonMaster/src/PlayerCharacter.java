@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Random;
+
+import Race.Race;
 
 public class PlayerCharacter extends WorldEntity
 {
@@ -12,6 +15,10 @@ public class PlayerCharacter extends WorldEntity
 	private int level;
 	private boolean inspiration;
 	private ArmorClass armorClass;
+	private int initiativeModifier;
+	
+	private int deathSaveFailures;
+	private int deathSaveSuccesses;
 	
 	
 	private ArrayList<SavingThrow> savingThrows;
@@ -26,6 +33,71 @@ public class PlayerCharacter extends WorldEntity
 	
 	private ArrayList<Spell> spells;
 
+	
+	public PlayerCharacter()
+	{
+		rand = new Random();
+	}
+	
+	
+	public void takeTurn()
+	{
+	
+	}
+	
+	
+	public void attacked()
+	{
+		
+	}
+	
+	public void attack()
+	{
+	
+	}
+	
+	public void attackOfOpportunity()
+	{
+		
+	}
+	
+	public void move()
+	{
+		
+	}
+	
+	public void dash()
+	{
+		
+	}
+	
+	public void useSkill()
+	{
+		
+	}
+	
+	public void makeSave()
+	{
+		
+	}
+	
+	public void takeDamage()
+	{
+		
+	}
+	
+	public void saveVsDeath()
+	{
+		
+	}
+	
+	public int rollInitiative()
+	{
+		int initiativeRoll = rand.nextInt(20) + 1;
+		initiativeRoll += this.initiativeModifier;
+		return initiativeRoll;
+	}
+	
 
 	public String getName() 
 	{
