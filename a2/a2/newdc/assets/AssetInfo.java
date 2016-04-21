@@ -15,6 +15,8 @@ public class AssetInfo
     public HashMap<String, NPCEnemyAsset> npcEnemies;
     public HashMap<String, ObjectInteractableAsset> objectInteractables;
     public HashMap<String, ObjectNonInteractableAsset> objectNonInteractables;
+    public HashMap<String, SkyboxAsset> skyBoxes;
+
 
     public AssetInfo(String path)
     {
@@ -85,21 +87,36 @@ public class AssetInfo
             if (!objectNonInteractables.containsKey(nonInteractable.getName()))
                 objectNonInteractables.put(nonInteractable.getName(), nonInteractable);
         }
+
+        skyBoxes = new HashMap<>();
+        for (String asset : GetNamesOfAssets(Asset.FamilyType.SkyBox))
+        {
+            SkyboxAsset skyBox = new SkyboxAsset(asset.split(reg));
+            if (!skyBoxes.containsKey(skyBox.getName()))
+                skyBoxes.put(skyBox.getName(), skyBox);
+        }
     }
 
     private ArrayList<String> GetNamesOfAssets(Asset.FamilyType familyType)
     {
         ArrayList<String> namesList = new ArrayList<>();
-        System.out.println(assetsPath + familyType + "s\\");
+        if (familyType == Asset.FamilyType.SkyBox)
+        {
+            File dir = new File(assetsPath + familyType + "es\\");
+            if (!dir.isDirectory())
+                dir.mkdir();
+
+            for (File file : dir.listFiles())
+                if (file.isDirectory())
+                    namesList.add(file.getPath());
+            return namesList;
+        }
 
         File dir = new File(assetsPath + familyType + "s\\");
-        if (!dir.isDirectory())
-            dir.mkdir();
         for (File file : dir.listFiles())
         {
-            if (file.getName().endsWith(".mesh.xml"))
+            if (file.getName().endsWith(".obj"))
             {
-                //System.out.println(file.getPath());
                 namesList.add(file.getPath());
             }
         }

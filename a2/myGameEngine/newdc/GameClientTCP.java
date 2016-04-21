@@ -159,7 +159,7 @@ public class GameClientTCP extends GameConnectionClient
 	 
 	public void sendJoinMessage() 
 	{
-		// format: join, localId 
+		System.out.println("A player has joined");
 		try 
 		{ 
 			sendPacket(new String("join," + id.toString()));

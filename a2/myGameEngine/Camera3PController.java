@@ -126,13 +126,13 @@ public class Camera3PController
 			 
 			 cameraDistanceFromTarget += zoomAmount * value ;
 			 
-			 if(cameraDistanceFromTarget < 2)
+			 if(cameraDistanceFromTarget < .1f)
 			 {
-				 cameraDistanceFromTarget = 2;
+				 cameraDistanceFromTarget = .1f;
 			 }
-			 if(cameraDistanceFromTarget > 10)
+			 if(cameraDistanceFromTarget > 200)
 			 {
-				 cameraDistanceFromTarget = 10;
+				 cameraDistanceFromTarget = 200;
 			 }
 		 }
 	 }
