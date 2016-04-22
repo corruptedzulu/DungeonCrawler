@@ -39,7 +39,8 @@ public class GameServerTCP extends GameConnectionServer<UUID>
 	{ 
 		String message = (String) o; 
 		String[] msgTokens = message.split(","); 
-	 
+
+		System.out.println(message);
 		if(msgTokens.length > 0) 
 		{ 
 			if(msgTokens[0].compareTo("bye") == 0) // receive �gbye�h 

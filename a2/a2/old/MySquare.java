@@ -1,5 +1,5 @@
 
-package a2;
+package a2.old;
 
 import sage.event.IEventListener;
 import sage.event.IGameEvent;

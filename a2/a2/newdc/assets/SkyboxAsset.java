@@ -1,14 +1,14 @@
 package a2.newdc.assets;
 
-public class PlayableAsset extends Asset
+public class SkyboxAsset extends Asset
 {
-    public PlayableAsset(String[] s)
+
+    public SkyboxAsset(String[] s)
     {
-        super.setFileName(String.join("_",s));
+        super.setFileName(String.join("_",s) +"\\");
         super.setName(s[1]);
         super.setVersion(Integer.parseInt(s[2]));
     }
-
     public String toString()
     {
         return "Name: " + getName() + " Version: " + getVersion();
