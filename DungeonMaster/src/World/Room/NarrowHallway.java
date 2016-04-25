@@ -2,7 +2,6 @@ package World.Room;
 
 public class NarrowHallway extends Hallway 
 {
-
 	public NarrowHallway()
 	{
 		super();

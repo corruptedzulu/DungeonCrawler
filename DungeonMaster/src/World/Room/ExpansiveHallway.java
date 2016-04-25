@@ -2,7 +2,6 @@ package World.Room;
 
 public class ExpansiveHallway extends Hallway 
 {
-
 	public ExpansiveHallway()
 	{
 		super();

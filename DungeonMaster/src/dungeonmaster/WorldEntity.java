@@ -1,3 +1,4 @@
+package dungeonmaster;
 import java.util.Random;
 
 public abstract class WorldEntity 

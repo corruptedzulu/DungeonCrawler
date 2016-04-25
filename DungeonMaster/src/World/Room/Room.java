@@ -4,17 +4,25 @@ import java.util.ArrayList;
 
 import World.Floor;
 import World.WorldObjects.Door;
-import World.WorldObjects.WorldObject; 
+import World.WorldObjects.WorldObject;
+import dungeonmaster.WorldEntity; 
+
 
 public class Room 
 {
 	
+	protected BoundingBox bb;
 	protected String roomName;
 	
 	protected String roomType;
 	
 	protected int widthSquares;
 	protected int lengthSquares;
+	
+	protected int minWidthSquares;
+	protected int maxWidthSquares;
+	protected int minLengthSquares;
+	protected int maxLengthSquares;
 	
 	
 	//the (x,y) coordinates of the square with the smallest x and y values (aka, lower left corner)
@@ -24,6 +32,7 @@ public class Room
 	protected int yWorldCoor;
 	
 	protected ArrayList<WorldObject> contents;
+	protected ArrayList<WorldEntity> entites;
 	
 	protected ArrayList<Door> doors;
 	
@@ -34,6 +43,15 @@ public class Room
 	
 	
 	public Room()
+	{
+		//room is constructed by whatever is creating an instance of it. no self-constructing
+		contents = new ArrayList<WorldObject>();
+		entites = new ArrayList<WorldEntity>();
+		doors = new ArrayList<Door>();
+		
+	}
+	
+	public Room(String scriptedConstruction)
 	{
 		
 	}

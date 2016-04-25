@@ -130,6 +130,12 @@ public class GameWorld
 		//create rooms, put in random, non-overlapping locations
 		//rooms have random (constrained) sizes
 		//type is random, though there are constraints for number of a type in the world
+			//create room
+			//place room
+			//check if overlap
+			//move to new location and try to place
+			//check if overlap
+			//repeat until no overlap (if more than 15 (?) tries, delete the room)
 		
 		
 		//populate rooms if needed

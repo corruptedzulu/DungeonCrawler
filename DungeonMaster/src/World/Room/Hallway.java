@@ -8,7 +8,6 @@ import World.WorldObjects.WorldObject;
 
 public class Hallway extends Room 
 {
-	
 	public Hallway()
 	{
 		super();

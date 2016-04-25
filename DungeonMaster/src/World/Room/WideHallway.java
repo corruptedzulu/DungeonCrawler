@@ -2,7 +2,7 @@ package World.Room;
 
 public class WideHallway extends Hallway 
 {
-
+	//Hallways have no number limits and are created to connect
 	public WideHallway()
 	{
 		super();
