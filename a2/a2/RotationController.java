@@ -2,6 +2,7 @@ package a2;
 
 import java.util.Iterator;
 
+import a2.old.PyramidGroup;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Vector3D;
 import sage.scene.Controller;

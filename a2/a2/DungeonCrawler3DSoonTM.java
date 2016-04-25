@@ -2,28 +2,11 @@ package a2;
 
 import a2.newdc.GhostAvatar;
 import a2.newdc.assets.AssetInfo;
-import a2.newdc.assets.PlayableAsset;
+import a2.newdc.assets.ObjectNonInteractableAsset;
 import a2.newdc.assets.TileAsset;
-import graphicslib3D.Quaternion;
-import sage.app.BaseGame;
 
-import sage.display.*;
-import sage.event.EventManager;
-import sage.event.IEventManager;
-import sage.scene.SceneNode;
-import sage.scene.SkyBox;
-import sage.scene.bounding.BoundingBox;
-import sage.scene.shape.*;
-import sage.scene.Group;
-import sage.scene.HUDString;
-
-import sage.input.*;
-import sage.input.action.*;
-import sage.renderer.IRenderer;
-import sage.camera.*;
-import graphicslib3D.Matrix3D;
-import graphicslib3D.Point3D;
-import graphicslib3D.Vector3D;
+import myGameEngine.newdc.GameClientTCP;
+import myGameEngine.newdc.GameServerTCP;
 import myGameEngine.Camera3PController;
 import myGameEngine.MoveBackAction;
 import myGameEngine.MoveForwardAction;
@@ -33,75 +16,73 @@ import myGameEngine.MoveUpAction;
 import myGameEngine.MyDisplaySystem;
 import myGameEngine.PitchDownAction;
 import myGameEngine.PitchUpAction;
-import myGameEngine.QuitGameAction;
 import myGameEngine.YawLeftAction;
 import myGameEngine.YawRightAction;
 
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Random;
-import java.text.DecimalFormat;
-
-import sage.scene.state.RenderState;
+import sage.app.BaseGame;
+import sage.display.*;
+import sage.event.EventManager;
+import sage.event.IEventManager;
+import sage.networking.IGameConnection;
+import sage.scene.SceneNode;
+import sage.scene.SkyBox;
+import sage.scene.shape.*;
+import sage.scene.Group;
+import sage.scene.HUDString;
+import sage.input.*;
+import sage.input.action.*;
+import sage.renderer.IRenderer;
+import sage.camera.*;
 import sage.scene.state.TextureState;
 import sage.terrain.TerrainBlock;
 import sage.terrain.AbstractHeightMap;
 import sage.terrain.HillHeightMap;
 import sage.texture.Texture;
 import sage.texture.TextureManager;
+import sage.scene.state.RenderState;
+
+import graphicslib3D.Matrix3D;
+import graphicslib3D.Point3D;
+import graphicslib3D.Vector3D;
+import graphicslib3D.Quaternion;
+
+import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.*;
+import java.text.DecimalFormat;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 {
-    private int scorePOne = 0;
-    private int scorePTwo = 0;
     private float time;
     private HUDString player1ID;
-
     private HUDString timeStringPOne;
-
-    private int numCrashes = 0;
-    private int numStandardShapes = 10;
     private Random random;
-
-    private MyPyramid avatarOne;
-
-    private PyramidGroup pyramids;
-    private RotationController rotational;
-
-
+    private SceneNode avatarOne;
     private String kbName, gpName;
 
-    private int maxXDistanceAbsolute = 10;
-    private int maxYDistanceAbsolute = 10;
-    private int maxZDistanceAbsolute = 10;
-
-    // ### Zag
-    private AssetInfo assetInfo;
-    // ### Zag
-
-    // ### TJ
     private SkyBox skyBox;
     private TerrainBlock theTerrain;
     private Group background;
 
-    // use File.separator later
-    private String zagDrivePath = "C:\\Users\\Zagak\\Google Drive\\CSC165\\DungeonCrawler\\assets\\";
+    private AssetInfo assetInfo;
+    private String zagDrivePath = "C:\\Users\\Zagaki\\Google Drive\\CSC165\\DungeonCrawler\\assets\\";
     private String zuluDrivePath = "your path here";
     private String tjDrivePath = "your path here";
     private String googleDrivePath = zagDrivePath;
 
     // http://www.farmpeeps.com/fp_skyboxes.html
-    private String terrainTexture = googleDrivePath + "Skyboxs\\0\\down.jpg";
-    private String skyboxDown = googleDrivePath + "Skyboxs\\0\\down.jpg";
-    private String skyboxEast = googleDrivePath + "Skyboxs\\0\\east.jpg";
-    private String skyboxNorth = googleDrivePath + "Skyboxs\\0\\north.jpg";
-    private String skyboxSouth = googleDrivePath + "Skyboxs\\0\\south.jpg";
-    private String skyboxWest = googleDrivePath + "Skyboxs\\0\\west.jpg";
-    private String skyboxUp = googleDrivePath + "Skyboxs\\0\\up.jpg";
+    private String terrainTexture = googleDrivePath + "SkyBoxes\\_countrypaths_1\\down.jpg";
     // TODO move skybox into assetInfo
 
     private boolean connected;
-    // ### TJ
 
     //private IDisplaySystem display;
     private IDisplaySystem display;
@@ -112,12 +93,34 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private Camera3PController camOne;
 
+    private GameServerTCP hostedServer;
+    private GameClientTCP client;
+
+
+    public DungeonCrawler3DSoonTM()
+    {
+        super();
+        hostedServer = null;
+    }
+
+    public DungeonCrawler3DSoonTM(InetAddress address, int port) throws IOException
+    {
+        super();
+        client = new GameClientTCP(address, port, IGameConnection.ProtocolType.TCP, this);
+
+    }
+
+    public DungeonCrawler3DSoonTM(InetAddress address, int port, GameServerTCP server) throws IOException
+    {
+        super();
+        hostedServer = server;
+        client = new GameClientTCP(address, port, IGameConnection.ProtocolType.TCP, this);
+        client.sendJoinMessage();
+    }
+
     protected void initGame()
     {
-        //test f = new test();
-        //f.listControllers();
 
-        //display = getDisplaySystem();
         display.setTitle("Dog Catcher!");
 
         renderer = display.getRenderer();
@@ -127,23 +130,25 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         createPlayers();
         createPlayerHUDs();
         initEnvironment();
+        //initScriptEngines();
         initGameObjects();
         associateDefaultKeyAndControllerBindings();
 
         camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
+        client.sendJoinMessage(); //$$
 
         super.update((float) 0.0);
     }
 
     protected void initSystem()
     {
-        //call a local method to create a DisplaySystem object
         display = createDisplaySystem();
         setDisplaySystem(display);
-        //create an Input Manager
+
+
         im = new InputManager();
         setInputManager(im);
-        //create an (empty) gameworld
+
         ArrayList<SceneNode> gameWorld = new ArrayList<>();
         setGameWorld(gameWorld);
         //super.initSystem();
@@ -151,7 +156,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private IDisplaySystem createDisplaySystem()
     {
-        IDisplaySystem display = new MyDisplaySystem(1280, 720, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
+        IDisplaySystem display = new MyDisplaySystem(1280, 720, 24, 20, true, "sage.renderer.jogl.JOGLRenderer");
         System.out.print("\nWaiting for display creation...");
         int count = 0;
         // wait until display creation completes or a timeout occurs
@@ -185,24 +190,61 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private void createPlayers()
     {
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+
+        SceneNode cleric = assetInfo.playables.get("cleric")
+                .make(new Point3D(0, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
+        addGameWorldObject(cleric);
         SceneNode wizard = assetInfo.playables.get("wizard")
-                .make(new Point3D(0, .3, 0), new Point3D(.01, .01, .01), new Quaternion(1, new double[]{0, 0, 0}));
+                .make(new Point3D(2, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
         addGameWorldObject(wizard);
+        SceneNode rogue = assetInfo.playables.get("rogue")
+                .make(new Point3D(4, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
+        addGameWorldObject(rogue);
+        SceneNode fighter = assetInfo.playables.get("fighter")
+                .make(new Point3D(6, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
+        addGameWorldObject(fighter);
 
-        TileAsset tile =assetInfo.tiles.get("Tile");
-        addGameWorldObject(tile.make(new Point3D(0,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        addGameWorldObject(tile.make(new Point3D(0,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        addGameWorldObject(tile.make(new Point3D(0,0,4),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        addGameWorldObject(tile.make(new Point3D(0,0,6),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        addGameWorldObject(tile.make(new Point3D(2,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        addGameWorldObject(tile.make(new Point3D(4,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        addGameWorldObject(tile.make(new Point3D(6,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        addGameWorldObject(tile.make(new Point3D(6,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        ObjectNonInteractableAsset barrel = assetInfo.objectNonInteractables.get("barrel");
+        addGameWorldObject(barrel.make(new Point3D(0, 0, 1.5), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
 
-        avatarOne = new MyPyramid("PLAYER1");
-        avatarOne.translate(0, 1, 50);
-        avatarOne.rotate(180, new Vector3D(0, 1, 0));
-        addGameWorldObject(avatarOne);
+        TileAsset tile = assetInfo.tiles.get("tile");
+        tile.setRandomTexture(true);
+
+        for (int i = 0; i < 64; i+=1)
+            for (int j =0; j < 64; j+=1)
+                addGameWorldObject(barrel.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+                //addGameWorldObject(tile.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+
+        //addGameWorldObject(tile.make(new Point3D(0, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        //addGameWorldObject(tile.make(new Point3D(0, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        //addGameWorldObject(tile.make(new Point3D(0, 0, 4), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        //addGameWorldObject(tile.make(new Point3D(0, 0, 6), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        //addGameWorldObject(tile.make(new Point3D(2, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        //addGameWorldObject(tile.make(new Point3D(4, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        //addGameWorldObject(tile.make(new Point3D(6, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        //addGameWorldObject(tile.make(new Point3D(6, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+//
+        //addGameWorldObject(tile.make(new Point3D(10,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(10,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(10,0,4),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(10,0,6),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(12,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(14,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(16,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(16,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+//
+        //addGameWorldObject(tile.make(new Point3D(10,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(10,0,12),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(10,0,14),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(10,0,16),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(12,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(14,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(16,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+        //addGameWorldObject(tile.make(new Point3D(16,0,12),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
+
+
+        avatarOne = cleric;
         cameraOne = new JOGLCamera(renderer);
         cameraOne.setPerspectiveFrustum(60, 2, 1, 1000);
         cameraOne.setViewport(0.0, 1.0, 0.0, 1);
@@ -227,95 +269,48 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private void initEnvironment()
     {
         eventManager = EventManager.getInstance();
-        //display.addMouseListener(this);
         random = new Random();
     }
 
     private void initGameObjects()
     {
-        // ### TJ skybox
-        skyBox = new SkyBox("skybox", 200, 200, 200);
-        skyBox.setTexture(SkyBox.Face.Up,  TextureManager.loadTexture2D(skyboxUp));
-        skyBox.setTexture(SkyBox.Face.Down, TextureManager.loadTexture2D(skyboxDown));
-        skyBox.setTexture(SkyBox.Face.North, TextureManager.loadTexture2D(skyboxNorth));
-        skyBox.setTexture(SkyBox.Face.South, TextureManager.loadTexture2D(skyboxSouth));
-        skyBox.setTexture(SkyBox.Face.East, TextureManager.loadTexture2D(skyboxEast));
-        skyBox.setTexture(SkyBox.Face.West, TextureManager.loadTexture2D(skyboxWest));
-        skyBox.setZBufferStateEnabled(false);
+        skyBox = assetInfo.skyBoxes.get("countrypaths").make(200, 200, 200, false);
         addGameWorldObject(skyBox);
 
         theTerrain = initTerrain();
         theTerrain.scale(2, 1, 2);
         background = new Group();
         background.addChild(theTerrain);
-
         addGameWorldObject(background);
-        /// ### TJ end skybox
-
-        Dog dg1 = new Dog();
-        Matrix3D dg1M = dg1.getLocalTranslation();
-        dg1M.translate(10, 0, 10);
-        dg1.setLocalTranslation(dg1M);
-        Point3D center = new Point3D(0, -0.5, 0.5);
-        BoundingBox bb = new BoundingBox(center, (float) 4.0, (float) 7.25, (float) 9.0);
-        dg1.setLocalBound(bb);
-
-        Matrix3D scale = dg1.getLocalScale();
-        int rand = random.nextInt(5);
-        rand += 3;
-        double scaleFactor = (double) rand / 10;
-        //double scaleFactor = (random.nextInt(5) + 1) / 10;
-        scale.scale(scaleFactor, scaleFactor, scaleFactor);
-        //dg1.setLocalScale(scale);
-        //dg1.setShowBound(true);
-
-        addGameWorldObject(dg1);
-        dg1.updateWorldBound();
-
         initWorldAxes();
     }
 
-    // ### TJ terrain
+
     private static TerrainBlock createTerBlock(AbstractHeightMap heightMap)
     {
         float heightScale = 0.05f;
         Vector3D terrainScale = new Vector3D(1, heightScale, 1);
-
-        // use the size of the height map as the size of the terrain
         int terrainSize = heightMap.getSize();
-
-        // specify terrain origin so heightmap (0,0) is at world origin
         float cornerHeight = heightMap.getTrueHeightAtPoint(0, 0) * heightScale;
-        Point3D terrainOrigin = new Point3D(-64.5, -cornerHeight-2, -64.5);
-
-        // create a terrain block using the height map
+        Point3D terrainOrigin = new Point3D(-64.5, -cornerHeight - 2, -64.5);
         String name = "Terrain:" + heightMap.getClass().getSimpleName();
-
         return new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
     }
 
     private TerrainBlock initTerrain()
     {
-        // create height map and terrain block
         HillHeightMap myHillHeightMap = new HillHeightMap(129, 2000, 5.0f, 20.0f, (byte) 2, 12345);
         myHillHeightMap.setHeightScale(0.1f);
         TerrainBlock hillTerrain = createTerBlock(myHillHeightMap);
-
-        // create texture and texture state to color the terrain
         Texture groundTexture = TextureManager.loadTexture2D(terrainTexture);
         groundTexture.setApplyMode(sage.texture.Texture.ApplyMode.Replace);
-
-        TextureState groundState = (TextureState) display.getRenderer().createRenderState(RenderState.RenderStateType.Texture);
+        TextureState groundState = (TextureState) display.getRenderer().createRenderState(
+                RenderState.RenderStateType.Texture);
         groundState.setTexture(groundTexture, 0);
         groundState.setEnabled(true);
-
-        // apply the texture to the terrain
         hillTerrain.setRenderState(groundState);
         return hillTerrain;
     }
-    // ### TJ end terrain
-
-
 
     private void initWorldAxes()
     {
@@ -336,22 +331,30 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         im = getInputManager();
         gpName = im.getFirstGamepadName();
 
-        //Controller c = new Controller();
         if (gpName == null && im.getControllers().size() > 2)
         {
             gpName = im.getControllers().get(2).getName();
             //gpName = im.getGamepadController(2).getName();
         }
-
         kbName = im.getKeyboardName();
-
         initPlayerOneControls();
     }
 
 
     private void initPlayerOneControls()
     {
-        QuitGameAction quitActionPOne = new QuitGameAction(this);
+        IAction quitActionPOne = (v, event) -> {
+            if (hostedServer != null)
+                try
+                {
+                    hostedServer.shutdown();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            setGameOver(true);
+        };
 
         MoveForwardAction mvFwdActionPOne = new MoveForwardAction(cameraOne, (float) 0.1);
         MoveLeftAction mvLeftActionPOne = new MoveLeftAction(cameraOne, (float) 0.1);
@@ -377,7 +380,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         yawRightActionPOne.setAvatar(avatarOne);
 
         //TODO: Switch all of the actions over to the correct objects
-
 
         //QUIT
         im.associateAction(kbName,
@@ -517,40 +519,37 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                            IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
 
-        //		//ZOOM IN
-        //		im.associateAction(kbName,
-        //				net.java.games.input.Component.Identifier.Key.Z,
-        //				rollLeftActionPOne,
-        //				IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        //		im.associateAction(kbName,
-        //				net.java.games.input.Component.Identifier.Key.Z,
-        //				rollLeftActionPOne,
-        //				IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-        //
-        //
-        //		//ZOOM OUT
-        //		im.associateAction(kbName,
-        //				net.java.games.input.Component.Identifier.Key.C,
-        //				rollLeftActionPOne,
-        //				IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        //		im.associateAction(kbName,
-        //				net.java.games.input.Component.Identifier.Key.C,
-        //				rollLeftActionPOne,
-        //				IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        //ZOOM IN
+        im.associateAction(kbName,
+                           net.java.games.input.Component.Identifier.Key.Z,
+                           rollLeftActionPOne,
+                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+        im.associateAction(kbName,
+                           net.java.games.input.Component.Identifier.Key.Z,
+                           rollLeftActionPOne,
+                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+
+
+        //ZOOM OUT
+        im.associateAction(kbName,
+                           net.java.games.input.Component.Identifier.Key.C,
+                           rollLeftActionPOne,
+                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+        im.associateAction(kbName,
+                           net.java.games.input.Component.Identifier.Key.C,
+                           rollLeftActionPOne,
+                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
     }
-
-
 
     private void updateSkybox()
     {
         Point3D camLoc1 = cameraOne.getLocation();
         Matrix3D camTrans = new Matrix3D();
-        camTrans.translate(camLoc1.getX(),camLoc1.getY(),camLoc1.getZ());
+        camTrans.translate(camLoc1.getX(), camLoc1.getY(), camLoc1.getZ());
         skyBox.setLocalTranslation(camTrans);
         // not 2
     }
-
 
     public void update(float elapsedTimeMS)
     {
@@ -602,4 +601,42 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         // TODO
     }
     // ### TJ
+
+    public void initScriptEngines()
+    {
+        ScriptEngineManager factory = new ScriptEngineManager();
+        String scriptFileName = googleDrivePath + "testscript1.js";
+
+        java.util.List<ScriptEngineFactory> list = factory.getEngineFactories();
+
+        ScriptEngine jsEngine = factory.getEngineByName("js");
+
+        this.executeScript(jsEngine, scriptFileName);
+    }
+
+    private void executeScript(ScriptEngine engine, String scriptFileName)
+    {
+        try
+        {
+            FileReader fileReader = new FileReader(scriptFileName);
+            engine.eval(fileReader); //execute the script statements in the file
+            fileReader.close();
+        }
+        catch (FileNotFoundException e1)
+        {
+            System.out.println(scriptFileName + " not found " + e1);
+        }
+        catch (IOException e2)
+        {
+            System.out.println("IO problem with " + scriptFileName + e2);
+        }
+        catch (ScriptException e3)
+        {
+            System.out.println("ScriptException in " + scriptFileName + e3);
+        }
+        catch (NullPointerException e4)
+        {
+            System.out.println("Null ptr exception in " + scriptFileName + e4);
+        }
+    }
 }

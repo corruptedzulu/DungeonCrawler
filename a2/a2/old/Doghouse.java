@@ -1,5 +1,5 @@
 
-package a2;
+package a2.old;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -7,6 +7,7 @@ import java.nio.IntBuffer;
 //import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import a2.MoveToDoghouseEvent;
 import sage.event.IEventListener;
 import sage.event.IGameEvent;
 import sage.scene.SceneNode;
