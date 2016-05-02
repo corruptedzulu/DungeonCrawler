@@ -18,6 +18,13 @@ public class PlayerCharacter extends WorldEntity
 	private ArmorClass armorClass;
 	private int initiativeModifier;
 	
+	
+	private int maxHP;
+	private int currentHP;
+	private int maxHitDice;
+	private int currentHitDice;
+	private int hitDiceFaceValue;
+	
 	private int deathSaveFailures;
 	private int deathSaveSuccesses;
 	

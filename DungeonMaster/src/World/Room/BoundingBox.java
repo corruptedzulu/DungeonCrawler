@@ -1,5 +1,8 @@
 package World.Room;
 
+
+
+//BOUNDING BOX IN DEFINED IN THE WORLD COORDINATES
 public class BoundingBox 
 {
 

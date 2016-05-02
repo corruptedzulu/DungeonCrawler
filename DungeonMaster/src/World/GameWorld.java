@@ -3,7 +3,7 @@ package World;
 import java.util.ArrayList;
 import java.util.Random;
 
-import World.Room.Room;
+import World.Room.*;
 import World.WorldObjects.Door;
 import World.WorldObjects.WorldObject;
 
@@ -53,7 +53,7 @@ public class GameWorld
 	private void fillArrays()
 	{
 		roomTypes = new ArrayList<String>();
-		roomTypes.add("Hallway");
+		//roomTypes.add("Hallway");
 		roomTypes.add("Barracks");
 		roomTypes.add("Quarters");
 		roomTypes.add("StorageCold");
@@ -63,13 +63,13 @@ public class GameWorld
 		roomTypes.add("Chapel");
 		roomTypes.add("Temple");
 		roomTypes.add("Armory");
-		roomTypes.add("Entrance");
+		//roomTypes.add("Entrance");
 		roomTypes.add("GrandHall");
 		roomTypes.add("Open");
-		roomTypes.add("NarrowHallway");
-		roomTypes.add("StandardHallway");
-		roomTypes.add("WideHallway");
-		roomTypes.add("ExpansiveHallway");
+		//roomTypes.add("NarrowHallway");
+		//roomTypes.add("StandardHallway");
+		//roomTypes.add("WideHallway");
+		//roomTypes.add("ExpansiveHallway");
 	}
 	
 	
@@ -98,12 +98,140 @@ public class GameWorld
 		//private boolean dungeonEntrance;
 		
 		
-		room.setLengthSquares(rand.nextInt(this.roomMaxDimension) + 2);
-		room.setWidthSquares(rand.nextInt(this.roomMaxDimension) + 2);
+		//room.setLengthSquares(rand.nextInt(this.roomMaxDimension) + 2);
+		//room.setWidthSquares(rand.nextInt(this.roomMaxDimension) + 2);
 		
+		
+		
+		//return room;
+		
+		Random r = new Random();
+		
+		int roomNumber = r.nextInt(roomTypes.size());
+		
+		
+		/*
+			//roomTypes.add("Hallway");
+		roomTypes.add("Barracks");
+		roomTypes.add("Quarters");
+		roomTypes.add("StorageCold");
+		roomTypes.add("StorageAmbient");
+		roomTypes.add("MessHall");
+		roomTypes.add("DiningHall");
+		roomTypes.add("Chapel");
+		roomTypes.add("Temple");
+		roomTypes.add("Armory");
+			//roomTypes.add("Entrance");
+		roomTypes.add("GrandHall");
+		roomTypes.add("Open");
+			//roomTypes.add("NarrowHallway");
+			//roomTypes.add("StandardHallway");
+			//roomTypes.add("WideHallway");
+			//roomTypes.add("ExpansiveHallway"); 
+		 */
+		
+		switch(roomNumber)
+		{
+		case 0:
+			
+			room = Barracks.create();
+			
+			
+			room.defineRoomSize();
+			
+			room.placeDoors();
+			
+			room.populateWithContents();
+			
+			room.populateWithEnemies();
+			
+			room.populateWithTreasures();
+			
+			
+			
+			
+			
+			
+			//return room;
+			
+			
+			break;
+			
+		case 1:
+			
+			break;
+			
+		case 2:
+			
+			break;
+			
+		case 3:
+			
+			break;
+			
+		case 4:
+			
+			break;
+			
+		case 5:
+			
+			break;
+			
+		case 6:
+			
+			break;
+			
+		case 7:
+			
+			break;
+			
+		case 8:
+			
+			break;
+			
+		case 9:
+			
+			break;
+			
+		case 10:
+			
+			break;
+			
+		case 11:
+			
+			break;
+			
+		case 12:
+			
+			break;
+			
+		case 13:
+			
+			break;
+			
+		case 14:
+			
+			break;
+			
+		case 15:
+			
+			break;
+			
+		case 16:
+			
+			break;
+			
+		case 17:
+			
+			break;
+		}
+		
+		
+		//Quarters q = Quarters.create();
 		
 		
 		return room;
+		
 	}
 	
 	

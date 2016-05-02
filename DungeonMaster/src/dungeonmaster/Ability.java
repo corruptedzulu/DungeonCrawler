@@ -1,5 +1,6 @@
 package dungeonmaster;
 
-public class Ability {
+public class Ability 
+{
 
 }

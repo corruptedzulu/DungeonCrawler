@@ -7,6 +7,12 @@ public class Spell
 	private String associatedClass;
 	private String school;
 	
+	private int level;
+	private boolean requiresSave;
+	private SavingThrow saveType;
+	private int numberDamageDice;
+	private int damageDiceFaceValue;
+	
 	
 	
 }

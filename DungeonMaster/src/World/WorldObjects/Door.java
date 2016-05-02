@@ -18,16 +18,49 @@ public class Door
 	private int xRoomTwoCoor;
 	private int yRoomTwoCoor;
 	
+	private int roomOneFace; //N=1, S=2, E=3, W=4
+	private int roomTwoFace;
 	
 	
 	
 	public Door()
 	{
-		xRoomOneCoor = -1;
-		yRoomOneCoor = -1;
+		setxRoomOneCoor(-1);
+		setyRoomOneCoor(-1);
 		
-		xRoomTwoCoor = -1;
-		yRoomTwoCoor = -1;
+		setxRoomTwoCoor(-1);
+		setyRoomTwoCoor(-1);
+	}
+	
+	private void updateDoorFaces()
+	{
+		
+		if(xRoomOneCoor == 0)
+		{
+			roomOneFace = 4;//west
+			roomTwoFace = 3;//east
+		}
+		
+		if(yRoomOneCoor == 0)
+		{
+			roomOneFace = 2;//south
+			roomTwoFace = 1;//north
+		}
+		
+		if(xRoomOneCoor > 0)
+		{
+			roomOneFace = 3;//east
+			roomTwoFace = 4;//west
+		}
+		
+		if(yRoomOneCoor > 0)
+		{
+			roomOneFace = 1;//north
+			roomTwoFace = 2;//south
+		}
+		
+		
+		
 	}
 	
 	
@@ -50,6 +83,50 @@ public class Door
 	public int getDoorWidth()
 	{
 		return width;
+	}
+
+
+	public int getxRoomOneCoor() {
+		return xRoomOneCoor;
+	}
+
+
+	public void setxRoomOneCoor(int xRoomOneCoor) {
+		this.xRoomOneCoor = xRoomOneCoor;
+		updateDoorFaces();
+	}
+
+
+	public int getyRoomOneCoor() {
+		return yRoomOneCoor;
+	}
+
+
+	public void setyRoomOneCoor(int yRoomOneCoor) {
+		this.yRoomOneCoor = yRoomOneCoor;
+		updateDoorFaces();
+	}
+
+
+	public int getxRoomTwoCoor() {
+		return xRoomTwoCoor;
+	}
+
+
+	public void setxRoomTwoCoor(int xRoomTwoCoor) {
+		this.xRoomTwoCoor = xRoomTwoCoor;
+		updateDoorFaces();
+	}
+
+
+	public int getyRoomTwoCoor() {
+		return yRoomTwoCoor;
+	}
+
+
+	public void setyRoomTwoCoor(int yRoomTwoCoor) {
+		this.yRoomTwoCoor = yRoomTwoCoor;
+		updateDoorFaces();
 	}
 	
 	

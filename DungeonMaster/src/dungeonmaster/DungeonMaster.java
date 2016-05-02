@@ -3,9 +3,9 @@ import World.*;
 
 import java.util.ArrayList;
 
-import Interfaces.IDungeonMasterInput;
-import Interfaces.IDungeonMasterOutput;
+import Interfaces.*;
 import Race.*;
+import Networking.*;
 
 public class DungeonMaster 
 {
@@ -33,6 +33,15 @@ public class DungeonMaster
 	
 	public void start()
 	{
+		//wait for all four players to connect
+		//transmit initial state to each one
+		while(server.getClientsConnected() < 4)
+		{
+			server.listen();
+		}
+		
+		
+		
 		//establish initiative order
 		
 	}
