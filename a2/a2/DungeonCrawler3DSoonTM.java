@@ -1,6 +1,7 @@
 package a2;
 
 import a2.newdc.GhostAvatar;
+import a2.newdc.ParticleSystemEngine;
 import a2.newdc.assets.AssetInfo;
 import a2.newdc.assets.ObjectNonInteractableAsset;
 import a2.newdc.assets.TileAsset;
@@ -19,11 +20,15 @@ import myGameEngine.PitchUpAction;
 import myGameEngine.YawLeftAction;
 import myGameEngine.YawRightAction;
 
+import net.java.games.input.*;
+import net.java.games.input.Event;
 import sage.app.BaseGame;
 import sage.display.*;
 import sage.event.EventManager;
 import sage.event.IEventManager;
 import sage.networking.IGameConnection;
+import sage.physics.IPhysicsEngine;
+import sage.physics.PhysicsEngineFactory;
 import sage.scene.SceneNode;
 import sage.scene.SkyBox;
 import sage.scene.shape.*;
@@ -67,6 +72,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private Random random;
     private SceneNode avatarOne;
     private String kbName, gpName;
+    private ArrayList<SceneNode> gameworld;
 
     private SkyBox skyBox;
     private TerrainBlock theTerrain;
@@ -95,7 +101,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private GameServerTCP hostedServer;
     private GameClientTCP client;
-
+    private ParticleSystemEngine particleSystemEngine;
+    private ParticleSystemEngine.ParticleSystem ps;
 
     public DungeonCrawler3DSoonTM()
     {
@@ -120,8 +127,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     protected void initGame()
     {
-
-        display.setTitle("Dog Catcher!");
+        display.setTitle("DungeonCrawler");
 
         renderer = display.getRenderer();
 
@@ -134,6 +140,17 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         initGameObjects();
         associateDefaultKeyAndControllerBindings();
 
+
+        random = new Random();
+        String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
+        IPhysicsEngine physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
+        physicsEngine.initSystem();
+        particleSystemEngine = new ParticleSystemEngine(assetInfo, physicsEngine,gameworld,random);
+
+
+        ps = particleSystemEngine.getSystem("Test",5,1,10000);
+        ps.start(new Point3D(0,50,0));
+
         camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
         client.sendJoinMessage(); //$$
 
@@ -145,18 +162,18 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         display = createDisplaySystem();
         setDisplaySystem(display);
 
-
         im = new InputManager();
         setInputManager(im);
 
-        ArrayList<SceneNode> gameWorld = new ArrayList<>();
-        setGameWorld(gameWorld);
+        gameworld = new ArrayList<SceneNode>();
+        setGameWorld(gameworld);
+
         //super.initSystem();
     }
 
     private IDisplaySystem createDisplaySystem()
     {
-        IDisplaySystem display = new MyDisplaySystem(1280, 720, 24, 20, true, "sage.renderer.jogl.JOGLRenderer");
+        IDisplaySystem display = new MyDisplaySystem(1280, 720, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
         System.out.print("\nWaiting for display creation...");
         int count = 0;
         // wait until display creation completes or a timeout occurs
@@ -211,38 +228,20 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         TileAsset tile = assetInfo.tiles.get("tile");
         tile.setRandomTexture(true);
 
-        for (int i = 0; i < 64; i+=1)
-            for (int j =0; j < 64; j+=1)
-                addGameWorldObject(barrel.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-                //addGameWorldObject(tile.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-
-        //addGameWorldObject(tile.make(new Point3D(0, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(0, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(0, 0, 4), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(0, 0, 6), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(2, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(4, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(6, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(6, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-//
-        //addGameWorldObject(tile.make(new Point3D(10,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,4),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,6),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(12,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(14,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(16,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(16,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-//
-        //addGameWorldObject(tile.make(new Point3D(10,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,12),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,14),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,16),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(12,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(14,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(16,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(16,0,12),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-
+        if (false) // throw errors
+        for (int i = 0; i < 40; i+=2)
+            for (int j =0; j < 40; j+=2)
+                if (true) // heap
+                    addGameWorldObject(tile.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+                else // GC space
+                    addGameWorldObject(barrel.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 4), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 6), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(2, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(4, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(6, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(6, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
 
         avatarOne = cleric;
         cameraOne = new JOGLCamera(renderer);
@@ -540,6 +539,19 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                            rollLeftActionPOne,
                            IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
+        im.associateAction(kbName,
+                           net.java.games.input.Component.Identifier.Key.P,
+                           new AbstractInputAction()
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   Vector3D v3 = avatarOne.getWorldTranslation().getCol(3);
+                                   Point3D pos = new Point3D(v3.getX(),v3.getY(),v3.getZ());
+                                   System.out.println(pos);
+                                   ps.start(pos);
+                               }
+                           },
+                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
     }
 
     private void updateSkybox()
@@ -559,6 +571,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         timeStringPOne.setText("Time = " + df.format(time / 1000));
 
         updateSkybox();
+        ps.update(elapsedTimeMS);
         camOne.update(elapsedTimeMS);
         super.update(elapsedTimeMS);
     }
