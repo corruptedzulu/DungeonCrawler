@@ -1,8 +1,18 @@
-package dungeonmaster;
+package PlayerCharacters;
 import java.util.ArrayList;
 import java.util.Random;
 
 import Race.Race;
+import dungeonmaster.Ability;
+import dungeonmaster.ArmorClass;
+import dungeonmaster.EntityClass;
+import dungeonmaster.Item;
+import dungeonmaster.SavingThrow;
+import dungeonmaster.Skill;
+import dungeonmaster.Spell;
+import dungeonmaster.Treasure;
+import dungeonmaster.Weapon;
+import dungeonmaster.WorldEntity;
 
 public class PlayerCharacter extends WorldEntity
 {
