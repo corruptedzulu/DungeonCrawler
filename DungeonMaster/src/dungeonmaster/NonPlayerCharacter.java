@@ -47,7 +47,14 @@ public class NonPlayerCharacter extends WorldEntity
 	
 	public void takeTurn()
 	{
+		//evaluate available actions
+		//move
+		//attack
+		//spell
 	
+		//take action
+		
+		
 	}
 	
 	

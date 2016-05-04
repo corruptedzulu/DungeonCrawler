@@ -38,6 +38,8 @@ public class PlayerCharacter extends WorldEntity
 	private int deathSaveFailures;
 	private int deathSaveSuccesses;
 	
+	private int visionDistanceSquares;
+	
 	
 	private ArrayList<SavingThrow> savingThrows;
 	private ArrayList<Skill> skills;
