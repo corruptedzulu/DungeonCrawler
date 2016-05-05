@@ -38,6 +38,8 @@ public class Room
 	//this means that they are counted in 5ft increments (squares)
 	//the lowest left corner square is defined as (0,0)
 	protected int xWorldCoor;
+
+
 	protected int yWorldCoor;
 	
 	protected ArrayList<WorldObject> contents;
@@ -200,6 +202,14 @@ public class Room
 	public void populateWithTreasures() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public ArrayList<WorldEntity> getEntities() {
+		return entities;
+	}
+
+	public void setEntities(ArrayList<WorldEntity> entities) {
+		this.entities = entities;
 	}
 	
 	

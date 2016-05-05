@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import Race.Race;
+import World.WorldObjects.Door;
 import dungeonmaster.Ability;
 import dungeonmaster.ArmorClass;
 import dungeonmaster.EntityClass;
@@ -17,48 +18,60 @@ import dungeonmaster.WorldEntity;
 public class PlayerCharacter extends WorldEntity
 {
 	
-	private String name;
-	private String playerName;
-	private Race playerRace;
-	private String alignment;
-	private EntityClass playerClass;
+	protected String name;
+	protected String playerName;
+	protected Race playerRace;
+	protected String alignment;
+	protected EntityClass playerClass;
 	
-	private int level;
-	private boolean inspiration;
-	private ArmorClass armorClass;
-	private int initiativeModifier;
-	
-	
-	private int maxHP;
-	private int currentHP;
-	private int maxHitDice;
-	private int currentHitDice;
-	private int hitDiceFaceValue;
-	
-	private int deathSaveFailures;
-	private int deathSaveSuccesses;
-	
-	private int visionDistanceSquares;
+	protected int level;
+	protected boolean inspiration;
+	protected ArmorClass armorClass;
+	protected int initiativeModifier;
 	
 	
-	private ArrayList<SavingThrow> savingThrows;
-	private ArrayList<Skill> skills;
-	private ArrayList<Ability> abilities;
+	protected int maxHP;
+	protected int currentHP;
+	protected int maxHitDice;
+	protected int currentHitDice;
+	protected int hitDiceFaceValue;
+	
+	protected int deathSaveFailures;
+	protected int deathSaveSuccesses;
+	
+	protected int movementInSquares;
+	protected int movementRemaining;
+	
+	protected int visionDistanceSquares;
 	
 	
-	private ArrayList<Treasure> treasures;
-	private ArrayList<Weapon> weapons;
-	private ArrayList<Item> inventory;
+	protected ArrayList<SavingThrow> savingThrows;
+	protected ArrayList<Skill> skills;
+	protected ArrayList<Ability> abilities;
 	
 	
-	private ArrayList<Spell> spells;
+	protected ArrayList<Treasure> treasures;
+	protected ArrayList<Weapon> weapons;
+	protected ArrayList<Item> inventory;
+	
+	
+	protected ArrayList<Spell> spells;
 
 	
 	public PlayerCharacter()
 	{
 		rand = new Random();
+		
+		this.resetTurnSpecificValues();
 	}
 	
+	
+	public void resetTurnSpecificValues()
+	{
+		
+		movementRemaining = movementInSquares;
+		
+	}
 	
 	public void takeTurn()
 	{
@@ -116,6 +129,17 @@ public class PlayerCharacter extends WorldEntity
 		int initiativeRoll = rand.nextInt(20) + 1;
 		initiativeRoll += this.initiativeModifier;
 		return initiativeRoll;
+	}
+	
+	
+	public void openDoor(Door door)
+	{
+		
+	}
+	
+	public void lootWorldEntity(WorldEntity entity)
+	{
+		
 	}
 	
 
@@ -251,6 +275,31 @@ public class PlayerCharacter extends WorldEntity
 	}
 
 
+	public void setMovementInSquares(int squares)
+	{
+		this.movementInSquares = squares;
+	}
+	
+	public int getMovementInSquares()
+	{
+		return this.movementInSquares;
+	}
+	
+	public int getMovementRemaining()
+	{
+		return this.movementRemaining;
+	}
+	
+	public boolean moveOneSquare()
+	{
+		if(movementRemaining > 0)
+		{
+			movementRemaining = movementRemaining - 1;
+			return true;
+		}
+		
+		return false;
+	}
 	
 	
 	public ArrayList<Treasure> getTreasures() 

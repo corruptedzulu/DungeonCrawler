@@ -7,6 +7,10 @@ import Race.Race;
 
 public class NonPlayerCharacter extends WorldEntity
 {
+	
+	protected RangedAttack ranged;
+	protected MeleeAttack melee;
+	protected SpellCast spellCast;
 
 	protected String npcName;
 	protected Race race;
@@ -26,6 +30,11 @@ public class NonPlayerCharacter extends WorldEntity
 	protected int currentHitDice;
 	protected int hitDiceFaceValue;
 	
+	
+	protected int movementInSquares;
+	protected int movementRemaining;
+	
+	
 	protected ArrayList<SavingThrow> savingThrows;
 	protected ArrayList<Skill> skills;
 	protected ArrayList<Ability> abilities;
@@ -42,6 +51,15 @@ public class NonPlayerCharacter extends WorldEntity
 	public NonPlayerCharacter()
 	{
 		rand = new Random();
+		
+		this.resetTurnSpecificValues();
+	}
+	
+	public void resetTurnSpecificValues()
+	{
+		
+		movementRemaining = movementInSquares;
+		
 	}
 	
 	
@@ -220,6 +238,34 @@ public class NonPlayerCharacter extends WorldEntity
 
 
 	
+	public void setMovementInSquares(int squares)
+	{
+		this.movementInSquares = squares;
+	}
+	
+	public int getMovementInSquares()
+	{
+		return this.movementInSquares;
+	}
+	
+	public int getMovementRemaining()
+	{
+		return this.movementRemaining;
+	}
+	
+	public boolean moveOneSquare()
+	{
+		if(movementRemaining > 0)
+		{
+			movementRemaining = movementRemaining - 1;
+			return true;
+		}
+		
+		return false;
+	}
+	
+	
+	
 	
 	public ArrayList<Treasure> getTreasures() 
 	{
@@ -269,6 +315,146 @@ public class NonPlayerCharacter extends WorldEntity
 	public void removeItem(Item i)
 	{
 		
+	}
+
+
+	public String getNpcName() {
+		return npcName;
+	}
+
+
+	public void setNpcName(String npcName) {
+		this.npcName = npcName;
+	}
+
+
+	public Race getRace() {
+		return race;
+	}
+
+
+	public void setRace(Race race) {
+		this.race = race;
+	}
+
+
+	public EntityClass getNpcClass() {
+		return npcClass;
+	}
+
+
+	public void setNpcClass(EntityClass npcClass) {
+		this.npcClass = npcClass;
+	}
+
+
+	public int getInitiativeModifier() {
+		return initiativeModifier;
+	}
+
+
+	public void setInitiativeModifier(int initiativeModifier) {
+		this.initiativeModifier = initiativeModifier;
+	}
+
+
+	public int getDeathSaveFailures() {
+		return deathSaveFailures;
+	}
+
+
+	public void setDeathSaveFailures(int deathSaveFailures) {
+		this.deathSaveFailures = deathSaveFailures;
+	}
+
+
+	public int getDeathSaveSuccesses() {
+		return deathSaveSuccesses;
+	}
+
+
+	public void setDeathSaveSuccesses(int deathSaveSuccesses) {
+		this.deathSaveSuccesses = deathSaveSuccesses;
+	}
+
+
+	public int getMaxHP() {
+		return maxHP;
+	}
+
+
+	public void setMaxHP(int maxHP) {
+		this.maxHP = maxHP;
+	}
+
+
+	public int getCurrentHP() {
+		return currentHP;
+	}
+
+
+	public void setCurrentHP(int currentHP) {
+		this.currentHP = currentHP;
+	}
+
+
+	public int getMaxHitDice() {
+		return maxHitDice;
+	}
+
+
+	public void setMaxHitDice(int maxHitDice) {
+		this.maxHitDice = maxHitDice;
+	}
+
+
+	public int getCurrentHitDice() {
+		return currentHitDice;
+	}
+
+
+	public void setCurrentHitDice(int currentHitDice) {
+		this.currentHitDice = currentHitDice;
+	}
+
+
+	public int getHitDiceFaceValue() {
+		return hitDiceFaceValue;
+	}
+
+
+	public void setHitDiceFaceValue(int hitDiceFaceValue) {
+		this.hitDiceFaceValue = hitDiceFaceValue;
+	}
+
+
+	public ArrayList<Spell> getSpells() {
+		return spells;
+	}
+
+
+	public void setSpells(ArrayList<Spell> spells) {
+		this.spells = spells;
+	}
+
+
+	public void setMovementRemaining(int movementRemaining) {
+		this.movementRemaining = movementRemaining;
+	}
+
+
+	public void setTreasures(ArrayList<Treasure> treasures) {
+		this.treasures = treasures;
+	}
+
+
+	public void setWeapons(ArrayList<Weapon> weapons) {
+		this.weapons = weapons;
+	}
+
+
+	public void setInventory(ArrayList<Item> inventory) {
+		this.inventory = inventory;
 	}
 	
 	

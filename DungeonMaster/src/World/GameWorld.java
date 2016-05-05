@@ -3,9 +3,14 @@ package World;
 import java.util.ArrayList;
 import java.util.Random;
 
+import Enemies.Enemy;
+import PlayerCharacters.PlayerCharacter;
 import World.Room.*;
 import World.WorldObjects.Door;
 import World.WorldObjects.WorldObject;
+import dungeonmaster.DungeonMaster;
+import dungeonmaster.Square;
+import dungeonmaster.WorldEntity;
 
 public class GameWorld 
 {
@@ -17,8 +22,15 @@ public class GameWorld
 	
 	private Random rand;
 	
+	
+	private Room currentRoom;
+	
 	private ArrayList<Room> rooms;
 	private ArrayList<String> roomTypes;
+	
+	private DungeonMaster dm;
+	
+	private ArrayList<PlayerCharacter> characters;
 	
 
 	
@@ -280,7 +292,57 @@ public class GameWorld
 		
 		
 	}
+
+	public void setDM(DungeonMaster dm)
+	{
+		this.dm = dm;
+	}
 	
+	public void setPCArrayList(ArrayList<PlayerCharacter> pcs)
+	{
+		this.characters = pcs;
+	}
+	
+	
+	public boolean entityCanMoveInDirection(WorldEntity e, String moveInDirection) 
+	{
+		
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public ArrayList<Square> getPlayerCharacterLocations() 
+	{
+		// TODO Auto-generated method stub
+		
+		ArrayList<Square> locations = new ArrayList<Square>();
+		
+		
+		for(PlayerCharacter p : characters)
+		{
+			Square s = new Square(p.getxCoor(), p.getyCoor());
+			locations.add(s);
+		}
+			
+		return locations;
+	}
+	
+	
+	public ArrayList<Square> getEntityLocations()
+	{
+		
+		ArrayList<Square> locations = new ArrayList<Square>();
+		
+		
+		for(WorldEntity e : currentRoom.getEntities())
+		{
+			Square s = new Square(e.getxCoor(), e.getyCoor());
+			locations.add(s);
+		}
+			
+		return locations;
+		
+	}
 	
 	
 }
