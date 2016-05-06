@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Flumph {
+public class Flumph extends Enemy
+{
 
 }

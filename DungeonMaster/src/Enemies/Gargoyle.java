@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Gargoyle {
+public class Gargoyle extends Enemy
+{
 
 }

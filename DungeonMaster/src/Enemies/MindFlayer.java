@@ -1,5 +1,6 @@
 package Enemies;
 
-public class MindFlayer {
+public class MindFlayer extends Enemy
+{
 
 }

@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Cultist {
+public class Cultist extends Enemy
+{
 
 }

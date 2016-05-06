@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Guard {
+public class Guard extends Enemy
+{
 
 }

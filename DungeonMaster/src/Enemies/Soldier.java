@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Soldier {
+public class Soldier extends Enemy
+{
 
 }

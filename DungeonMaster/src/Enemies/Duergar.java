@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Duergar {
+public class Duergar extends Enemy
+{
 
 }

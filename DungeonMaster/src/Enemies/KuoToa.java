@@ -1,5 +1,6 @@
 package Enemies;
 
-public class KuoToa {
+public class KuoToa extends Enemy
+{
 
 }

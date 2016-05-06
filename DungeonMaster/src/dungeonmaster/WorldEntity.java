@@ -2,10 +2,12 @@ package dungeonmaster;
 import java.util.Random;
 
 import World.GameWorld;
+import World.Room.Room;
 
 public abstract class WorldEntity 
 {
 
+	//zero indexed
 	protected int xCoor;
 	protected int yCoor;
 	
@@ -13,6 +15,23 @@ public abstract class WorldEntity
 	
 	protected GameWorld gw;
 	
+	protected Room containingRoom;
+	
+
+	public Room getContainingRoom() {
+		return containingRoom;
+	}
+
+
+	public void setContainingRoom(Room containingRoom) {
+		this.containingRoom = containingRoom;
+	}
+	
+	public void moveToNewRoom(Room newRoom)
+	{
+		this.containingRoom = newRoom;
+	}
+
 
 	public void setGameWorld(GameWorld gw)
 	{

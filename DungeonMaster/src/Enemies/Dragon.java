@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Dragon {
+public class Dragon extends Enemy
+{
 
 }

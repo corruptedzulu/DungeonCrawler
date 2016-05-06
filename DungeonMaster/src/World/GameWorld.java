@@ -307,8 +307,231 @@ public class GameWorld
 	public boolean entityCanMoveInDirection(WorldEntity e, String moveInDirection) 
 	{
 		
-		// TODO Auto-generated method stub
-		return false;
+		
+		switch(moveInDirection)
+		{
+		case "N":
+			
+			
+			//check the walls of the room
+			
+			//if the current Y coordinate has 1 added to it (go North), does that new Y coordinate exceed the length of the room?
+			//these are zero indexed, so subtract 1 from the Length (just like with subtracting 1 from the size of an array to find the correct index)			
+			if(e.getyCoor() + 1 > e.getContainingRoom().getLengthSquares() - 1)
+			{
+				return false;
+			}
+			
+			
+			//check the other entities in the room
+			for(WorldEntity we : e.getContainingRoom().getEntities())
+			{
+				//if we're on the same X value
+				if(e.getxCoor() == we.getxCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getyCoor() + 1 == we.getyCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			//check the world objects in the room
+			for(WorldObject wo : e.getContainingRoom().getContents())
+			{
+				//if we're on the same X value
+				if(e.getxCoor() == wo.getxCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getyCoor() + 1 == wo.getyCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			
+			
+			
+			
+			break;	
+			
+		case "S":
+			
+			//check the walls of the room
+			
+			//if the current Y coordinate has 1 subtracted from it (go South), does that new Y coordinate become less than zero? Zero is the lowest Y coordinate
+			//these are zero indexed
+			if(e.getyCoor() - 1 < 0)
+			{
+				return false;
+			}
+			
+			
+			//check the other entities in the room
+			for(WorldEntity we : e.getContainingRoom().getEntities())
+			{
+				//if we're on the same X value
+				if(e.getxCoor() == we.getxCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getyCoor() - 1 == we.getyCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			//check the world objects in the room
+			for(WorldObject wo : e.getContainingRoom().getContents())
+			{
+				//if we're on the same X value
+				if(e.getxCoor() == wo.getxCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getyCoor() - 1 == wo.getyCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			
+			
+			break;
+			
+		case "E":
+			
+			
+			
+			//check the walls of the room
+			
+			//if the current Y coordinate has 1 added to it (go North), does that new Y coordinate exceed the length of the room?
+			//these are zero indexed, so subtract 1 from the Length (just like with subtracting 1 from the size of an array to find the correct index)			
+			if(e.getxCoor() + 1 > e.getContainingRoom().getWidthSquares() - 1)
+			{
+				return false;
+			}
+			
+			
+			//check the other entities in the room
+			for(WorldEntity we : e.getContainingRoom().getEntities())
+			{
+				//if we're on the same X value
+				if(e.getyCoor() == we.getyCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getxCoor() + 1 == we.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			//check the world objects in the room
+			for(WorldObject wo : e.getContainingRoom().getContents())
+			{
+				//if we're on the same X value
+				if(e.getyCoor() == wo.getyCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getxCoor() + 1 == wo.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			
+			
+			break;
+			
+		case "W":
+			
+			
+			
+			//check the walls of the room
+			
+			//if the current Y coordinate has 1 subtracted from it (go South), does that new Y coordinate become less than zero? Zero is the lowest Y coordinate
+			//these are zero indexed
+			if(e.getxCoor() - 1 < 0)
+			{
+				return false;
+			}
+			
+			
+			//check the other entities in the room
+			for(WorldEntity we : e.getContainingRoom().getEntities())
+			{
+				//if we're on the same X value
+				if(e.getyCoor() == we.getyCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getxCoor() - 1 == we.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			//check the world objects in the room
+			for(WorldObject wo : e.getContainingRoom().getContents())
+			{
+				//if we're on the same X value
+				if(e.getyCoor() == wo.getyCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getxCoor() - 1 == wo.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			
+			
+			break;l
+			
+		case "NE":
+			
+			
+			
+			break;
+			
+		case "NW":
+			
+			
+			
+			break;
+			
+		case "SE":
+			
+			
+			
+			break;
+			
+		case "SW":
+			
+			
+			
+			break;
+		
+		
+		
+		}
+		
+		
+		//no collisions were detected in that direction, so go ahead
+		return true;
 	}
 
 	public ArrayList<Square> getPlayerCharacterLocations() 

@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Skeleton {
+public class Skeleton extends Enemy
+{
 
 }

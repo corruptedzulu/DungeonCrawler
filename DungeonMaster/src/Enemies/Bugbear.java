@@ -1,5 +1,6 @@
 package Enemies;
 
-public class Bugbear {
+public class Bugbear extends Enemy
+{
 
 }

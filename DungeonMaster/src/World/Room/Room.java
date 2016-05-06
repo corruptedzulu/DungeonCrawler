@@ -149,7 +149,7 @@ public class Room
 		this.contents = contents;
 	}
 
-
+	containingRoom
 	public ArrayList<Door> getDoors() {
 		return doors;
 	}
