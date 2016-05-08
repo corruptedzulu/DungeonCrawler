@@ -1,6 +1,6 @@
 package a2;
 
-import myGameEngine.GameServerTCP;
+import myGameEngine.newdc.GameServerTCP;
 
 import java.io.IOException;
 import java.net.InetAddress;

@@ -17,6 +17,7 @@ public class AssetInfo
     public HashMap<String, ObjectNonInteractableAsset> objectNonInteractables;
     public HashMap<String, SkyboxAsset> skyBoxes;
 
+
     public AssetInfo(String path)
     {
         //assetsPath = new File("").getAbsolutePath() + "\\assets\\";
@@ -114,7 +115,7 @@ public class AssetInfo
         File dir = new File(assetsPath + familyType + "s\\");
         for (File file : dir.listFiles())
         {
-            if (file.getName().endsWith(".obj") || file.getName().endsWith(".mesh.xml") )
+            if (file.getName().endsWith(".obj"))
             {
                 namesList.add(file.getPath());
             }
