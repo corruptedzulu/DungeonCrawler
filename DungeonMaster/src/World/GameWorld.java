@@ -23,7 +23,7 @@ public class GameWorld
 	private Random rand;
 	
 	
-	private Room currentRoom;
+	//private Room currentRoom;
 	
 	private ArrayList<Room> rooms;
 	private ArrayList<String> roomTypes;
@@ -499,7 +499,7 @@ public class GameWorld
 			
 			
 			
-			break;l
+			break;
 			
 		case "NE":
 			
@@ -551,13 +551,13 @@ public class GameWorld
 	}
 	
 	
-	public ArrayList<Square> getEntityLocations()
+	public ArrayList<Square> getEntityLocations(Room room)
 	{
 		
 		ArrayList<Square> locations = new ArrayList<Square>();
 		
 		
-		for(WorldEntity e : currentRoom.getEntities())
+		for(WorldEntity e : room.getEntities())
 		{
 			Square s = new Square(e.getxCoor(), e.getyCoor());
 			locations.add(s);
@@ -587,6 +587,30 @@ public class GameWorld
 		return locations;
 		
 	}
+	
+	
+	
+	
+	public String toString()
+	{
+		String result = "";
+		
+		//report width, length of the world
+		//report the rooms (call each room's toString)
+		
+		result += "GW:" + worldLength + "," + worldWidth + ";";
+		
+		
+		for(Room r : rooms)
+		{
+			result += r.toString();
+		}
+		
+		result += "$$";
+		
+		return result;
+	}
+	
 	
 	
 	

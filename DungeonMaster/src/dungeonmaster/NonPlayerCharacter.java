@@ -8,9 +8,9 @@ import Race.Race;
 public class NonPlayerCharacter extends WorldEntity
 {
 	
-	protected RangedAttack ranged;
-	protected MeleeAttack melee;
-	protected SpellCast spellCast;
+	//protected RangedAttack ranged;
+	//protected MeleeAttack melee;
+	//protected SpellCast spellCast;
 
 	protected String npcName;
 	protected Race race;

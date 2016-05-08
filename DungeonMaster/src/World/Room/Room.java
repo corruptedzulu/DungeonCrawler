@@ -15,6 +15,11 @@ public class Room
 	protected Random r;
 	
 	
+	public static int roomID = 0;
+	
+	protected int myRoomID;
+	
+	
 	protected BoundingBox bb;
 	protected String roomName;
 	
@@ -60,6 +65,9 @@ public class Room
 		contents = new ArrayList<WorldObject>();
 		entities = new ArrayList<WorldEntity>();
 		doors = new ArrayList<Door>();
+		
+		myRoomID = roomID;
+		roomID++;
 		
 	}
 	
@@ -150,7 +158,6 @@ public class Room
 		this.contents = contents;
 	}
 
-	containingRoom
 	public ArrayList<Door> getDoors() {
 		return doors;
 	}
@@ -219,6 +226,55 @@ public class Room
 		
 		entities.remove(attackedEnemy);	
 		
+	}
+	
+	
+	public String toString()
+	{
+		String result = "";
+		
+		
+		result += "Room" + myRoomID + ":" + roomType + ";";
+		result += widthSquares + "," + lengthSquares + ";";
+		result += xWorldCoor + "," + yWorldCoor + ";";
+		
+		
+		for(WorldEntity we : entities)
+		{
+			result += we.toString();
+			
+		}
+		result += ";";
+		
+		
+		for(WorldObject wo : contents)
+		{
+			result += wo.toString();
+		}
+		result += ";";
+		
+		
+		for(Door d : doors)
+		{
+			result += d.toString();
+		}
+		result += ";";
+		
+		
+		if(dungeonEntrance)
+		{
+			result += "true;";
+		}
+		else
+		{
+			result += "false;";
+		}
+		 
+		
+		
+		result += "$$";
+		
+		return result;
 	}
 	
 	

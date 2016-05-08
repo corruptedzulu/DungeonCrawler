@@ -22,8 +22,11 @@ public class DungeonMaster
 	private ArrayList<PlayerCharacter> characters;
 	private ArrayList<Player> players; 
 	
+	private ArrayList<PlayerCharacter> availableCharacters;
+	
+	
 	private ArrayList<WorldEntity> initiative;
-	private Room currentRoom;
+	//private Room currentRoom;
 	
 	private IDungeonMasterInput input;
 	private IDungeonMasterOutput output;
@@ -43,15 +46,23 @@ public class DungeonMaster
 	
 	public DungeonMaster()
 	{
+		characters = new ArrayList<PlayerCharacter>();
+		players = new ArrayList<Player>();
 		
+		initiative = new ArrayList<WorldEntity>();
+		
+		availableCharacters = new ArrayList<PlayerCharacter>();
 		
 	}
 	
 	public void initialize(String[] args)
 	{
-		if(args[0] == "singleplayer")
+		if(args != null)
 		{
-			singlePlayerGame = true;
+			if(args[0] == "singleplayer")
+			{
+				singlePlayerGame = true;
+			}
 		}
 		
 		
@@ -89,6 +100,7 @@ public class DungeonMaster
 			gw.setDM(this);
 			
 			//gw = new GameWorld("simple");
+			
 			
 			
 			
@@ -150,8 +162,8 @@ public class DungeonMaster
 			
 			
 			//TODO: sendInitialGameState
-			sendInitialGameState(socket);
-			sendAvailableCharacters(socket);
+			sendInitialGameState(p);
+			sendAvailableCharacters(p);
 			
 			
 			//TODO: listen for which character they want and their name
@@ -210,7 +222,20 @@ public class DungeonMaster
 			
 			clientsConnected++;
 			
+			
+			
+			//TODO tell any other connected players about this new player.
+			
 		}
+		
+		
+		
+		
+		for(WorldEntity e : characters)
+		{
+			
+		}
+		
 		
 		
 		
@@ -220,14 +245,15 @@ public class DungeonMaster
 		gameLoop();
 	}
 	
-	private void sendInitialGameState(Socket socket2) 
+	private void sendInitialGameState(Player p) 
 	{
 		// TODO Auto-generated method stub
 		
+		p.getOut().println(gw.toString());
 		
 	}
 
-	private void sendAvailableCharacters(Socket socket2) 
+	private void sendAvailableCharacters(Player p) 
 	{
 		// TODO Auto-generated method stub
 		
@@ -366,7 +392,10 @@ public class DungeonMaster
 						{
 							
 							//check with the world to see what actions are available
-							
+							//see what is adjacent to the character.
+							//ask each of those 
+							//	objects: what their interactions are
+							//	entites: if they are enemy, ally, or PCs
 							
 							
 							
@@ -415,7 +444,7 @@ public class DungeonMaster
 									
 									//ask the gameworld which enemies are adjacent
 									
-									ArrayList<WorldEntity> enemiesInRoom = currentRoom.getEntities();
+									ArrayList<WorldEntity> enemiesInRoom = e.getContainingRoom().getEntities();
 									
 									ArrayList<Enemy> enemiesAttackable = new ArrayList<Enemy>();
 									
@@ -522,7 +551,7 @@ public class DungeonMaster
 										if(attackedEnemy.getShouldRemoveSelfFromGame())
 										{
 											//then tell the Room to delete the enemy
-											currentRoom.removeEntity(attackedEnemy);
+											e.getContainingRoom().removeEntity(attackedEnemy);
 											
 											
 											//and tell the player clients to remove it as well
@@ -557,13 +586,139 @@ public class DungeonMaster
 								if(attackType == "ranged")
 								{
 									
+																	
+									//ask the gameworld which enemies are within range of ranged weapon
 									
-									//ask the gameworld which enemies are within range of the ranged weapon
+									ArrayList<WorldEntity> enemiesInRoom = e.getContainingRoom().getEntities();
+									
+									ArrayList<Enemy> enemiesAttackable = new ArrayList<Enemy>();
 									
 									
-									//send that list and ask which enemy the player would like to attack
+									for(WorldEntity s : enemiesInRoom)
+									{
+										//check if this one is an enemy. if it is not, skip to the next one
+										if( !(s instanceof Enemy) )
+										{
+											continue;
+										}
+										
+										
+										
+										int squareX = s.getxCoor();
+										int squareY = s.getyCoor();
+										int myX = e.getxCoor();
+										int myY = e.getyCoor();
+										
+										int maxDistance = ((PlayerCharacter) e).getRangedAttackDistance();
+										
+										
+										//compute range to each enemy and add it if it is in range
+										//recall that DnD distances on diagonals do not follow the Pythagorean theorem
+										//up two, over two, but on the diagonal is counted as two
+										//thus, the distance in a large square from the center to each side is the same as to the diagonals
+										//thus, we only need to check the sides in the following block										
+										
+										//if it is in between the x distances that my weapon could go
+										if(squareX <= myX + maxDistance && squareX >= myX - maxDistance)
+										{
+											if(squareY <= myY + maxDistance && squareY >= myY - maxDistance)
+											{
+												enemiesAttackable.add((Enemy) s);
+											}
+										}
+				
+										
+									}
 									
 									
+									
+									//now i have an arraylist of adjacent enemies
+									
+									
+									String enemiesList = "";
+									
+									for(Enemy en : enemiesAttackable)
+									{
+										enemiesList += en.toString() + "$$";
+										
+									}
+									
+									
+									//send the list of enemies to the client
+									p.getOut().println(enemiesList);
+									
+									
+									
+									//ask which enemy the player would like to attack
+									String attackEnemyID = null;
+									
+									//get the attack type that the player would like to make
+									try 
+									{
+										attackEnemyID = p.getIn().readLine();
+									} 
+									catch (IOException e1) 
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+									
+									
+									Enemy attackedEnemy = null;
+									
+									for(Enemy en : enemiesAttackable)
+									{
+										if(en.getMyWorldEntityID() ==  Integer.parseInt(attackEnemyID))
+										{
+											attackedEnemy = en;
+										}
+									}
+									
+									
+									
+									//make the attack roll
+									int attackRoll = ((PlayerCharacter) e).makeAttackRoll("melee");
+									
+									
+									//if it beats the enemy's AC
+									if(attackRoll >= attackedEnemy.getArmorClass().getAC())
+									{
+										//make the damage roll
+										int damage = ((PlayerCharacter) e).makeDamageRoll("melee");
+										
+										
+										//tell the enemy to take the damage
+										attackedEnemy.takeDamage(damage);
+										
+										
+										//if that kills the enemy
+										if(attackedEnemy.getShouldRemoveSelfFromGame())
+										{
+											//then tell the Room to delete the enemy
+											e.getContainingRoom().removeEntity(attackedEnemy);
+											
+											
+											//and tell the player clients to remove it as well
+											p.getOut().println(attackedEnemy.toString());
+											
+											for(Player player : players)
+											{
+												//if this player we're checking at is actually the one who is taking the turn
+												//skip them
+												//they're already getting the gameplay updates directly
+												if(player == p)
+												{
+													
+												}
+												else
+												{
+													player.getOut().println(attackedEnemy.toString());
+												}
+											}
+											
+										}
+										
+									}
 									
 									
 									
@@ -579,11 +734,15 @@ public class DungeonMaster
 								
 							}
 							
-							if(standardActionType == "useAbility")
+							if(standardActionType == "interactWithObject")
 							{
 								
 								
-								//ask if melee or ranged
+								//get all of the abilities that can be used
+								//so... check what objects in the world we're near
+								
+								//this m
+								
 								
 								String abilityType = null;
 								
@@ -626,6 +785,8 @@ public class DungeonMaster
 						if(playerMove == "minor")
 						{
 						
+							
+							
 							
 							
 							

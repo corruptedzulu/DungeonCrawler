@@ -21,7 +21,7 @@ public class Wizard extends PlayerCharacter
 	
 	public Wizard()
 	{
-		private String name;
+		/*private String name;
 		private String playerName;
 		private Race playerRace;
 		private String alignment;
@@ -53,6 +53,6 @@ public class Wizard extends PlayerCharacter
 		private ArrayList<Item> inventory;
 		
 		
-		private ArrayList<Spell> spells;
+		private ArrayList<Spell> spells;*/
 	}
 }

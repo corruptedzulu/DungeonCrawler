@@ -6,6 +6,7 @@ public class Weapon
 	private String name;
 	private String damageType;
 	private String weaponType;
+	private int distance;
 	private int damageDiceNumber;
 	private int numberOfDamageDice;
 	private int damageModifier;
@@ -20,11 +21,12 @@ public class Weapon
 		
 	}
 	
-	public Weapon(String n, String dType, String wType, int dNumber, int diceNumber, int dmgMod, int attMod)
+	public Weapon(String n, String dType, String wType, int dist, int dNumber, int diceNumber, int dmgMod, int attMod)
 	{
 		name = n;
 		damageType = dType;
-		setWeaponType(wType);
+		weaponType = wType;
+		distance = dist;
 		damageDiceNumber = dNumber;
 		numberOfDamageDice = diceNumber;
 		damageModifier = dmgMod;
@@ -84,6 +86,11 @@ public class Weapon
 
 	public String getWeaponType() {
 		return weaponType;
+	}
+	
+	public int getDistance()
+	{
+		return distance;
 	}
 	
 }

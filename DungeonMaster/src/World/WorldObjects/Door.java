@@ -21,6 +21,9 @@ public class Door
 	private int roomOneFace; //N=1, S=2, E=3, W=4
 	private int roomTwoFace;
 	
+	public static int doorID = 0;
+	protected int myDoorID;
+	
 	
 	
 	public Door()
@@ -30,6 +33,11 @@ public class Door
 		
 		setxRoomTwoCoor(-1);
 		setyRoomTwoCoor(-1);
+		
+		
+		myDoorID = doorID;
+		doorID++;
+		
 	}
 	
 	private void updateDoorFaces()
@@ -131,6 +139,14 @@ public class Door
 	
 	
 	
+	public String toString()
+	{
+		String result = "";
+		
+		result += "Door" + myDoorID + ":" + xRoomOneCoor + "," + yRoomOneCoor + ";" + + xRoomTwoCoor + "," + yRoomTwoCoor + ";" + "$$";
+		
+		return result;
+	}
 	
 	
 }

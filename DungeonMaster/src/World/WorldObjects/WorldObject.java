@@ -10,6 +10,19 @@ public class WorldObject
 	protected int yCoor;
 	
 	
+	public static int worldObjectID = 0;
+	protected int myWorldObjectID;
+	
+	
+	
+	public WorldObject()
+	{
+		myWorldObjectID = worldObjectID;
+		worldObjectID++;
+		
+	}
+	
+	
 	
 	public int getWidth() {
 		return width;
@@ -36,6 +49,17 @@ public class WorldObject
 		this.yCoor = yCoor;
 	}
 	
+	
+	public String toString()
+	{
+		String result = "";
+		
+		result += "WorldObject" + myWorldObjectID + ":" + xCoor + "," + yCoor + ";" + "$$";
+		
+		
+		
+		return result;
+	}
 	
 	
 }

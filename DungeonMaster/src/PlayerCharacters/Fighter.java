@@ -20,7 +20,7 @@ public class Fighter extends PlayerCharacter
 	
 	public Fighter()
 	{
-		private String name;
+		/*private String name;
 		private String playerName;
 		private Race playerRace;
 		private String alignment;
@@ -52,6 +52,6 @@ public class Fighter extends PlayerCharacter
 		private ArrayList<Item> inventory;
 		
 		
-		private ArrayList<Spell> spells;
+		private ArrayList<Spell> spells;*/
 	}
 }

@@ -394,6 +394,13 @@ public class PlayerCharacter extends WorldEntity
 		return 0;
 	}
 
+
+	public int getRangedAttackDistance() 
+	{
+		// TODO Auto-generated method stub
+		return rangedWeapon.getDistance();
+	}
+
 	
 	
 }

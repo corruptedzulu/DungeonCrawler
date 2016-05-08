@@ -7,7 +7,7 @@ import World.Room.Room;
 public abstract class WorldEntity 
 {
 
-	protected static int worldEntityID;
+	protected static int worldEntityID = 0;
 	
 	protected int myWorldEntityID;
 	
@@ -58,7 +58,7 @@ public abstract class WorldEntity
 	{
 		String s = null;
 		
-		s = myWorldEntityID + ":" + xCoor + "," + yCoor + ";";
+		s = "WorldEntity" + myWorldEntityID + ":" + xCoor + "," + yCoor + ";";
 		
 		return s;
 	}

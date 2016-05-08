@@ -8,7 +8,9 @@ public class DungeonMasterStarter
 		// TODO Auto-generated method stub
 		DungeonMaster dm = new DungeonMaster();
 		
-		dm.initialize(args);
+		String[] array = {""};
+		
+		dm.initialize(array);
 		dm.start();
 		
 	}
