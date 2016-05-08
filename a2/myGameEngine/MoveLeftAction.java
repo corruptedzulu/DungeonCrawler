@@ -8,19 +8,19 @@ import net.java.games.input.Event;
 import sage.camera.ICamera;
 import sage.scene.SceneNode;
 
-public class MoveLeftAction extends MoveAction 
+public class MoveLeftAction extends MoveAction
 {
 
 	private SceneNode avatar;
 	private float speed = 0.01f; // it would be better to use axis value
 
-	
-	public MoveLeftAction(ICamera c, float s) 
+
+	public MoveLeftAction(ICamera c, float s)
 	{
 		super(c, s);
 		moveAmount = moveAmount * -1;
 	}
-	
+
 	public void performAction(float time, Event event)
 	{
 		if(true){
@@ -36,14 +36,14 @@ public class MoveLeftAction extends MoveAction
 				avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
 
 			return;}
-		
+
 		timeSinceLastMoveMS += time;
-		
+
 		if(timeSinceLastMoveMS > 25)
 		{
 			timeSinceLastMoveMS = 0;
-			
-			
+
+
 			Vector3D viewDir = camera.getRightAxis().normalize();
 			Vector3D curLocVector = new Vector3D(camera.getLocation());
 			Vector3D newLocVec = curLocVector.add(viewDir.mult(moveAmount));
@@ -55,8 +55,8 @@ public class MoveLeftAction extends MoveAction
 		}
 	}
 
-	public void setAvatar(SceneNode n) 
-	{ 
-		avatar = n; 
+	public void setAvatar(SceneNode n)
+	{
+		avatar = n;
 	}
 }

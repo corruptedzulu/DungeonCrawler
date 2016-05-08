@@ -8,22 +8,22 @@ import net.java.games.input.Event;
 import sage.camera.ICamera;
 import sage.scene.SceneNode;
 
-public class MoveBackAction extends MoveAction 
+public class MoveBackAction extends MoveAction
 {
 	private SceneNode avatar;
 	private float speed = 0.01f; // it would be better to use axis value
 
-	
-	public MoveBackAction(ICamera c, float s) 
+
+	public MoveBackAction(ICamera c, float s)
 	{
 		super(c, s);
 		moveAmount = moveAmount * -1;
 
 	}
-	
+
 	public void performAction(float time, Event event)
 	{
-		
+
 		if(true){
 			Matrix3D rot = avatar.getLocalRotation();
 			Vector3D dir = new Vector3D(0,0,1);
@@ -34,12 +34,12 @@ public class MoveBackAction extends MoveAction
 				avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
 
 			return;}
-		
+
 		timeSinceLastMoveMS += time;
-		
+
 		if(timeSinceLastMoveMS > 25)
 		{
-			
+
 			//if we got this from the Y Axis, make sure we're applying a sanity check to the value
 			if(event.getComponent().getName().contains("Y Axis"))// && event.getValue() > 0.2)
 			{
@@ -48,7 +48,7 @@ public class MoveBackAction extends MoveAction
 					return;
 				}
 			}
-			
+
 			timeSinceLastMoveMS = 0;
 			//moveAmount = (float) -0.1 ; 
 
@@ -63,9 +63,9 @@ public class MoveBackAction extends MoveAction
 		}
 	}
 
-	public void setAvatar(SceneNode n) 
-	{ 
-		avatar = n; 
+	public void setAvatar(SceneNode n)
+	{
+		avatar = n;
 	}
-	
+
 }
