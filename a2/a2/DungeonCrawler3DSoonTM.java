@@ -1,6 +1,7 @@
 package a2;
 
 import a2.newdc.GhostAvatar;
+import a2.newdc.ParticleSystemEngine;
 import a2.newdc.assets.AssetInfo;
 import a2.newdc.assets.ObjectInteractableAsset;
 import a2.newdc.assets.ObjectNonInteractableAsset;
@@ -27,7 +28,14 @@ import sage.display.*;
 import sage.event.EventManager;
 import sage.event.IEventManager;
 import sage.networking.IGameConnection;
+<<<<<<< HEAD
 import sage.scene.*;
+=======
+import sage.physics.IPhysicsEngine;
+import sage.physics.PhysicsEngineFactory;
+import sage.scene.SceneNode;
+import sage.scene.SkyBox;
+>>>>>>> refs/remotes/origin/master
 import sage.scene.shape.*;
 import sage.input.*;
 import sage.input.action.*;
@@ -67,6 +75,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private Random random;
     private SceneNode avatarOne;
     private String kbName, gpName;
+    private ArrayList<SceneNode> gameworld;
 
     private SkyBox skyBox;
     private TerrainBlock theTerrain;
@@ -96,7 +105,12 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private GameServerTCP hostedServer;
     private GameClientTCP client;
+<<<<<<< HEAD
     private boolean connected;
+=======
+    private ParticleSystemEngine particleSystemEngine;
+    private ParticleSystemEngine.ParticleSystem ps;
+>>>>>>> refs/remotes/origin/master
 
     public DungeonCrawler3DSoonTM()
     {
@@ -141,6 +155,17 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         initGameObjects();
         associateDefaultKeyAndControllerBindings();
 
+
+        random = new Random();
+        String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
+        IPhysicsEngine physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
+        physicsEngine.initSystem();
+        particleSystemEngine = new ParticleSystemEngine(assetInfo, physicsEngine,gameworld,random);
+
+
+        ps = particleSystemEngine.getSystem("Test",5,1,10000);
+        ps.start(new Point3D(0,50,0));
+
         camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
         client.sendJoinMessage();
 
@@ -152,12 +177,12 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         display = createDisplaySystem();
         setDisplaySystem(display);
 
-
         im = new InputManager();
         setInputManager(im);
 
-        ArrayList<SceneNode> gameWorld = new ArrayList<>();
-        setGameWorld(gameWorld);
+        gameworld = new ArrayList<SceneNode>();
+        setGameWorld(gameworld);
+
         //super.initSystem();
     }
 
@@ -216,6 +241,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         addGameWorldObject(barrel.make(new Point3D(0, 0, 1.5), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
 
 
+<<<<<<< HEAD
 
         // animation objects
         animateGroup = new Group("animateGroup");
@@ -228,6 +254,22 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
         addGameWorldObject(animateGroup);
 
+=======
+        if (false) // throw errors
+        for (int i = 0; i < 40; i+=2)
+            for (int j =0; j < 40; j+=2)
+                if (true) // heap
+                    addGameWorldObject(tile.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+                else // GC space
+                    addGameWorldObject(barrel.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 4), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 6), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(2, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(4, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(6, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(6, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+>>>>>>> refs/remotes/origin/master
 
 
         TileAsset tile = assetInfo.tiles.get("tile");
@@ -548,13 +590,19 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                            rollLeftActionPOne,
                            IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
+<<<<<<< HEAD
         // OPEN CHEST
         im.associateAction(kbName,
                            net.java.games.input.Component.Identifier.Key.G,
+=======
+        im.associateAction(kbName,
+                           net.java.games.input.Component.Identifier.Key.P,
+>>>>>>> refs/remotes/origin/master
                            new AbstractInputAction()
                            {
                                public void performAction(float v, Event event)
                                {
+<<<<<<< HEAD
                                    Iterator<SceneNode> itr = chestGroup.getChildren();
                                    while (itr.hasNext())
                                    {
@@ -570,6 +618,15 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
 
 
+=======
+                                   Vector3D v3 = avatarOne.getWorldTranslation().getCol(3);
+                                   Point3D pos = new Point3D(v3.getX(),v3.getY(),v3.getZ());
+                                   System.out.println(pos);
+                                   ps.start(pos);
+                               }
+                           },
+                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+>>>>>>> refs/remotes/origin/master
     }
 
     private void updateSkybox()
@@ -591,6 +648,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         updateAnimations(elapsedTimeMS);
 
         updateSkybox();
+        ps.update(elapsedTimeMS);
         camOne.update(elapsedTimeMS);
         super.update(elapsedTimeMS);
     }
