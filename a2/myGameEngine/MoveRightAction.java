@@ -8,20 +8,20 @@ import net.java.games.input.Event;
 import sage.camera.ICamera;
 import sage.scene.SceneNode;
 
-public class MoveRightAction extends MoveAction 
+public class MoveRightAction extends MoveAction
 {
 
 	private SceneNode avatar;
 	private float speed = 0.01f; // it would be better to use axis value	
-	
-	public MoveRightAction(ICamera c, float s) 
+
+	public MoveRightAction(ICamera c, float s)
 	{
 		super(c, s);
 	}
-	
+
 	public void performAction(float time, Event event)
 	{
-		
+
 		if(true){
 			Matrix3D rot = avatar.getLocalRotation();
 			Vector3D dir = new Vector3D(0,0,1);
@@ -29,7 +29,7 @@ public class MoveRightAction extends MoveAction
 			tempRot.concatenate(rot);
 			tempRot.rotate(0,90,0);
 			dir = dir.mult(tempRot);
-			
+
 			if(event.getComponent().getName().contains("X Axis"))
 			{
 				if( event.getValue() < -0.2)
@@ -45,13 +45,16 @@ public class MoveRightAction extends MoveAction
 					return;
 				}
 			}
-			
+
 			dir.scale((double)(speed * time) * -1);
 			avatar.translate((float)dir.getX(),(float)dir.getY(),(float)dir.getZ());
+			if (isTerrainFollow())
+				avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
+
 			return;}
-		
+
 		timeSinceLastMoveMS += time;
-		
+
 		if(timeSinceLastMoveMS > 25)
 		{
 			//System.out.println("move right: " + event.getComponent().getName());
@@ -62,7 +65,7 @@ public class MoveRightAction extends MoveAction
 				{
 					timeSinceLastMoveMS = 0;
 					//moveAmount = (float) 0.1 ; 
-				//}
+					//}
 					Vector3D viewDir = camera.getRightAxis().normalize();
 					Vector3D curLocVector = new Vector3D(camera.getLocation());
 					Vector3D newLocVec = curLocVector.add(viewDir.mult(-moveAmount));
@@ -71,14 +74,14 @@ public class MoveRightAction extends MoveAction
 					double newZ = newLocVec.getZ();
 					Point3D newLoc = new Point3D(newX, newY, newZ);
 					camera.setLocation(newLoc);
-					
+
 					return;
 				}
 				else if( (event.getValue() > 0.2) )
 				{
 					timeSinceLastMoveMS = 0;
 					//moveAmount = (float) 0.1 ; 
-				//}
+					//}
 					Vector3D viewDir = camera.getRightAxis().normalize();
 					Vector3D curLocVector = new Vector3D(camera.getLocation());
 					Vector3D newLocVec = curLocVector.add(viewDir.mult(moveAmount));
@@ -87,7 +90,7 @@ public class MoveRightAction extends MoveAction
 					double newZ = newLocVec.getZ();
 					Point3D newLoc = new Point3D(newX, newY, newZ);
 					camera.setLocation(newLoc);
-					
+
 					return;
 				}
 				else
@@ -95,10 +98,10 @@ public class MoveRightAction extends MoveAction
 					return;
 				}
 			}
-			
+
 			timeSinceLastMoveMS = 0;
 			//moveAmount = (float) 0.1 ; 
-		//}
+			//}
 			Vector3D viewDir = camera.getRightAxis().normalize();
 			Vector3D curLocVector = new Vector3D(camera.getLocation());
 			Vector3D newLocVec = curLocVector.add(viewDir.mult(moveAmount));
@@ -107,13 +110,13 @@ public class MoveRightAction extends MoveAction
 			double newZ = newLocVec.getZ();
 			Point3D newLoc = new Point3D(newX, newY, newZ);
 			camera.setLocation(newLoc);
-	
+
 		}
 	}
 
-	public void setAvatar(SceneNode n) 
-	{ 
-		avatar = n; 
+	public void setAvatar(SceneNode n)
+	{
+		avatar = n;
 	}
-	
+
 }

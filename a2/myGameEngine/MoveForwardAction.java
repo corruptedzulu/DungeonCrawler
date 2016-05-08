@@ -7,21 +7,22 @@ import graphicslib3D.Vector3D;
 import net.java.games.input.Event;
 import sage.camera.ICamera;
 import sage.scene.SceneNode;
+import sage.terrain.TerrainBlock;
 
-public class MoveForwardAction extends MoveAction 
+public class MoveForwardAction extends MoveAction
 {
 	private SceneNode avatar;
 	private float speed = 0.01f; // it would be better to use axis value
-	
-	 
-	public MoveForwardAction(ICamera c, float s) 
+
+
+	public MoveForwardAction(ICamera c, float s)
 	{
 		super(c, s);
-		
-		
+
+
 	}
 
-	
+
 	public void performAction(float time, Event event)
 	{
 		if(true)
@@ -46,12 +47,15 @@ public class MoveForwardAction extends MoveAction
 			}
 			dir.scale((double)(speed * time));
 			avatar.translate((float)dir.getX(),(float)dir.getY(),(float)dir.getZ());
+			if (isTerrainFollow())
+				avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
+
 			return;
 		}
-		
+
 		timeSinceLastMoveMS += time;
 
-		if(timeSinceLastMoveMS > 25) 
+		if(timeSinceLastMoveMS > 25)
 		{
 			//if we got this from the Y Axis, make sure we're applying a sanity check to the value
 			if(event.getComponent().getName().contains("Y Axis"))// && event.getValue() > 0.2)
@@ -60,7 +64,7 @@ public class MoveForwardAction extends MoveAction
 				{
 					timeSinceLastMoveMS = 0;
 					//moveAmount = (float) 0.1 ; 
-				//}
+					//}
 					Vector3D viewDir = camera.getViewDirection().normalize();
 					Vector3D curLocVector = new Vector3D(camera.getLocation());
 					Vector3D newLocVec = curLocVector.add(viewDir.mult(moveAmount));
@@ -69,14 +73,14 @@ public class MoveForwardAction extends MoveAction
 					double newZ = newLocVec.getZ();
 					Point3D newLoc = new Point3D(newX, newY, newZ);
 					camera.setLocation(newLoc);
-					
+
 					return;
 				}
 				else if( (event.getValue() > 0.2) )
 				{
 					timeSinceLastMoveMS = 0;
 					//moveAmount = (float) 0.1 ; 
-				//}
+					//}
 					Vector3D viewDir = camera.getViewDirection().normalize();
 					Vector3D curLocVector = new Vector3D(camera.getLocation());
 					Vector3D newLocVec = curLocVector.add(viewDir.mult(-moveAmount));
@@ -85,7 +89,7 @@ public class MoveForwardAction extends MoveAction
 					double newZ = newLocVec.getZ();
 					Point3D newLoc = new Point3D(newX, newY, newZ);
 					camera.setLocation(newLoc);
-					
+
 					return;
 				}
 				else
@@ -93,10 +97,10 @@ public class MoveForwardAction extends MoveAction
 					return;
 				}
 			}
-			
+
 			timeSinceLastMoveMS = 0;
 			//moveAmount = (float) 0.1 ; 
-		//}
+			//}
 			Vector3D viewDir = camera.getViewDirection().normalize();
 			Vector3D curLocVector = new Vector3D(camera.getLocation());
 			Vector3D newLocVec = curLocVector.add(viewDir.mult(moveAmount));
@@ -107,10 +111,10 @@ public class MoveForwardAction extends MoveAction
 			camera.setLocation(newLoc);
 		}
 	}
-	
-	public void setAvatar(SceneNode n) 
-	{ 
-		avatar = n; 
+
+	public void setAvatar(SceneNode n)
+	{
+		avatar = n;
 	}
-	 
+
 }

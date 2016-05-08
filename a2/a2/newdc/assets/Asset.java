@@ -3,6 +3,7 @@ package a2.newdc.assets;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Quaternion;
+import sage.scene.Group;
 import sage.scene.SkyBox;
 import sage.scene.TriMesh;
 import java.io.File;
@@ -118,6 +119,21 @@ public abstract class Asset
         return newNode;
     }
 
+    public Group makeAni(Point3D position, Point3D scale, Quaternion rotation) throws Exception
+    {
+        Group newNode = AssetBuilder.BuildMeshWithAni(getFileName(), getName(), getTexture());
+        Matrix3D trans = new Matrix3D();
+        trans.translate(position.getX(),position.getY(),position.getZ());
+        newNode.setLocalTranslation(trans);
+        Matrix3D sc = new Matrix3D();
+        sc.scale(scale.getX(),scale.getY(),scale.getZ());
+        newNode.setLocalScale(sc);
+        Matrix3D rot = new Matrix3D();
+        rot.rotate(rotation.getAngleAxis()[1],rotation.getAngleAxis()[2],rotation.getAngleAxis()[3]);
+        newNode.setLocalRotation(rot);
+        return newNode;
+    }
+
     public TriMesh make(Matrix3D position, Matrix3D rotation)
     {
         TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture());
@@ -205,7 +221,6 @@ public abstract class Asset
     {
         textures = new HashMap<>();
         File dir = new File(fileName.substring(0,fileName.indexOf('_')));
-        System.out.println(dir.getParent());
         if (getName().contains("_t_"))
         {
             String[] split = getName().split("_");
