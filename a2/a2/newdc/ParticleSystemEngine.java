@@ -79,6 +79,7 @@ public class ParticleSystemEngine
             }
         }
 
+
         public void update(float elaspedTime)
         {
             ttl = ttl - elaspedTime;
@@ -135,6 +136,7 @@ public class ParticleSystemEngine
                 float tx = (.5f - random.nextFloat())*startLinearVelocityScale;
                 float ty = (.5f - random.nextFloat())*startLinearVelocityScale;
                 float tz = (.5f - random.nextFloat())*startLinearVelocityScale;
+                //System.out.println("tx: " + tx + " ty: " + ty + " tz: " + tz);
                 System.out.println("tx: " + tx + " ty: " + ty + " tz: " + tz);
                 return new float[]{tx,ty,tz};
             }

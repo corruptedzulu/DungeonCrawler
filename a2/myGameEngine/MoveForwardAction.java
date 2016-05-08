@@ -7,6 +7,7 @@ import graphicslib3D.Vector3D;
 import net.java.games.input.Event;
 import sage.camera.ICamera;
 import sage.scene.SceneNode;
+import sage.terrain.TerrainBlock;
 
 public class MoveForwardAction extends MoveAction 
 {
@@ -46,6 +47,9 @@ public class MoveForwardAction extends MoveAction
 			}
 			dir.scale((double)(speed * time));
 			avatar.translate((float)dir.getX(),(float)dir.getY(),(float)dir.getZ());
+			if (isTerrainFollow())
+				avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
+
 			return;
 		}
 		

@@ -1,4 +1,4 @@
-package myGameEngine.newdc;
+package myGameEngine;
 
 import graphicslib3D.Point3D;
 

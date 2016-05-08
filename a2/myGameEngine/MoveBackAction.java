@@ -30,6 +30,9 @@ public class MoveBackAction extends MoveAction
 			dir = dir.mult(rot);
 			dir.scale((double)(speed * time) * -1);
 			avatar.translate((float)dir.getX(),(float)dir.getY(),(float)dir.getZ());
+			if (isTerrainFollow())
+				avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
+
 			return;}
 		
 		timeSinceLastMoveMS += time;

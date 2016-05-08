@@ -1,4 +1,4 @@
-package myGameEngine.newdc;
+package myGameEngine;
 
 import a2.DungeonCrawler3DSoonTM;
 import a2.newdc.GhostAvatar;
