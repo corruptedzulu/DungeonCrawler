@@ -7,6 +7,10 @@ import World.Room.Room;
 public abstract class WorldEntity 
 {
 
+	protected static int worldEntityID;
+	
+	protected int myWorldEntityID;
+	
 	//zero indexed
 	protected int xCoor;
 	protected int yCoor;
@@ -17,11 +21,49 @@ public abstract class WorldEntity
 	
 	protected Room containingRoom;
 	
+	
+	protected boolean shouldRemoveSelfFromGame;
+	
+	
+	protected WorldEntity()
+	{
+		myWorldEntityID = worldEntityID;
+		worldEntityID++;
+		
+		shouldRemoveSelfFromGame = false;
+	}
 
+	
+	public boolean getShouldRemoveSelfFromGame() {
+		return shouldRemoveSelfFromGame;
+	}
+
+
+	protected void setShouldRemoveSelfFromGame(boolean shouldRemoveSelfFromGame) {
+		this.shouldRemoveSelfFromGame = shouldRemoveSelfFromGame;
+	}
+
+
+	public int getMyWorldEntityID() {
+		return myWorldEntityID;
+	}
+	
+	
 	public Room getContainingRoom() {
 		return containingRoom;
 	}
 
+	
+	public String toString()
+	{
+		String s = null;
+		
+		s = myWorldEntityID + ":" + xCoor + "," + yCoor + ";";
+		
+		return s;
+	}
+	
+	
 
 	public void setContainingRoom(Room containingRoom) {
 		this.containingRoom = containingRoom;

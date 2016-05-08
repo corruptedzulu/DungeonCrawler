@@ -566,6 +566,28 @@ public class GameWorld
 		return locations;
 		
 	}
+
+	public ArrayList<Square> getEnemyLocationsInRoom(Room room) 
+	{
+		// TODO Auto-generated method stub
+		
+		ArrayList<Square> locations = new ArrayList<Square>();
+		
+		
+		for(WorldEntity e : room.getEntities())
+		{
+			
+			if(e instanceof Enemy)
+			{
+				Square s = new Square(e.getxCoor(), e.getyCoor());
+				locations.add(s);
+			}
+		}
+			
+		return locations;
+		
+	}
+	
 	
 	
 }

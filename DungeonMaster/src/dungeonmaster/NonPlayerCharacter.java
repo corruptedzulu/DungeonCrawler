@@ -21,6 +21,7 @@ public class NonPlayerCharacter extends WorldEntity
 	protected ArmorClass armorClass;
 	protected int initiativeModifier;
 	
+	protected boolean dying;
 	protected int deathSaveFailures;
 	protected int deathSaveSuccesses;
 	
@@ -50,6 +51,10 @@ public class NonPlayerCharacter extends WorldEntity
 	
 	public NonPlayerCharacter()
 	{
+		super();
+		
+		dying = false;
+		
 		rand = new Random();
 		
 		this.resetTurnSpecificValues();
@@ -59,6 +64,22 @@ public class NonPlayerCharacter extends WorldEntity
 	{
 		
 		movementRemaining = movementInSquares;
+		
+	}
+	
+	
+	public String toString()
+	{
+		String s = super.toString();
+		
+		s += race + ";";
+		
+		if(shouldRemoveSelfFromGame)
+		{
+			s += "shouldRemoveSelfFromGame;";
+		}
+		
+		return s;
 		
 	}
 	
@@ -111,9 +132,14 @@ public class NonPlayerCharacter extends WorldEntity
 		
 	}
 	
-	public void takeDamage()
+	public void takeDamage(int damage)
 	{
+		this.currentHP = this.currentHP - damage;
 		
+		if(currentHP < 1)
+		{
+			dying = true;
+		}
 	}
 	
 	public void saveVsDeath()

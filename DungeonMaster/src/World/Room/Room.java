@@ -3,6 +3,7 @@ package World.Room;
 import java.util.ArrayList;
 import java.util.Random;
 
+import Enemies.Enemy;
 import World.Floor;
 import World.WorldObjects.Door;
 import World.WorldObjects.WorldObject;
@@ -210,6 +211,14 @@ public class Room
 
 	public void setEntities(ArrayList<WorldEntity> entities) {
 		this.entities = entities;
+	}
+
+	public void removeEntity(Enemy attackedEnemy) 
+	{
+		// TODO Auto-generated method stub
+		
+		entities.remove(attackedEnemy);	
+		
 	}
 	
 	

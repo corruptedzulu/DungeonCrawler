@@ -248,6 +248,7 @@ public class DungeonMaster
 				String move = "Move";
 				String action = "Standard Action";
 				String minor = "Minor Action";
+				String ender = "End turn";
 				
 				
 				if(e instanceof PlayerCharacter)
@@ -285,6 +286,8 @@ public class DungeonMaster
 						{
 							p.getOut().print(minor);
 						}
+						
+						p.getOut().print(ender);
 						
 											
 						
@@ -338,8 +341,22 @@ public class DungeonMaster
 							
 							
 							//send the new X and Y coordinates (in squares coordinate space)
-							p.getOut().print(e.xCoor + ", " + e.yCoor);
+							p.getOut().print(e.getMyWorldEntityID() + ":" + e.xCoor + ", " + e.yCoor);
 							
+							for(Player player : players)
+							{
+								//if this player we're checking at is actually the one who is taking the turn
+								//skip them
+								//they're already getting the gameplay updates directly
+								if(player == p)
+								{
+									
+								}
+								else
+								{
+									player.getOut().println(e.xCoor + ", " + e.yCoor);
+								}
+							}
 							
 						}
 						
@@ -348,16 +365,300 @@ public class DungeonMaster
 						if(playerMove == "standard")
 						{
 							
+							//check with the world to see what actions are available
 							
+							
+							
+							
+							
+							String standardActionType = null;
+							
+							//get the action type that the player would like to make
+							try 
+							{
+								standardActionType = p.getIn().readLine();
+							} 
+							catch (IOException e1) 
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+							
+							
+							
+							
+							if(standardActionType == "attack")
+							{
+								
+								//ask if melee or ranged
+								
+								String attackType = null;
+								
+								//get the attack type that the player would like to make
+								try 
+								{
+									attackType = p.getIn().readLine();
+								} 
+								catch (IOException e1) 
+								{
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								
+								
+								
+								
+								
+								if(attackType == "melee")
+								{
+									
+									//ask the gameworld which enemies are adjacent
+									
+									ArrayList<WorldEntity> enemiesInRoom = currentRoom.getEntities();
+									
+									ArrayList<Enemy> enemiesAttackable = new ArrayList<Enemy>();
+									
+									
+									for(WorldEntity s : enemiesInRoom)
+									{
+										//check if this one is an enemy. if it is not, skip to the next one
+										if( !(s instanceof Enemy) )
+										{
+											continue;
+										}
+										
+										
+										
+										int squareX = s.getxCoor();
+										int squareY = s.getyCoor();
+										int myX = e.getxCoor();
+										int myY = e.getyCoor();
+										
+										
+										
+										
+										//if it is in x-alignment with me or one square either direction
+										if(squareX == myX || squareX == myX - 1 || squareX == myX + 1)
+										{
+											
+											//then check if it is on either side of me on the y axis or on my y axis
+											if(squareY == myY + 1 || squareY == myY - 1 || squareY == myY)
+											{
+												
+												
+												//the enemy in question is adjacent to me
+												
+												enemiesAttackable.add((Enemy) s);
+												
+											}
+											
+											
+										}
+									}
+									
+									
+									
+									//now i have an arraylist of adjacent enemies
+									
+									
+									String enemiesList = "";
+									
+									for(Enemy en : enemiesAttackable)
+									{
+										enemiesList += en.toString() + "$$";
+										
+									}
+									
+									
+									//send the list of enemies to the client
+									p.getOut().println(enemiesList);
+									
+									
+									
+									//ask which enemy the player would like to attack
+									String attackEnemyID = null;
+									
+									//get the attack type that the player would like to make
+									try 
+									{
+										attackEnemyID = p.getIn().readLine();
+									} 
+									catch (IOException e1) 
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+									
+									
+									Enemy attackedEnemy = null;
+									
+									for(Enemy en : enemiesAttackable)
+									{
+										if(en.getMyWorldEntityID() ==  Integer.parseInt(attackEnemyID))
+										{
+											attackedEnemy = en;
+										}
+									}
+									
+									
+									
+									//make the attack roll
+									int attackRoll = ((PlayerCharacter) e).makeAttackRoll("melee");
+									
+									
+									//if it beats the enemy's AC
+									if(attackRoll >= attackedEnemy.getArmorClass().getAC())
+									{
+										//make the damage roll
+										int damage = ((PlayerCharacter) e).makeDamageRoll("melee");
+										
+										
+										//tell the enemy to take the damage
+										attackedEnemy.takeDamage(damage);
+										
+										
+										//if that kills the enemy
+										if(attackedEnemy.getShouldRemoveSelfFromGame())
+										{
+											//then tell the Room to delete the enemy
+											currentRoom.removeEntity(attackedEnemy);
+											
+											
+											//and tell the player clients to remove it as well
+											p.getOut().println(attackedEnemy.toString());
+											
+											for(Player player : players)
+											{
+												//if this player we're checking at is actually the one who is taking the turn
+												//skip them
+												//they're already getting the gameplay updates directly
+												if(player == p)
+												{
+													
+												}
+												else
+												{
+													player.getOut().println(attackedEnemy.toString());
+												}
+											}
+											
+										}
+										
+									}
+									
+									
+									
+									
+									
+								}
+								
+								
+								if(attackType == "ranged")
+								{
+									
+									
+									//ask the gameworld which enemies are within range of the ranged weapon
+									
+									
+									//send that list and ask which enemy the player would like to attack
+									
+									
+									
+									
+									
+									
+								}
+								
+								
+								
+								
+								
+								
+								
+								
+							}
+							
+							if(standardActionType == "useAbility")
+							{
+								
+								
+								//ask if melee or ranged
+								
+								String abilityType = null;
+								
+								//get the attack type that the player would like to make
+								try 
+								{
+									abilityType = p.getIn().readLine();
+								} 
+								catch (IOException e1) 
+								{
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+								
+							}
+							
+							
+							
+							
+							
+							
+							hasActioned = true;
 							
 						}
 						
 						if(playerMove == "minor")
 						{
+						
+							
+							
+							
+							String minorActionType = null;
+							
+							//get the action type that the player would like to make
+							try 
+							{
+								minorActionType = p.getIn().readLine();
+							} 
+							catch (IOException e1) 
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							
+							
+							
+							
+							hasMinorActioned = true;
 							
 						}
 						
 						
+						
+						//player is done with turn, either by declaration or by exhaustion of options
+						if(playerMove == "end" || (hasActioned == true && hasMinorActioned == true && hasMoved == true))
+						{
+							
+							
+							
+							break;
+						}
 						
 						
 						

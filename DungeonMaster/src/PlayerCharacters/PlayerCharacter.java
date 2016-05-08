@@ -52,6 +52,8 @@ public class PlayerCharacter extends WorldEntity
 	
 	protected ArrayList<Treasure> treasures;
 	protected ArrayList<Weapon> weapons;
+	protected Weapon meleeWeapon;
+	protected Weapon rangedWeapon;
 	protected ArrayList<Item> inventory;
 	
 	
@@ -60,6 +62,9 @@ public class PlayerCharacter extends WorldEntity
 	
 	public PlayerCharacter()
 	{
+		
+		super();
+		
 		rand = new Random();
 		
 		this.resetTurnSpecificValues();
@@ -351,6 +356,44 @@ public class PlayerCharacter extends WorldEntity
 	{
 		
 	}
+
+
+	public int makeAttackRoll(String string) 
+	{
+		// TODO Auto-generated method stub
+		
+		if(string == "melee")
+		{
+			return meleeWeapon.rollToAttack();
+		}
+		
+		if(string == "ranged")
+		{
+			return rangedWeapon.rollToAttack();
+		}
+		
+		return 0;
+	}
+
+
+	public int makeDamageRoll(String string) 
+	{
+		// TODO Auto-generated method stub
+		
+		
+		if(string == "melee")
+		{
+			return meleeWeapon.rollDamage();
+		}
+		
+		if(string == "ranged")
+		{
+			return rangedWeapon.rollDamage();
+		}
+		
+		return 0;
+	}
+
 	
 	
 }
