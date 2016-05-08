@@ -2,11 +2,12 @@ package a2;
 
 import a2.newdc.GhostAvatar;
 import a2.newdc.assets.AssetInfo;
+import a2.newdc.assets.ObjectInteractableAsset;
 import a2.newdc.assets.ObjectNonInteractableAsset;
 import a2.newdc.assets.TileAsset;
 
-import myGameEngine.newdc.GameClientTCP;
-import myGameEngine.newdc.GameServerTCP;
+import myGameEngine.GameClientTCP;
+import myGameEngine.GameServerTCP;
 import myGameEngine.Camera3PController;
 import myGameEngine.MoveBackAction;
 import myGameEngine.MoveForwardAction;
@@ -19,16 +20,15 @@ import myGameEngine.PitchUpAction;
 import myGameEngine.YawLeftAction;
 import myGameEngine.YawRightAction;
 
+import net.java.games.input.*;
+import net.java.games.input.Event;
 import sage.app.BaseGame;
 import sage.display.*;
 import sage.event.EventManager;
 import sage.event.IEventManager;
 import sage.networking.IGameConnection;
-import sage.scene.SceneNode;
-import sage.scene.SkyBox;
+import sage.scene.*;
 import sage.scene.shape.*;
-import sage.scene.Group;
-import sage.scene.HUDString;
 import sage.input.*;
 import sage.input.action.*;
 import sage.renderer.IRenderer;
@@ -72,17 +72,18 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private TerrainBlock theTerrain;
     private Group background;
 
+    private Group animateGroup;
+    private Group chestGroup;
+
     private AssetInfo assetInfo;
-    private String zagDrivePath = "C:\\Users\\Zagaki\\Google Drive\\CSC165\\DungeonCrawler\\assets\\";
+    private String zagDrivePath = "C:\\Users\\Zagak\\Google Drive\\CSC165\\DungeonCrawler\\assets\\";
     private String zuluDrivePath = "your path here";
     private String tjDrivePath = "your path here";
     private String googleDrivePath = zagDrivePath;
 
     // http://www.farmpeeps.com/fp_skyboxes.html
     private String terrainTexture = googleDrivePath + "SkyBoxes\\_countrypaths_1\\down.jpg";
-    // TODO move skybox into assetInfo
 
-    private boolean connected;
 
     //private IDisplaySystem display;
     private IDisplaySystem display;
@@ -95,7 +96,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private GameServerTCP hostedServer;
     private GameClientTCP client;
-
+    private boolean connected;
 
     public DungeonCrawler3DSoonTM()
     {
@@ -120,14 +121,20 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     protected void initGame()
     {
-
-        display.setTitle("Dog Catcher!");
+        display.setTitle("DungeonCrawler");
 
         renderer = display.getRenderer();
 
         assetInfo = new AssetInfo(googleDrivePath);
 
-        createPlayers();
+        try
+        {
+            createPlayers();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
         createPlayerHUDs();
         initEnvironment();
         //initScriptEngines();
@@ -135,7 +142,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         associateDefaultKeyAndControllerBindings();
 
         camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
-        client.sendJoinMessage(); //$$
+        client.sendJoinMessage();
 
         super.update((float) 0.0);
     }
@@ -156,7 +163,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private IDisplaySystem createDisplaySystem()
     {
-        IDisplaySystem display = new MyDisplaySystem(1280, 720, 24, 20, true, "sage.renderer.jogl.JOGLRenderer");
+        IDisplaySystem display = new MyDisplaySystem(1280, 720, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
         System.out.print("\nWaiting for display creation...");
         int count = 0;
         // wait until display creation completes or a timeout occurs
@@ -188,9 +195,9 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     }
 
 
-    private void createPlayers()
+    private void createPlayers() throws Exception
     {
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        //System.out.println("Working Directory = " + System.getProperty("user.dir"));
 
         SceneNode cleric = assetInfo.playables.get("cleric")
                 .make(new Point3D(0, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
@@ -208,45 +215,35 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         ObjectNonInteractableAsset barrel = assetInfo.objectNonInteractables.get("barrel");
         addGameWorldObject(barrel.make(new Point3D(0, 0, 1.5), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
 
+
+
+        // animation objects
+        animateGroup = new Group("animateGroup");
+
+        ObjectInteractableAsset chest = assetInfo.objectInteractables.get("chest");
+        chestGroup = chest
+                .makeAni(new Point3D(0, 0, -2), new Point3D(.01, .01, .01), new Quaternion(1, new double[]{0, 0, 0}));
+        animateGroup.addChild(chestGroup);
+
+
+        addGameWorldObject(animateGroup);
+
+
+
         TileAsset tile = assetInfo.tiles.get("tile");
         tile.setRandomTexture(true);
-
-        for (int i = 0; i < 64; i+=1)
-            for (int j =0; j < 64; j+=1)
-                addGameWorldObject(barrel.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-                //addGameWorldObject(tile.make(new Point3D(i, 0, j), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-
-        //addGameWorldObject(tile.make(new Point3D(0, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(0, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(0, 0, 4), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(0, 0, 6), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(2, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(4, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(6, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        //addGameWorldObject(tile.make(new Point3D(6, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-//
-        //addGameWorldObject(tile.make(new Point3D(10,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,4),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,6),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(12,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(14,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(16,0,0),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(16,0,2),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-//
-        //addGameWorldObject(tile.make(new Point3D(10,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,12),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,14),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(10,0,16),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(12,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(14,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(16,0,10),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-        //addGameWorldObject(tile.make(new Point3D(16,0,12),new Point3D(.95,.95,.95),new Quaternion(1, new double[] {0,0,0})));
-
+        addGameWorldObject(tile.make(new Point3D(0, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 4), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 6), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(2, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(4, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(6, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(6, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
 
         avatarOne = cleric;
         cameraOne = new JOGLCamera(renderer);
-        cameraOne.setPerspectiveFrustum(60, 2, 1, 1000);
+        cameraOne.setPerspectiveFrustum(60, 2, .2, 1000);
         cameraOne.setViewport(0.0, 1.0, 0.0, 1);
         cameraOne.setLocation(new Point3D(0, 0, 0));
     }
@@ -278,23 +275,12 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         addGameWorldObject(skyBox);
 
         theTerrain = initTerrain();
-        theTerrain.scale(2, 1, 2);
+
+
         background = new Group();
         background.addChild(theTerrain);
         addGameWorldObject(background);
         initWorldAxes();
-    }
-
-
-    private static TerrainBlock createTerBlock(AbstractHeightMap heightMap)
-    {
-        float heightScale = 0.05f;
-        Vector3D terrainScale = new Vector3D(1, heightScale, 1);
-        int terrainSize = heightMap.getSize();
-        float cornerHeight = heightMap.getTrueHeightAtPoint(0, 0) * heightScale;
-        Point3D terrainOrigin = new Point3D(-64.5, -cornerHeight - 2, -64.5);
-        String name = "Terrain:" + heightMap.getClass().getSimpleName();
-        return new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
     }
 
     private TerrainBlock initTerrain()
@@ -310,6 +296,17 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         groundState.setEnabled(true);
         hillTerrain.setRenderState(groundState);
         return hillTerrain;
+    }
+
+    private static TerrainBlock createTerBlock(AbstractHeightMap heightMap)
+    {
+        float heightScale = 0.05f;
+        Vector3D terrainScale = new Vector3D(2, heightScale, 2);
+        int terrainSize = heightMap.getSize();
+        float cornerHeight = heightMap.getTrueHeightAtPoint(0, 0) * heightScale;
+        Point3D terrainOrigin = new Point3D(0, -cornerHeight, 0);
+        String name = "Terrain:" + heightMap.getClass().getSimpleName();
+        return new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
     }
 
     private void initWorldAxes()
@@ -360,7 +357,18 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         MoveLeftAction mvLeftActionPOne = new MoveLeftAction(cameraOne, (float) 0.1);
         MoveRightAction mvRightActionPOne = new MoveRightAction(cameraOne, (float) 0.1);
         MoveBackAction mvBackActionPOne = new MoveBackAction(cameraOne, (float) 0.1);
-        MoveUpAction mvUpActionPOne = new MoveUpAction(cameraOne, (float) 0.1);
+        mvFwdActionPOne.setTerrain(theTerrain);
+        mvBackActionPOne.setTerrain(theTerrain);
+        mvLeftActionPOne.setTerrain(theTerrain);
+        mvRightActionPOne.setTerrain(theTerrain);
+        mvFwdActionPOne.setTerrainFollow(true);
+        mvBackActionPOne.setTerrainFollow(true);
+        mvLeftActionPOne.setTerrainFollow(true);
+        mvRightActionPOne.setTerrainFollow(true);
+
+
+
+        //MoveUpAction mvUpActionPOne = new MoveUpAction(cameraOne, (float) 0.1);
         //MoveDownAction mvDownActionPOne = new MoveDownAction(cameraOne, (float) 0.1);
 
         PitchUpAction pitchUpActionPOne = new PitchUpAction(cameraOne, (float) 0.1);
@@ -433,14 +441,14 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                            IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
         //MOVE UP
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.SPACE,
-                           mvUpActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.SPACE,
-                           mvUpActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        //im.associateAction(kbName,
+        //                   net.java.games.input.Component.Identifier.Key.SPACE,
+        //                   mvUpActionPOne,
+        //                   IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+        //im.associateAction(kbName,
+        //                   net.java.games.input.Component.Identifier.Key.SPACE,
+        //                   mvUpActionPOne,
+        //                   IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
         //		//MOVE DOWN
         //		im.associateAction(kbName,
@@ -540,6 +548,28 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                            rollLeftActionPOne,
                            IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
+        // OPEN CHEST
+        im.associateAction(kbName,
+                           net.java.games.input.Component.Identifier.Key.G,
+                           new AbstractInputAction()
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   Iterator<SceneNode> itr = chestGroup.getChildren();
+                                   while (itr.hasNext())
+                                   {
+                                       Model3DTriMesh mesh = ((Model3DTriMesh)itr.next());
+                                       if (mesh.hasAnimations())
+                                       {
+                                            mesh.startAnimation("my_animation");
+                                       }
+                                   }
+                               }
+                           },
+                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+
+
+
     }
 
     private void updateSkybox()
@@ -558,10 +588,36 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         DecimalFormat df = new DecimalFormat("0.0");
         timeStringPOne.setText("Time = " + df.format(time / 1000));
 
+        updateAnimations(elapsedTimeMS);
+
         updateSkybox();
         camOne.update(elapsedTimeMS);
         super.update(elapsedTimeMS);
     }
+
+    private void updateAnimations(float elapsedTimeMS)
+    {
+        Iterator<SceneNode> groups = animateGroup.getChildren();
+        while (groups.hasNext())
+        {
+            Iterator<SceneNode> children = ((Group)groups.next()).getChildren();
+            while (children.hasNext())
+            {
+                Model3DTriMesh submesh = (Model3DTriMesh) children.next();
+                if (submesh.isAnimating())
+                {
+                    if (submesh.getCurrentAnimationTime() < 3.33f)   // unique to chest
+                    {
+                        submesh.updateAnimation(elapsedTimeMS);
+
+
+                        // remove from animation group add to gw ?
+                    }
+                }
+            }
+        }
+    }
+
 
     protected void render()
     {
