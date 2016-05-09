@@ -1,4 +1,8 @@
-/dungeonmaster/
-/PlayerCharacters/
-/World/
 /Enemies/
+/IO/
+/Interfaces/
+/Networking/
+/PlayerCharacters/
+/Race/
+/World/
+/dungeonmaster/

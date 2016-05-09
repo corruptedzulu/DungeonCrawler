@@ -3,11 +3,23 @@ import World.*;
 import World.Room.Room;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.Invocable;
 
 import Enemies.Enemy;
 import Interfaces.*;
@@ -18,12 +30,20 @@ import PlayerCharacters.*;
 public class DungeonMaster 
 {
 
+	private ScriptEngine engine;
+	private String scriptName = "script.js";
+	private File scriptFile;
+	
+	
 	private GameWorld gw;
 	private ArrayList<PlayerCharacter> characters;
 	private ArrayList<Player> players; 
 	
 	private ArrayList<PlayerCharacter> availableCharacters;
 	
+	
+	
+	private List<WorldEntity> allEntities;
 	
 	private ArrayList<WorldEntity> initiative;
 	//private Room currentRoom;
@@ -53,6 +73,8 @@ public class DungeonMaster
 		
 		availableCharacters = new ArrayList<PlayerCharacter>();
 		
+		allEntities = new ArrayList<WorldEntity>();
+		
 	}
 	
 	public void initialize(String[] args)
@@ -66,8 +88,20 @@ public class DungeonMaster
 		}
 		
 		
+		ScriptEngineManager factory = new ScriptEngineManager();
+		List<ScriptEngineFactory> list = factory.getEngineFactories();
+		engine = factory.getEngineByName("js");
+		scriptFile = new File(scriptName);
 		
 		boolean scriptsAvailable = false;
+		
+		
+		if(scriptFile.exists())
+		{
+			scriptsAvailable = true;
+		}
+		
+		
 		
 		//check if any script files are being provided to build the world with
 		
@@ -77,7 +111,30 @@ public class DungeonMaster
 		
 		if(scriptsAvailable)
 		{
-		
+			 try
+			 { 
+				 FileReader fileReader = new FileReader(scriptFile);
+				 engine.eval(fileReader);
+				 fileReader.close();
+			 }
+			 catch (FileNotFoundException e1)
+			 { 
+				 System.out.println(scriptFile + " not found " + e1);
+			 }
+			 catch (IOException e2)
+			 { 
+				 System.out.println("IO problem with " + scriptFile + e2);
+			 }
+			 catch (ScriptException e3) 
+			 { 
+				 System.out.println("ScriptException in " + scriptFile + e3);
+			 }
+			 catch (NullPointerException e4)
+			 { 
+				 System.out.println ("Null ptr exception reading " + scriptFile + e4); 
+			 }
+			 
+			 
 			//loadScripts();
 			//check if they are character and/or world scripts
 			//if(characterScripts)
@@ -97,10 +154,8 @@ public class DungeonMaster
 		{
 			
 			gw = new GameWorld();
+			gw = new GameWorld("simple");
 			gw.setDM(this);
-			
-			//gw = new GameWorld("simple");
-			
 			
 			
 			
@@ -115,10 +170,12 @@ public class DungeonMaster
 			characters.add(rogue);
 			characters.add(wizard);
 			
-			gw.setPCArrayList(characters);
-			
 		}
 		
+		
+		gw.setPCArrayList(characters);
+		
+		allEntities = gw.getAllEnemies();
 		
 		
 		//start networking
@@ -231,15 +288,35 @@ public class DungeonMaster
 		
 		
 		
-		for(WorldEntity e : characters)
+		//establish initiative order
+		
+		for(WorldEntity e : allEntities)
 		{
+			if(e instanceof PlayerCharacter)
+			{
+				((PlayerCharacter) e).rollInitiative();
+			}
 			
+			if(e instanceof NonPlayerCharacter)
+			{
+				((NonPlayerCharacter) e).rollInitiative();
+			}
+		}
+		
+		
+		//sort them in ascending order
+		Collections.sort(allEntities);
+		
+		//now, we want them in descending order for the initiative list
+		//so just keep inserting the next one at the beginning
+		for(WorldEntity e : allEntities)
+		{
+			initiative.add(0, e);
 		}
 		
 		
 		
 		
-		//establish initiative order
 		
 		
 		gameLoop();
@@ -257,11 +334,34 @@ public class DungeonMaster
 	{
 		// TODO Auto-generated method stub
 		
+		String sending = "";
+		
+		for(PlayerCharacter pc : characters)
+		{
+			sending += pc.getClass().getName() + ";";
+		}
+		
+		sending += "$$";
+		
+		p.getOut().println(sending);
 		
 	}
 
 	private void gameLoop()
 	{
+		
+		
+		//check if the players can see enemies or vice versa
+		//if yes, bring the enemies into the initiative
+		
+		//go through the list of players
+		//offer each player their turn
+		//receive their choice and update
+		//move to next player
+	
+		//if we come to an enemy or npc
+		//call takeTurn()
+		
 		while(gameInProgress == true)
 		{
 			
@@ -290,6 +390,32 @@ public class DungeonMaster
 							p = player;
 						}	
 					}
+					
+					
+					if( ((PlayerCharacter) e).isDead())
+					{
+						continue; //this lets us keep the player in the initiative order, just we skip them
+					}
+					
+					
+					if( ((PlayerCharacter) e).isDying() )
+					{
+						((PlayerCharacter) e).saveVsDeath();
+						//TODO inform player of success or failure
+						continue; //skip to the next WorldEntity
+					}
+					
+					
+					if( ((PlayerCharacter) e).isDead())
+					{
+						//TODO player is dead
+						//inform all players that the player died
+						
+						
+						
+						continue;//skip to the next player
+					}
+					
 					
 					//while the player still has turn options
 					while( hasMoved == false || hasActioned == false || hasMinorActioned == false)
@@ -332,7 +458,7 @@ public class DungeonMaster
 						
 						
 						
-						if(playerMove == "move")
+						if(playerMove == "move" && hasMoved == false)
 						{
 							String moveInDirection = null;
 							
@@ -353,7 +479,7 @@ public class DungeonMaster
 							if( gw.entityCanMoveInDirection(e, moveInDirection) )
 							{
 								//if it is a valid location, tell the player to make the move
-								((PlayerCharacter) e).move();
+								((PlayerCharacter) e).move(moveInDirection);
 							
 								//decrement the player's remaining movement
 								((PlayerCharacter) e).moveOneSquare();
@@ -388,7 +514,7 @@ public class DungeonMaster
 						
 						
 						
-						if(playerMove == "standard")
+						if(playerMove == "standard" && hasActioned == false)
 						{
 							
 							//check with the world to see what actions are available
@@ -398,6 +524,9 @@ public class DungeonMaster
 							//	entites: if they are enemy, ally, or PCs
 							
 							
+							
+							//TODO get a list of all of the things that the player could do from this square
+							//attack and interact are the two over arching things
 							
 							
 							String standardActionType = null;
@@ -677,14 +806,14 @@ public class DungeonMaster
 									
 									
 									//make the attack roll
-									int attackRoll = ((PlayerCharacter) e).makeAttackRoll("melee");
+									int attackRoll = ((PlayerCharacter) e).makeAttackRoll("ranged");
 									
 									
 									//if it beats the enemy's AC
 									if(attackRoll >= attackedEnemy.getArmorClass().getAC())
 									{
 										//make the damage roll
-										int damage = ((PlayerCharacter) e).makeDamageRoll("melee");
+										int damage = ((PlayerCharacter) e).makeDamageRoll("ranged");
 										
 										
 										//tell the enemy to take the damage
@@ -720,19 +849,10 @@ public class DungeonMaster
 										
 									}
 									
-									
-									
-									
-								}
-								
-								
-								
-								
-								
-								
-								
+								}					
 								
 							}
+							
 							
 							if(standardActionType == "interactWithObject")
 							{
@@ -756,19 +876,7 @@ public class DungeonMaster
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
-								
+														
 								
 								
 							}
@@ -785,11 +893,7 @@ public class DungeonMaster
 						if(playerMove == "minor")
 						{
 						
-							
-							
-							
-							
-							
+		
 							String minorActionType = null;
 							
 							//get the action type that the player would like to make
@@ -835,37 +939,803 @@ public class DungeonMaster
 					if(e instanceof Enemy)
 					{
 						
-						
-						
-					}
-					else
-					{
-						
-					}
+						//check if we've attacked
+						//if no, check for melee attack
 					
-				}
-				
-				
-				
-				//check if the players can see enemies or vice versa
-				//if yes, bring the enemies into the initiative
-				
-				//go through the list of players
-				//offer each player their turn
-				//receive their choice and update
-				//move to next player
-			
-				//if we come to an enemy or npc
-				//call takeTurn()
-				
-			}
-			
-			
+						ArrayList<PlayerCharacter> playerCharactersInRoom = new ArrayList<PlayerCharacter>();
+						
+						ArrayList<WorldEntity> myRoomEntities = e.getContainingRoom().getEntities();
+						
+						ArrayList<PlayerCharacter> playerCharactersAttackable = new ArrayList<PlayerCharacter>();
+						
+						
+						//get the locations of all of the playercharacters in this room
+						for(WorldEntity we : myRoomEntities)
+						{
+							if(we instanceof PlayerCharacter)
+							{
+								if(((PlayerCharacter) we).isDying())
+								{
+									//if the player is dying, then ignore them (no need to kill them if they're down)
+								}
+								else
+								{
+									playerCharactersInRoom.add((PlayerCharacter) we);
+								}
+							}
+						}
+						
+						
+						//find out which ones are within my immediate melee range
+						for(PlayerCharacter s : playerCharactersInRoom)
+						{			
+							
+							int squareX = s.getxCoor();
+							int squareY = s.getyCoor();
+							int myX = e.getxCoor();
+							int myY = e.getyCoor();
+							
+									
+							//if it is in x-alignment with me or one square either direction
+							if(squareX == myX || squareX == myX - 1 || squareX == myX + 1)
+							{
+								
+								//then check if it is on either side of me on the y axis or on my y axis
+								if(squareY == myY + 1 || squareY == myY - 1 || squareY == myY)
+								{
+									
+									
+									//the enemy in question is adjacent to me
+									
+									playerCharactersAttackable.add(s);
+									
+								}
+								
+								
+							}
+						}
+					
+					
+						//if there are characters adjacent to me, attack one
+						if(playerCharactersAttackable.size() != 0)
+						{
+						
+							Random random = new Random();
+							
+							int attackIndex = random.nextInt(playerCharactersAttackable.size());
+														
+							
+							PlayerCharacter attackedEnemy = playerCharactersAttackable.get(attackIndex);
+							
+							
+							//make the attack roll
+							int attackRoll = ((PlayerCharacter) e).makeAttackRoll("melee");
+							
+							
+							//if it beats the enemy's AC
+							if(attackRoll >= attackedEnemy.getArmorClass().getAC())
+							{
+								//make the damage roll
+								int damage = ((PlayerCharacter) e).makeDamageRoll("melee");
+								
+								
+								//tell the enemy to take the damage
+								attackedEnemy.takeDamage(damage);
+								
+								
+								//if that took the player to 0 or fewer HP, then on their turn they will start making death saving throws								
+							}
+							
+							hasActioned = true;
+							break;
+												
+						}
+						else//otherwise, move to the nearest enemy
+						{
+							
+							
+							//check if there is another enemy within move range
+							//if yes, move to enemy and attack
+							//if no, check if we've attacked
+							//if no, check for ranged attack
+							
+							
+					
+							//find out which players are within movement range
+							ArrayList<PlayerCharacter> reachableCharacters = new ArrayList<PlayerCharacter>();
+							
+							for(PlayerCharacter s : playerCharactersInRoom)
+							{								
+								
+								int squareX = s.getxCoor();
+								int squareY = s.getyCoor();
+								int myX = e.getxCoor();
+								int myY = e.getyCoor();
+								
+								int maxDistance = ((Enemy) e).getMovementInSquares();
+								
+								
+								//compute range to each enemy and add it if it is in range
+								//recall that DnD distances on diagonals do not follow the Pythagorean theorem
+								//up two, over two, but on the diagonal is counted as two
+								//thus, the distance in a large square from the center to each side is the same as to the diagonals
+								//thus, we only need to check the sides in the following block										
+								
+								//if it is in between the x distances that my weapon could go
+								if(squareX <= myX + maxDistance && squareX >= myX - maxDistance)
+								{
+									if(squareY <= myY + maxDistance && squareY >= myY - maxDistance)
+									{
+										reachableCharacters.add(s);
+									}
+								}
 		
-		
-		}
-		
-		
+								
+							}
+							
+							
+							//if i can move to another character, do so
+							if(reachableCharacters.size() != 0)
+							{
+								Random random = new Random();
+								
+								int moveTowards = random.nextInt(reachableCharacters.size());
+								
+								//TODO make up to MOVEMENT number of moves towards the selected character
+								//then, once we're adjacent, make a melee attack
+								
+								
+								
+								while(hasMoved == false)
+								{
+									String moveInDirection = determineDirectionTowardsEntity(e, reachableCharacters.get(moveTowards));
+
+									
+									//check if the direction the enemy wants to move is valid
+									if( gw.entityCanMoveInDirection(e, moveInDirection) )
+									{
+										//if it is a valid location, tell the player to make the move
+										((Enemy) e).move(moveInDirection);
+									
+										//decrement the player's remaining movement
+										((Enemy) e).moveOneSquare();
+										
+										if(((Enemy) e).getMovementRemaining() == 0)
+										{
+											hasMoved = true;
+										}
+										
+									}
+									else
+									{
+										switch (moveInDirection)
+										{
+										case "N":
+											
+											if(gw.entityCanMoveInDirection(e, "NE"))
+											{
+												moveInDirection = "NE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NW"))
+											{
+												moveInDirection = "NW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "E"))
+											{
+												moveInDirection = "E";
+											}
+											else if(gw.entityCanMoveInDirection(e, "W"))
+											{
+												moveInDirection = "W";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SE"))
+											{
+												moveInDirection = "SE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SW"))
+											{
+												moveInDirection = "SW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "S"))
+											{
+												moveInDirection = "S";
+											}
+											else
+											{
+												//if we can't make any of those moves, then we're stuck
+												//so just cancel out of attempting to move
+												//this is really only possible if we're surrounded
+												//we wouldve attacked something first
+												hasMoved = true;
+												break;
+											}
+											
+											
+											
+											//if it is a valid location, tell the player to make the move
+											((Enemy) e).move(moveInDirection);
+										
+											//decrement the player's remaining movement
+											((Enemy) e).moveOneSquare();
+											
+											if(((Enemy) e).getMovementRemaining() == 0)
+											{
+												hasMoved = true;
+											}
+											
+											
+											break;
+											
+										case "S":
+											
+											if(gw.entityCanMoveInDirection(e, "SE"))
+											{
+												moveInDirection = "SE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SW"))
+											{
+												moveInDirection = "SW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "E"))
+											{
+												moveInDirection = "E";
+											}
+											else if(gw.entityCanMoveInDirection(e, "W"))
+											{
+												moveInDirection = "W";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NE"))
+											{
+												moveInDirection = "NE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NW"))
+											{
+												moveInDirection = "NW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "N"))
+											{
+												moveInDirection = "N";
+											}
+											else
+											{
+												//if we can't make any of those moves, then we're stuck
+												//so just cancel out of attempting to move
+												//this is really only possible if we're surrounded
+												//we wouldve attacked something first
+												hasMoved = true;
+												break;
+											}
+											
+											
+											
+											//if it is a valid location, tell the player to make the move
+											((Enemy) e).move(moveInDirection);
+										
+											//decrement the player's remaining movement
+											((Enemy) e).moveOneSquare();
+											
+											if(((Enemy) e).getMovementRemaining() == 0)
+											{
+												hasMoved = true;
+											}
+											
+											
+											break;
+											
+										case "E":
+											
+											if(gw.entityCanMoveInDirection(e, "NE"))
+											{
+												moveInDirection = "NE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SE"))
+											{
+												moveInDirection = "SE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "N"))
+											{
+												moveInDirection = "N";
+											}
+											else if(gw.entityCanMoveInDirection(e, "S"))
+											{
+												moveInDirection = "S";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NW"))
+											{
+												moveInDirection = "NW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SW"))
+											{
+												moveInDirection = "SW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "W"))
+											{
+												moveInDirection = "W";
+											}
+											else
+											{
+												//if we can't make any of those moves, then we're stuck
+												//so just cancel out of attempting to move
+												//this is really only possible if we're surrounded
+												//we wouldve attacked something first
+												hasMoved = true;
+												break;
+											}
+											
+											
+											
+											//if it is a valid location, tell the player to make the move
+											((Enemy) e).move(moveInDirection);
+										
+											//decrement the player's remaining movement
+											((Enemy) e).moveOneSquare();
+											
+											if(((Enemy) e).getMovementRemaining() == 0)
+											{
+												hasMoved = true;
+											}
+											
+											
+											break;
+											
+										case "W":
+											
+											if(gw.entityCanMoveInDirection(e, "NW"))
+											{
+												moveInDirection = "NW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SW"))
+											{
+												moveInDirection = "SW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "N"))
+											{
+												moveInDirection = "N";
+											}
+											else if(gw.entityCanMoveInDirection(e, "S"))
+											{
+												moveInDirection = "S";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NE"))
+											{
+												moveInDirection = "NE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SE"))
+											{
+												moveInDirection = "SE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "E"))
+											{
+												moveInDirection = "E";
+											}
+											else
+											{
+												//if we can't make any of those moves, then we're stuck
+												//so just cancel out of attempting to move
+												//this is really only possible if we're surrounded
+												//we wouldve attacked something first
+												hasMoved = true;
+												break;
+											}
+											
+											
+											
+											//if it is a valid location, tell the player to make the move
+											((Enemy) e).move(moveInDirection);
+										
+											//decrement the player's remaining movement
+											((Enemy) e).moveOneSquare();
+											
+											if(((Enemy) e).getMovementRemaining() == 0)
+											{
+												hasMoved = true;
+											}
+											
+											
+											break;
+											
+										case "NW":
+											
+											if(gw.entityCanMoveInDirection(e, "N"))
+											{
+												moveInDirection = "N";
+											}
+											else if(gw.entityCanMoveInDirection(e, "W"))
+											{
+												moveInDirection = "W";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NE"))
+											{
+												moveInDirection = "NE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SW"))
+											{
+												moveInDirection = "SW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "E"))
+											{
+												moveInDirection = "E";
+											}
+											else if(gw.entityCanMoveInDirection(e, "S"))
+											{
+												moveInDirection = "S";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SE"))
+											{
+												moveInDirection = "SE";
+											}
+											else
+											{
+												//if we can't make any of those moves, then we're stuck
+												//so just cancel out of attempting to move
+												//this is really only possible if we're surrounded
+												//we wouldve attacked something first
+												hasMoved = true;
+												break;
+											}
+											
+											
+											
+											//if it is a valid location, tell the player to make the move
+											((Enemy) e).move(moveInDirection);
+										
+											//decrement the player's remaining movement
+											((Enemy) e).moveOneSquare();
+											
+											if(((Enemy) e).getMovementRemaining() == 0)
+											{
+												hasMoved = true;
+											}
+											
+											
+											break;
+											
+										case "NE":
+											
+											if(gw.entityCanMoveInDirection(e, "N"))
+											{
+												moveInDirection = "N";
+											}
+											else if(gw.entityCanMoveInDirection(e, "E"))
+											{
+												moveInDirection = "E";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NW"))
+											{
+												moveInDirection = "NW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SE"))
+											{
+												moveInDirection = "SE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "W"))
+											{
+												moveInDirection = "W";
+											}
+											else if(gw.entityCanMoveInDirection(e, "S"))
+											{
+												moveInDirection = "S";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SW"))
+											{
+												moveInDirection = "SW";
+											}
+											else
+											{
+												//if we can't make any of those moves, then we're stuck
+												//so just cancel out of attempting to move
+												//this is really only possible if we're surrounded
+												//we wouldve attacked something first
+												hasMoved = true;
+												break;
+											}
+											
+											
+											
+											//if it is a valid location, tell the player to make the move
+											((Enemy) e).move(moveInDirection);
+										
+											//decrement the player's remaining movement
+											((Enemy) e).moveOneSquare();
+											
+											if(((Enemy) e).getMovementRemaining() == 0)
+											{
+												hasMoved = true;
+											}
+											
+											
+											break;
+											
+										case "SW":
+											
+											if(gw.entityCanMoveInDirection(e, "W"))
+											{
+												moveInDirection = "W";
+											}
+											else if(gw.entityCanMoveInDirection(e, "S"))
+											{
+												moveInDirection = "S";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NW"))
+											{
+												moveInDirection = "NW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SE"))
+											{
+												moveInDirection = "SE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "N"))
+											{
+												moveInDirection = "N";
+											}
+											else if(gw.entityCanMoveInDirection(e, "E"))
+											{
+												moveInDirection = "E";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NE"))
+											{
+												moveInDirection = "NE";
+											}
+											else
+											{
+												//if we can't make any of those moves, then we're stuck
+												//so just cancel out of attempting to move
+												//this is really only possible if we're surrounded
+												//we wouldve attacked something first
+												hasMoved = true;
+												break;
+											}
+											
+											
+											
+											//if it is a valid location, tell the player to make the move
+											((Enemy) e).move(moveInDirection);
+										
+											//decrement the player's remaining movement
+											((Enemy) e).moveOneSquare();
+											
+											if(((Enemy) e).getMovementRemaining() == 0)
+											{
+												hasMoved = true;
+											}
+											
+											
+											break;
+											
+										case "SE":
+											
+											if(gw.entityCanMoveInDirection(e, "E"))
+											{
+												moveInDirection = "E";
+											}
+											else if(gw.entityCanMoveInDirection(e, "S"))
+											{
+												moveInDirection = "S";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NE"))
+											{
+												moveInDirection = "NE";
+											}
+											else if(gw.entityCanMoveInDirection(e, "SW"))
+											{
+												moveInDirection = "SW";
+											}
+											else if(gw.entityCanMoveInDirection(e, "N"))
+											{
+												moveInDirection = "N";
+											}
+											else if(gw.entityCanMoveInDirection(e, "W"))
+											{
+												moveInDirection = "W";
+											}
+											else if(gw.entityCanMoveInDirection(e, "NW"))
+											{
+												moveInDirection = "NW";
+											}
+											else
+											{
+												//if we can't make any of those moves, then we're stuck
+												//so just cancel out of attempting to move
+												//this is really only possible if we're surrounded
+												//we wouldve attacked something first
+												hasMoved = true;
+												break;
+											}
+											
+											
+											
+											//if it is a valid location, tell the player to make the move
+											((Enemy) e).move(moveInDirection);
+										
+											//decrement the player's remaining movement
+											((Enemy) e).moveOneSquare();
+											
+											if(((Enemy) e).getMovementRemaining() == 0)
+											{
+												hasMoved = true;
+											}
+											
+											
+											break;
+										
+										
+										
+										}
+									}
+																		
+									for(Player player : players)
+									{
+										player.getOut().println(e.xCoor + ", " + e.yCoor);
+									}
+								}
+								
+								
+								//we've now exhausted our movement
+								//check if we can attack
+								//if we can check if we have anyone next to us
+								
+
+								//find out which ones are within my immediate melee range
+								for(PlayerCharacter s : playerCharactersInRoom)
+								{			
+									
+									int squareX = s.getxCoor();
+									int squareY = s.getyCoor();
+									int myX = e.getxCoor();
+									int myY = e.getyCoor();
+									
+											
+									//if it is in x-alignment with me or one square either direction
+									if(squareX == myX || squareX == myX - 1 || squareX == myX + 1)
+									{
+										
+										//then check if it is on either side of me on the y axis or on my y axis
+										if(squareY == myY + 1 || squareY == myY - 1 || squareY == myY)
+										{									
+											//the enemy in question is adjacent to me										
+											playerCharactersAttackable.add(s);										
+										}
+										
+										
+									}
+								}
+							
+							
+								//if there are characters adjacent to me after i completed my movement, attack one
+								if(playerCharactersAttackable.size() != 0 && hasActioned == false)
+								{
+									int attackIndex = random.nextInt(playerCharactersAttackable.size());
+									
+									//TODO fill in the attack for adjacent enemy (picked from the list based on attackIndex)
+									
+									PlayerCharacter attackedEnemy = playerCharactersAttackable.get(attackIndex);
+									
+									//TODO MELEE attack
+									
+									//make the attack roll
+									int attackRoll = ((PlayerCharacter) e).makeAttackRoll("melee");
+									
+									
+									//if it beats the enemy's AC
+									if(attackRoll >= attackedEnemy.getArmorClass().getAC())
+									{
+										//make the damage roll
+										int damage = ((PlayerCharacter) e).makeDamageRoll("melee");
+										
+										
+										//tell the enemy to take the damage
+										attackedEnemy.takeDamage(damage);
+																				
+									}
+																		
+									hasActioned = true;
+									break;
+									
+									
+								}
+								
+								
+								//TODO send notificaiton to the players
+								
+								
+								hasMoved = true;
+								
+								break;
+							}
+							else//ranged attack
+							{
+							
+								
+								//find out which players are within ranged weapon range
+								for(PlayerCharacter s : playerCharactersInRoom)
+								{								
+									
+									int squareX = s.getxCoor();
+									int squareY = s.getyCoor();
+									int myX = e.getxCoor();
+									int myY = e.getyCoor();
+									
+									int maxDistance = ((Enemy) e).getRangedAttackDistance();
+									
+									
+									//compute range to each enemy and add it if it is in range
+									//recall that DnD distances on diagonals do not follow the Pythagorean theorem
+									//up two, over two, but on the diagonal is counted as two
+									//thus, the distance in a large square from the center to each side is the same as to the diagonals
+									//thus, we only need to check the sides in the following block										
+									
+									//if it is in between the x distances that my weapon could go
+									if(squareX <= myX + maxDistance && squareX >= myX - maxDistance)
+									{
+										if(squareY <= myY + maxDistance && squareY >= myY - maxDistance)
+										{
+											playerCharactersAttackable.add(s);
+										}
+									}
+				
+								}
+								
+								
+								if(playerCharactersAttackable.size() != 0)
+								{
+									
+									
+									Random random = new Random();
+									
+									int attackIndex = random.nextInt(playerCharactersAttackable.size());
+									
+									//TODO fill in the attack for ranged enemy (picked from the list based on attackIndex)
+									
+																		
+									
+									PlayerCharacter attackedEnemy = playerCharactersAttackable.get(attackIndex);
+																		
+									
+									
+									//make the attack roll
+									int attackRoll = ((Enemy) e).makeAttackRoll("ranged");
+									
+									
+									//if it beats the enemy's AC
+									if(attackRoll >= attackedEnemy.getArmorClass().getAC())
+									{
+										//make the damage roll
+										int damage = ((Enemy) e).makeDamageRoll("ranged");
+										
+										
+										//tell the enemy to take the damage
+										attackedEnemy.takeDamage(damage);
+										
+									}
+									
+									
+									//TODO send notification to the players
+									
+									
+									hasActioned = true;
+									break;
+									
+									
+								}
+								else
+								{
+									//no enemies within ranged attack range, nor movement
+									//so just quit our turn
+									break;
+								}						
+							}							
+						}								
+					}								
+				}						
+			}				
+		}			
+	}
+
+
+	private String determineDirectionTowardsEntity(WorldEntity mover, WorldEntity moveTowards)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

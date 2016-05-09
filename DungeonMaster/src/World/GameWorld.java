@@ -57,6 +57,22 @@ public class GameWorld
 	}
 	
 	
+	public GameWorld(String string)
+	{
+		// TODO Auto-generated constructor stub
+		
+		
+		this();
+		
+		
+		//create 3 rooms for default set up
+		
+		
+		
+		
+		
+	}
+
 	public void initializeWorld()
 	{
 		
@@ -607,6 +623,24 @@ public class GameWorld
 		}
 		
 		result += "$$";
+		
+		return result;
+	}
+
+	public ArrayList<WorldEntity> getAllEnemies()
+	{
+		// TODO Auto-generated method stub
+		
+		
+		ArrayList<WorldEntity> result = new ArrayList<WorldEntity>();
+		
+		
+		for(Room r : rooms)
+		{
+			result.addAll(r.getEntities());
+		}
+		
+		
 		
 		return result;
 	}

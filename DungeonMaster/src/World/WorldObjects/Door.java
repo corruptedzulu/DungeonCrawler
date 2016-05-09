@@ -1,5 +1,7 @@
 package World.WorldObjects;
 
+import World.Room.Room;
+
 public class Door 
 {
 	
@@ -20,6 +22,9 @@ public class Door
 	
 	private int roomOneFace; //N=1, S=2, E=3, W=4
 	private int roomTwoFace;
+	
+	private Room myRoom;
+	private Room roomIConnectTo;
 	
 	public static int doorID = 0;
 	protected int myDoorID;
@@ -146,6 +151,26 @@ public class Door
 		result += "Door" + myDoorID + ":" + xRoomOneCoor + "," + yRoomOneCoor + ";" + + xRoomTwoCoor + "," + yRoomTwoCoor + ";" + "$$";
 		
 		return result;
+	}
+
+	public Room getMyRoom()
+	{
+		return myRoom;
+	}
+
+	public void setMyRoom(Room myRoom)
+	{
+		this.myRoom = myRoom;
+	}
+
+	public Room getRoomIConnectTo()
+	{
+		return roomIConnectTo;
+	}
+
+	public void setRoomIConnectTo(Room roomIConnectTo)
+	{
+		this.roomIConnectTo = roomIConnectTo;
 	}
 	
 	

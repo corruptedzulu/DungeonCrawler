@@ -4,7 +4,7 @@ import java.util.Random;
 import World.GameWorld;
 import World.Room.Room;
 
-public abstract class WorldEntity 
+public abstract class WorldEntity implements Comparable
 {
 
 	protected static int worldEntityID = 0;
@@ -33,6 +33,10 @@ public abstract class WorldEntity
 		shouldRemoveSelfFromGame = false;
 	}
 
+	public int rollInitiative()
+	{
+		return 0;
+	}
 	
 	public boolean getShouldRemoveSelfFromGame() {
 		return shouldRemoveSelfFromGame;
