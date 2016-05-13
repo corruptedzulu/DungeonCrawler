@@ -2,7 +2,7 @@ package World.WorldObjects;
 
 import World.Room.Room;
 
-public class Door 
+public class Door extends WorldObject
 {
 	
 	private String doorType;

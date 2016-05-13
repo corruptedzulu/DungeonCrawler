@@ -651,13 +651,22 @@ public class GameWorld
 		
 		ArrayList<WorldObject> objects = new ArrayList<WorldObject>();
 		
+		int eX = e.getxCoor();
+		int eY = e.getyCoor();
+		
+		ArrayList<WorldObject> allRoomObjects = e.getContainingRoom().getContents();
+		
 		
 		if(e instanceof PlayerCharacter)
-		{
-			
+		{	
+			for(WorldObject wo : allRoomObjects)
+			{
+				if(e.isAdjacentTo(wo))
+				{
+					objects.add(wo);
+				}
+			}	
 		}
-		
-		
 		
 		return objects;
 		

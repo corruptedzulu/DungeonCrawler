@@ -1,6 +1,7 @@
 package dungeonmaster;
 import World.*;
 import World.Room.Room;
+import World.WorldObjects.Door;
 import World.WorldObjects.WorldObject;
 
 import java.io.BufferedReader;
@@ -942,6 +943,12 @@ public class DungeonMaster
 								
 								if(interactingWith.meetsInteractionDC(roll))
 								{
+									if(interactingWith instanceof Door)
+									{
+										//TODO door-specific interactions code (move character to the next room)
+									}
+									
+									
 									interactingWith.interact(e);
 								}
 								else

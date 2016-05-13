@@ -16,6 +16,8 @@ public class WorldObject
 	public static int worldObjectID = 0;
 	protected int myWorldObjectID;
 	
+	private Skill interactionSkill;
+	private int interactionDC;
 	
 	
 	public WorldObject()
@@ -51,6 +53,22 @@ public class WorldObject
 	public void setyCoor(int yCoor) {
 		this.yCoor = yCoor;
 	}
+	public Skill getInteractionSkill()
+	{
+		return interactionSkill;
+	}
+	public void setInteractionSkill(Skill interactionSkill)
+	{
+		this.interactionSkill = interactionSkill;
+	}
+	public int getInteractionDC()
+	{
+		return interactionDC;
+	}
+	public void setInteractionDC(int interactionDC)
+	{
+		this.interactionDC = interactionDC;
+	}
 	
 	
 	public String toString()
@@ -68,15 +86,18 @@ public class WorldObject
 
 	public Skill getApplicableInteractionSkill()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return getInteractionSkill();
 	}
 
 
 
 	public boolean meetsInteractionDC(int roll)
 	{
-		// TODO Auto-generated method stub
+		if(roll >= this.interactionDC)
+		{
+			return true;
+		}
+		
 		return false;
 	}
 
@@ -88,5 +109,105 @@ public class WorldObject
 		
 	}
 	
+	
+	public boolean isAdjacentTo(WorldObject e)
+	{
+		boolean result = false;
+		
+		int x1 = this.xCoor + 1;
+		int x0 = this.xCoor;
+		int xn1 = this.xCoor - 1;
+		
+		int y1 = this.yCoor + 1;
+		int y0 = this.yCoor;
+		int yn1 = this.yCoor - 1;
+		
+		
+		int eX = e.getxCoor();
+		int eY = e.getyCoor();
+		
+		
+		if(eX == x1) //if we're aligned with the column one square to the right
+		{
+			if(eY == y1 || eY == y0 || eY == yn1) //if we're aligned with any of the three rows
+			{
+				result = true;
+			}
+		}
+		else if(eX == x0)
+		{
+			if(eY == y1 || eY == yn1)
+			{
+				result = true;
+			}
+		}
+		else if(eX == xn1)
+		{
+			if(eY == y1 || eY == y0 || eY == yn1)
+			{
+				result = true;
+			}
+		}
+		else
+		{
+			result = false;
+		}
+		
+		return result;
+	}
+	
+	public boolean isAdjacentTo(WorldEntity e)
+	{
+		boolean result = false;
+		
+		int x1 = this.xCoor + 1;
+		int x0 = this.xCoor;
+		int xn1 = this.xCoor - 1;
+		
+		int y1 = this.yCoor + 1;
+		int y0 = this.yCoor;
+		int yn1 = this.yCoor - 1;
+		
+		
+		int eX = e.getxCoor();
+		int eY = e.getyCoor();
+		
+		
+		if(eX == x1) //if we're aligned with the column one square to the right
+		{
+			if(eY == y1 || eY == y0 || eY == yn1) //if we're aligned with any of the three rows
+			{
+				result = true;
+			}
+		}
+		else if(eX == x0)
+		{
+			if(eY == y1 || eY == yn1)
+			{
+				result = true;
+			}
+		}
+		else if(eX == xn1)
+		{
+			if(eY == y1 || eY == y0 || eY == yn1)
+			{
+				result = true;
+			}
+		}
+		else
+		{
+			result = false;
+		}
+		
+		return result;
+	}
+
+
+
+
+
+
+
+
 	
 }
