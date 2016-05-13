@@ -644,6 +644,24 @@ public class GameWorld
 		
 		return result;
 	}
+
+	public ArrayList<WorldObject> getWorldObjectsAdjacentToMe(WorldEntity e)
+	{
+		// TODO Auto-generated method stub
+		
+		ArrayList<WorldObject> objects = new ArrayList<WorldObject>();
+		
+		
+		if(e instanceof PlayerCharacter)
+		{
+			
+		}
+		
+		
+		
+		return objects;
+		
+	}
 	
 	
 	

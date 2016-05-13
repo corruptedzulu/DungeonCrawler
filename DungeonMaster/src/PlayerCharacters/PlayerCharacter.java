@@ -187,9 +187,11 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		
 	}
 	
-	public void useSkill()
+	public int useSkill(Skill skill)
 	{
+		//TODO fill in
 		
+		return 0;
 	}
 	
 	public void makeSave()

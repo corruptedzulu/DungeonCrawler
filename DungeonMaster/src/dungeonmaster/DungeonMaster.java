@@ -1,6 +1,7 @@
 package dungeonmaster;
 import World.*;
 import World.Room.Room;
+import World.WorldObjects.WorldObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -219,13 +220,13 @@ public class DungeonMaster
 			
 			
 			//TODO: sendInitialGameState
-			sendInitialGameState(p);
-			sendAvailableCharacters(p);
+			//sendInitialGameState(p); //tells them about the world
+			sendAvailableCharacters(p); //tells them who is available
 			
 			
 			//TODO: listen for which character they want and their name
 			String playerName = "";
-			p.getOut().print("What is your name? ");
+			p.getOut().println("requestName");
 			try 
 			{
 				playerName = p.getIn().readLine();
@@ -236,7 +237,7 @@ public class DungeonMaster
 				e1.printStackTrace();
 			}
 			
-			p.getOut().print("Which character would you like? Cleric, Rogue, Wizard, or Fighter: ");
+			p.getOut().println("pickCharacter");
 			
 			
 			String playerCharacterChoice = "";
@@ -281,10 +282,33 @@ public class DungeonMaster
 			
 			
 			
-			//TODO tell any other connected players about this new player.
+			
 			
 		}
 		
+		//TODO tell all connected players about each of the other players.
+		
+		for(Player p : players)
+		{
+			for(Player player : players)
+			{
+				//report to each player what all of the players currently are
+				if(player == p)
+				{
+					
+				}
+				else
+				{
+					p.getOut().println(player.getMyCharacter().toString());
+				}
+
+				
+			}
+		}
+		
+		
+		
+		//TODO wait for all players to send the ready signal (ie, they stepped on the teleporter)
 		
 		
 		
@@ -316,6 +340,7 @@ public class DungeonMaster
 		
 		
 		
+		//TODO tell the players about the first room
 		
 		
 		
@@ -856,36 +881,83 @@ public class DungeonMaster
 							
 							if(standardActionType == "interactWithObject")
 							{
+								//get all of the adjacent objects
+								ArrayList<WorldObject> objects = gw.getWorldObjectsAdjacentToMe(e);
+								WorldObject interactingWith = null;
+								boolean isInteracting = false;
+								
+								String interactionDirection = null;
+								
+								p.getOut().println("interactionDirection");
 								
 								
-								//get all of the abilities that can be used
-								//so... check what objects in the world we're near
-								
-								//this m
-								
-								
-								String abilityType = null;
-								
-								//get the attack type that the player would like to make
+								//ask player for direction of object to interact with								
+								//get the interaction direction that the player would like to make
 								try 
 								{
-									abilityType = p.getIn().readLine();
+									interactionDirection = p.getIn().readLine();
 								} 
 								catch (IOException e1) 
 								{
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
-														
+								
+								
+								for(WorldObject wo : objects)
+								{
+									//check direction relative to e
+									//check if that direction matches the interaction direction
+									//set the object as interactingWith
+									//if nothing found, break
+									
+									
+									String directionOfObject = this.determineDirectionTowardsObject(e, wo);
+									
+									
+									if(directionOfObject == interactionDirection)
+									{
+										interactingWith = wo;
+										
+										isInteracting = true;
+									}
+									
+									
+									
+								}
+								
+								if(!isInteracting)
+								{
+									break;
+								}
+								
+								
+								//call object.getApplicableInteractionSkill()
+								//call PlayerCharacter.rollSkill(skill);
+								//call object.rollMeetsDC(pc's roll);
+								//if yes, object.interact();
+								
+								Skill skill = interactingWith.getApplicableInteractionSkill();
+								int roll = ((PlayerCharacter) e).useSkill(skill);
+								
+								if(interactingWith.meetsInteractionDC(roll))
+								{
+									interactingWith.interact(e);
+								}
+								else
+								{
+									
+								}
+								
+								
+								
+								//TODO some sort of way to report what happened
+																			
 								
 								
 							}
 							
-							
-							
-							
-							
-							
+				
 							hasActioned = true;
 							
 						}
@@ -1734,8 +1806,130 @@ public class DungeonMaster
 
 	private String determineDirectionTowardsEntity(WorldEntity mover, WorldEntity moveTowards)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		String direction = "";
+		
+		int moverX = mover.getxCoor();
+		int moverY = mover.getyCoor();
+		int moveToX = moveTowards.getxCoor();
+		int moveToY = moveTowards.getyCoor();
+		
+		
+		
+		//compute angle from where i am to where i'm going and assign a direction (1/8th of a circle)
+		//woohoo, trig
+		int deltaX = moverX - moveToX;//adjacent
+		int deltaY = moverY - moveToY;//opposite
+		
+		
+		double angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+		
+		
+		//0-359 degrees
+		
+		if(angle >= 22.5 && angle < 77.5)
+		{
+			direction = "NE";
+		}
+		else if(angle >= 77.5 && angle < 112.5)
+		{
+			direction = "N";
+		}
+		else if(angle >= 112.5 && angle < 157.5)
+		{
+			direction = "NW";
+		}
+		else if(angle >= 157.5 && angle < 202.5)
+		{
+			direction = "W";
+		}
+		else if(angle >= 202.5 && angle < 247.5)
+		{
+			direction = "SW";
+		}
+		else if(angle >= 247.5 && angle < 292.5)
+		{
+			direction = "S";
+		}
+		else if(angle >= 292.5 && angle < 337.5)
+		{
+			direction = "SE";
+		}
+		else if(angle >= 337.5 || angle < 22.5) //have to use the OR here, since it can be bigger han 337.5 or smaller than 22.5
+		{
+			direction = "E";
+		}
+		else
+		{
+			direction = "E";//use east as the fallback if nothing matches correctly
+		}
+		
+		
+		
+		return direction;
+	}
+	
+	private String determineDirectionTowardsObject(WorldEntity mover, WorldObject moveTowards)
+	{
+		String direction = "";
+		
+		int moverX = mover.getxCoor();
+		int moverY = mover.getyCoor();
+		int moveToX = moveTowards.getxCoor();
+		int moveToY = moveTowards.getyCoor();
+		
+		
+		
+		//compute angle from where i am to where i'm going and assign a direction (1/8th of a circle)
+		//woohoo, trig
+		int deltaX = moverX - moveToX;//adjacent
+		int deltaY = moverY - moveToY;//opposite
+		
+		
+		double angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+		
+		
+		//0-359 degrees
+		
+		if(angle >= 22.5 && angle < 77.5)
+		{
+			direction = "NE";
+		}
+		else if(angle >= 77.5 && angle < 112.5)
+		{
+			direction = "N";
+		}
+		else if(angle >= 112.5 && angle < 157.5)
+		{
+			direction = "NW";
+		}
+		else if(angle >= 157.5 && angle < 202.5)
+		{
+			direction = "W";
+		}
+		else if(angle >= 202.5 && angle < 247.5)
+		{
+			direction = "SW";
+		}
+		else if(angle >= 247.5 && angle < 292.5)
+		{
+			direction = "S";
+		}
+		else if(angle >= 292.5 && angle < 337.5)
+		{
+			direction = "SE";
+		}
+		else if(angle >= 337.5 || angle < 22.5) //have to use the OR here, since it can be bigger han 337.5 or smaller than 22.5
+		{
+			direction = "E";
+		}
+		else
+		{
+			direction = "E";//use east as the fallback if nothing matches correctly
+		}
+		
+		
+		
+		return direction;
 	}
 	
 }

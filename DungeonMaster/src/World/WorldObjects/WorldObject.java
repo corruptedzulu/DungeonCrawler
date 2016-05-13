@@ -1,5 +1,8 @@
 package World.WorldObjects;
 
+import dungeonmaster.Skill;
+import dungeonmaster.WorldEntity;
+
 public class WorldObject 
 {
 
@@ -59,6 +62,30 @@ public class WorldObject
 		
 		
 		return result;
+	}
+
+
+
+	public Skill getApplicableInteractionSkill()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	public boolean meetsInteractionDC(int roll)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+
+	public void interact(WorldEntity e)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 	
 	
