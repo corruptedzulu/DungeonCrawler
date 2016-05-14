@@ -512,12 +512,12 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 	{
 		// TODO Auto-generated method stub
 		
-		if(string == "melee")
+		if(string.equals("melee"))
 		{
 			return meleeWeapon.rollToAttack();
 		}
 		
-		if(string == "ranged")
+		if(string.equals("ranged"))
 		{
 			return rangedWeapon.rollToAttack();
 		}
@@ -531,12 +531,12 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		// TODO Auto-generated method stub
 		
 		
-		if(string == "melee")
+		if(string.equals("melee"))
 		{
 			return meleeWeapon.rollDamage();
 		}
 		
-		if(string == "ranged")
+		if(string.equals("ranged"))
 		{
 			return rangedWeapon.rollDamage();
 		}

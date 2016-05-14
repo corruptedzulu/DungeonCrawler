@@ -75,7 +75,7 @@ public class WorldObject
 	{
 		String result = "";
 		
-		result += "WorldObject" + myWorldObjectID + ":" + xCoor + "," + yCoor + ";" + "$$";
+		result += "WorldObject" + myWorldObjectID + ":" + xCoor + "," + yCoor + ";";
 		
 		
 		

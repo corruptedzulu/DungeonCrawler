@@ -83,7 +83,7 @@ public class DungeonMaster
 	{
 		if(args != null)
 		{
-			if(args[0] == "singleplayer")
+			if(args[0].equals("singleplayer"))
 			{
 				singlePlayerGame = true;
 			}
@@ -177,7 +177,8 @@ public class DungeonMaster
 		
 		gw.setPCArrayList(characters);
 		
-		allEntities = gw.getAllEnemies();
+		//TODO: uncomment
+		//allEntities = gw.getAllEnemies();
 		
 		
 		//start networking
@@ -256,7 +257,7 @@ public class DungeonMaster
 			
 			for(PlayerCharacter pc : characters)
 			{
-				if(pc.getPlayerClass().getThisInstanceClass() == playerCharacterChoice)
+				if(pc.getPlayerClass().getThisInstanceClass().equals(playerCharacterChoice))
 				{
 					pc.setPlayerName(playerName);
 					p.setMyCharacter(pc);
@@ -272,7 +273,7 @@ public class DungeonMaster
 				//go ahead and remove all of the characters that are not the single player
 				for(PlayerCharacter pc : characters)
 				{
-					if(pc.getPlayerName() == "")
+					if(pc.getPlayerName().equals(""))
 					{
 						characters.remove(pc);
 					}
@@ -541,7 +542,7 @@ public class DungeonMaster
 						
 						
 						
-						if(playerMove == "move" && hasMoved == false)
+						if(playerMove.equals("move") && hasMoved == false)
 						{
 							
 							p.getOut().println("moveDirection");
@@ -603,7 +604,7 @@ public class DungeonMaster
 						
 						
 						
-						if(playerMove == "standard" && hasActioned == false)
+						if(playerMove.equals("standard") && hasActioned == false)
 						{
 							
 							//check with the world to see what actions are available
@@ -638,7 +639,7 @@ public class DungeonMaster
 							
 							
 							
-							if(standardActionType == "attack")
+							if(standardActionType.equals("attack"))
 							{
 								
 								p.getOut().println("attackType");
@@ -662,7 +663,7 @@ public class DungeonMaster
 								
 								
 								
-								if(attackType == "melee")
+								if(attackType.equals("melee"))
 								{
 									
 									//ask the gameworld which enemies are adjacent
@@ -807,7 +808,7 @@ public class DungeonMaster
 								}
 								
 								
-								if(attackType == "ranged")
+								if(attackType.equals("ranged"))
 								{
 									
 																	
@@ -952,7 +953,7 @@ public class DungeonMaster
 							}//if(standardActionType == "attack")
 							
 							
-							if(standardActionType == "interactWithObject")
+							if(standardActionType.equals("interactWithObject"))
 							{
 								//get all of the adjacent objects
 								ArrayList<WorldObject> objects = gw.getWorldObjectsAdjacentToMe(e);
@@ -988,7 +989,7 @@ public class DungeonMaster
 									String directionOfObject = this.determineDirectionTowardsObject(e, wo);
 									
 									
-									if(directionOfObject == interactionDirection)
+									if(directionOfObject.equals(interactionDirection))
 									{
 										interactingWith = wo;
 										
@@ -1092,7 +1093,10 @@ public class DungeonMaster
 									{
 										interactingWith.interact(e);
 										
-										
+										for(Player player : players)
+										{
+											player.getOut().println(interactingWith.toString());
+										}
 										//TODO some sort of way to report what happened with an interaction
 									}
 								
@@ -1132,7 +1136,7 @@ public class DungeonMaster
 						
 						
 						//player is done with turn, either by declaration or by exhaustion of options
-						if(playerMove == "end" || (hasActioned == true && hasMoved == true)) //hasMinorActioned == true &&
+						if(playerMove.equals("end") || (hasActioned == true && hasMoved == true)) //hasMinorActioned == true &&
 						{
 							
 							
