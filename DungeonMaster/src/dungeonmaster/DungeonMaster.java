@@ -201,7 +201,8 @@ public class DungeonMaster
 		//transmit initial state to each one
 		while(clientsConnected < 4)
 		{
-			//TODO: server.listen
+			
+			//create a new serversocket and listen for a client
 			Socket socket = new Socket();
 			try 
 			{
@@ -214,14 +215,14 @@ public class DungeonMaster
 			}
 					
 						
-			
+			//make a new player to represent that socket
+			//store the socket there and add the player to the list
 			Player p = new Player();
 			p.setMySocket(socket);
 			players.add(p);
 			
 			
-			//TODO: sendInitialGameState
-			//sendInitialGameState(p); //tells them about the world
+			
 			sendAvailableCharacters(p); //tells them who is available
 			
 			
@@ -287,6 +288,7 @@ public class DungeonMaster
 			
 		}
 		
+		
 		//TODO tell all connected players about each of the other players.
 		
 		for(Player p : players)
@@ -305,16 +307,48 @@ public class DungeonMaster
 
 				
 			}
+			
+			//p.getOut().println("nextReportWhenReadyToProceed");//tell the client that the next communcation from the server will be asking them to report they're ready
+			
+		}
+		
+		
+		//wait for all players (in succession) to send the ready signal (ie, they stepped on the teleporter)
+		int clientsHaveReportedReady = 0;
+		
+		for(Player p : players)
+		{
+			p.getOut().println("reportReadyToProceed");
+			String readyToProceed = "";
+			
+			
+			while(readyToProceed != "ready")
+			{
+				try
+				{
+					readyToProceed = p.getIn().readLine();
+				}
+				catch (IOException e1)
+				{
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			
+			clientsHaveReportedReady += 1;
+			
+			
+			//tell the player about the whole game world
+			sendInitialGameState(p);
+			
 		}
 		
 		
 		
-		//TODO wait for all players to send the ready signal (ie, they stepped on the teleporter)
-		
+
 		
 		
 		//establish initiative order
-		
 		for(WorldEntity e : allEntities)
 		{
 			if(e instanceof PlayerCharacter)
@@ -328,7 +362,6 @@ public class DungeonMaster
 			}
 		}
 		
-		
 		//sort them in ascending order
 		Collections.sort(allEntities);
 		
@@ -339,9 +372,14 @@ public class DungeonMaster
 			initiative.add(0, e);
 		}
 		
+
 		
 		
-		//TODO tell the players about the first room
+		
+		for(Player p : players)
+		{
+			p.getOut().println("readyToProceed");//the game will begin, change display to the internal map, away from the outdoors area
+		}
 		
 		
 		
@@ -395,11 +433,11 @@ public class DungeonMaster
 			{
 				boolean hasMoved = false;
 				boolean hasActioned = false;
-				boolean hasMinorActioned = false;
+				//boolean hasMinorActioned = false;
 				
 				String move = "Move";
-				String action = "Standard Action";
-				String minor = "Minor Action";
+				String action = "StandardAction";
+				//String minor = "MinorAction";
 				String ender = "End turn";
 				
 				
@@ -416,56 +454,74 @@ public class DungeonMaster
 							p = player;
 						}	
 					}
-					
-					
-					if( ((PlayerCharacter) e).isDead())
-					{
-						continue; //this lets us keep the player in the initiative order, just we skip them
-					}
-					
+			
 					
 					if( ((PlayerCharacter) e).isDying() )
 					{
 						((PlayerCharacter) e).saveVsDeath();
 						//TODO inform player of success or failure
+						
+						
+						if( ((PlayerCharacter)e).isDead() )
+						{
+							
+							for(Player player : players)
+							{
+								if(player != p)
+								{
+									player.getOut().println(p.getMyCharacter().toString());
+								}
+							}
+								
+							p.getOut().println("dead");
+			
+						}
+						
+						if( ((PlayerCharacter)e).isDying() )
+						{
+							p.getOut().println("dying");
+							
+							
+							
+						}
+						
+						
+							
+						//TODO player is dead
+						//inform all players that the player died	
 						continue; //skip to the next WorldEntity
 					}
 					
 					
 					if( ((PlayerCharacter) e).isDead())
-					{
-						//TODO player is dead
-						//inform all players that the player died
-						
-						
-						
-						continue;//skip to the next player
+					{					
+						continue;//skip to the next player, but keep us in the initiative order
 					}
 					
 					
 					//while the player still has turn options
-					while( hasMoved == false || hasActioned == false || hasMinorActioned == false)
+					while( hasMoved == false || hasActioned == false)// || hasMinorActioned == false)
 					{
 						//tell the player that it is their turn
 						//ask the player what they would like to do
-						p.getOut().print("It is your move. What would you like to do (or end)?");
+						p.getOut().println("yourMove");
 						
 						
 						//these are the things the player can do, dependent of what they've already done
 						if(hasMoved == false)
 						{
-							p.getOut().print(move);
+							p.getOut().println(move);
 						}
 						if(hasActioned == false)
 						{
-							p.getOut().print(action);
+							p.getOut().println(action);
 						}
-						if(hasMinorActioned == false)
+						/*if(hasMinorActioned == false)
 						{
-							p.getOut().print(minor);
-						}
+							//p.getOut().println(minor);
+						}*/
 						
-						p.getOut().print(ender);
+						p.getOut().println(ender);
 						
 											
 						
@@ -475,6 +531,7 @@ public class DungeonMaster
 						{
 							playerMove = p.getIn().readLine();
 						} 
+						
 						catch (IOException e1) 
 						{
 							// TODO Auto-generated catch block
@@ -486,6 +543,10 @@ public class DungeonMaster
 						
 						if(playerMove == "move" && hasMoved == false)
 						{
+							
+							p.getOut().println("moveDirection");
+							
+							
 							String moveInDirection = null;
 							
 							//get the direction the player would like to move in (N, NE, E, SE, S, SW, W, NW);
@@ -498,6 +559,8 @@ public class DungeonMaster
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
+							
+							
 							
 							
 							
@@ -519,7 +582,7 @@ public class DungeonMaster
 							
 							
 							//send the new X and Y coordinates (in squares coordinate space)
-							p.getOut().print(e.getMyWorldEntityID() + ":" + e.xCoor + ", " + e.yCoor);
+							p.getOut().println( ((PlayerCharacter) e).toString() );
 							
 							for(Player player : players)
 							{
@@ -532,7 +595,7 @@ public class DungeonMaster
 								}
 								else
 								{
-									player.getOut().println(e.xCoor + ", " + e.yCoor);
+									player.getOut().println(((PlayerCharacter) e).toString());
 								}
 							}
 							
@@ -551,8 +614,11 @@ public class DungeonMaster
 							
 							
 							
-							//TODO get a list of all of the things that the player could do from this square
+							//get a list of all of the things that the player could do from this square
 							//attack and interact are the two over arching things
+							
+							
+							p.getOut().println("standardActionType");
 							
 							
 							String standardActionType = null;
@@ -574,6 +640,8 @@ public class DungeonMaster
 							
 							if(standardActionType == "attack")
 							{
+								
+								p.getOut().println("attackType");
 								
 								//ask if melee or ranged
 								
@@ -621,6 +689,7 @@ public class DungeonMaster
 										
 										
 										
+										//NOTE: this if() if() could be replaced with a call to e.isAdjacentTo(s);
 										
 										//if it is in x-alignment with me or one square either direction
 										if(squareX == myX || squareX == myX - 1 || squareX == myX + 1)
@@ -646,19 +715,19 @@ public class DungeonMaster
 									//now i have an arraylist of adjacent enemies
 									
 									
-									String enemiesList = "";
-									
+									String enemiesList = "EnemyList:";
 									for(Enemy en : enemiesAttackable)
 									{
-										enemiesList += en.toString() + "$$";
+										enemiesList += en.toString();
 										
 									}
-									
+									enemiesList += "$$";
 									
 									//send the list of enemies to the client
 									p.getOut().println(enemiesList);
 									
 									
+									p.getOut().println("selectEnemyWorldEntityID");
 									
 									//ask which enemy the player would like to attack
 									String attackEnemyID = null;
@@ -787,22 +856,25 @@ public class DungeonMaster
 									
 									
 									
-									//now i have an arraylist of adjacent enemies
+									//now i have an arraylist of within-range enemies
 									
 									
-									String enemiesList = "";
+									String enemiesList = "EnemyList";
 									
 									for(Enemy en : enemiesAttackable)
 									{
-										enemiesList += en.toString() + "$$";
+										enemiesList += en.toString();
 										
 									}
 									
+									enemiesList += "$$";
+																	
 									
 									//send the list of enemies to the client
 									p.getOut().println(enemiesList);
 									
 									
+									p.getOut().println("selectEnemyWorldEntityID");
 									
 									//ask which enemy the player would like to attack
 									String attackEnemyID = null;
@@ -869,15 +941,15 @@ public class DungeonMaster
 												{
 													player.getOut().println(attackedEnemy.toString());
 												}
-											}
+											}//for(Player player : players)
 											
-										}
+										}//if(attackedEnemy.getShouldRemoveSelfFromGame())
 										
-									}
+									}//if(attackRoll >= attackedEnemy.getArmorClass().getAC())
 									
-								}					
+								}//if(attackType == "ranged")					
 								
-							}
+							}//if(standardActionType == "attack")
 							
 							
 							if(standardActionType == "interactWithObject")
@@ -929,7 +1001,7 @@ public class DungeonMaster
 								
 								if(!isInteracting)
 								{
-									break;
+									continue; //turns out we're not interacting with anything, so skip to the next go around of our turn-loop
 								}
 								
 								
@@ -938,6 +1010,7 @@ public class DungeonMaster
 								//call object.rollMeetsDC(pc's roll);
 								//if yes, object.interact();
 								
+								Room movingFrom = e.getContainingRoom(); //save this in case we need to rereport it
 								Skill skill = interactingWith.getApplicableInteractionSkill();
 								int roll = ((PlayerCharacter) e).useSkill(skill);
 								
@@ -945,23 +1018,87 @@ public class DungeonMaster
 								{
 									if(interactingWith instanceof Door)
 									{
-										//TODO door-specific interactions code (move character to the next room)
+										//door-specific interactions code (move character to the next room)
+										
+										
+										//get the room this door connects to
+										Room roomMovingTo = ((Door) interactingWith).getRoomIConnectTo();
+										
+										//get all of the Doors in the new room
+										ArrayList<Door> doorsInNewRoom = roomMovingTo.getDoors();
+										
+										
+										//check each door to see what it connects with
+										for(Door d : doorsInNewRoom)
+										{
+											//if the door connects to the room we're coming out of
+											//then get it's location and put the playercharacter one sqaure in
+											if(d.getRoomIConnectTo() == e.getContainingRoom())
+											{
+												//move the character to the new room
+												e.setContainingRoom(roomMovingTo);
+												
+												//set the coordinates in that new room
+												
+												int doorX = d.getxRoomOneCoor();
+												int doorY = d.getyRoomOneCoor();
+												
+												if(doorX == 0)//SOUTH WALL
+												{
+													e.setxCoor(doorX + 1);
+													e.setyCoor(doorY);
+												}
+												else if(doorX == d.getMyRoom().getLengthSquares())//NORTH WALL
+												{
+													e.setxCoor(doorX - 1);
+													e.setyCoor(doorY);
+												}
+												else if(doorY == 0)//WEST WALL
+												{
+													e.setxCoor(doorX);
+													e.setyCoor(doorY + 1);
+												}
+												else if(doorX == d.getMyRoom().getWidthSquares())//EAST WALL
+												{
+													e.setxCoor(doorX);
+													e.setyCoor(doorY - 1);
+												}
+																						
+												
+												
+											}
+										}
+										
+										
+										
+										//tell the player about it's character (specifically that it moved)
+										p.getOut().println( ((PlayerCharacter) e).toString() );
+										//TODO tell the player about the new room it' in, but only if we're not saving the whole world map on the client-side on startup
+										
+										
+										//now tell the other players about the change in rooms
+										
+										for(Player player : players)
+										{
+											if(p != player)
+											{
+												player.getOut().println( ((PlayerCharacter) e).toString() );
+											}
+										}				
+										
+										
 									}
+									else
+									{
+										interactingWith.interact(e);
+										
+										
+										//TODO some sort of way to report what happened with an interaction
+									}
+								
 									
-									
-									interactingWith.interact(e);
 								}
-								else
-								{
-									
-								}
-								
-								
-								
-								//TODO some sort of way to report what happened
-																			
-								
-								
+				
 							}
 							
 				
@@ -969,7 +1106,7 @@ public class DungeonMaster
 							
 						}
 						
-						if(playerMove == "minor")
+						/*if(playerMove == "minor")
 						{
 						
 		
@@ -982,7 +1119,6 @@ public class DungeonMaster
 							} 
 							catch (IOException e1) 
 							{
-								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
 							
@@ -991,12 +1127,12 @@ public class DungeonMaster
 							
 							hasMinorActioned = true;
 							
-						}
+						}*/
 						
 						
 						
 						//player is done with turn, either by declaration or by exhaustion of options
-						if(playerMove == "end" || (hasActioned == true && hasMinorActioned == true && hasMoved == true))
+						if(playerMove == "end" || (hasActioned == true && hasMoved == true)) //hasMinorActioned == true &&
 						{
 							
 							

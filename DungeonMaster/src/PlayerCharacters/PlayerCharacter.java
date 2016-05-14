@@ -86,6 +86,27 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		
 	}
 	
+	public String toString()
+	{
+		String s = null;
+		
+		s = "WorldEntity" + myWorldEntityID + ":" + xCoor + "," + yCoor + ";";
+		
+		
+		if(dead)
+		{
+			s += "dead;";
+		}
+		if(dying)
+		{
+			s += "dying";
+		}
+		
+		s += "$$";
+		
+		return s;
+	}
+	
 	public void takeTurn()
 	{
 	
@@ -226,6 +247,7 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		if(deathSaveFailures == 3)
 		{
 			this.dead = true;
+			this.dying = false;//can't be dying if we're already dead
 		}
 		
 		if(deathSaveSuccesses == 3)

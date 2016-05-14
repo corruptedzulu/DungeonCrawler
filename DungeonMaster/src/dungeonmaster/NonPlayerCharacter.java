@@ -82,6 +82,8 @@ public class NonPlayerCharacter extends WorldEntity implements Comparable
 			s += "shouldRemoveSelfFromGame;";
 		}
 		
+		s += "$$";
+		
 		return s;
 		
 	}
