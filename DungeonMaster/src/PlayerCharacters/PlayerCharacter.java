@@ -72,6 +72,8 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		
 		dying = false;
 		dead = false;
+		deathSaveFailures = 0;
+		deathSaveSuccesses = 0;
 		
 		rand = new Random();
 		

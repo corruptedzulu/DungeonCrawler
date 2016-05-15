@@ -155,7 +155,7 @@ public class DungeonMaster
 		else
 		{
 			
-			gw = new GameWorld();
+			//gw = new GameWorld();
 			gw = new GameWorld("simple");
 			gw.setDM(this);
 			
@@ -178,7 +178,7 @@ public class DungeonMaster
 		gw.setPCArrayList(characters);
 		
 		//TODO: uncomment
-		//allEntities = gw.getAllEnemies();
+		allEntities = gw.getAllEnemies();
 		
 		
 		//start networking
@@ -1038,6 +1038,8 @@ public class DungeonMaster
 											{
 												//move the character to the new room
 												e.setContainingRoom(roomMovingTo);
+												movingFrom.getEntities().remove(e);
+												roomMovingTo.getEntities().add(e);
 												
 												//set the coordinates in that new room
 												

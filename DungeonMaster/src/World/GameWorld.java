@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import Enemies.Enemy;
+import Enemies.Goblin;
 import PlayerCharacters.PlayerCharacter;
 import World.Room.*;
+import World.WorldObjects.Chest;
 import World.WorldObjects.Door;
 import World.WorldObjects.WorldObject;
 import dungeonmaster.DungeonMaster;
@@ -58,9 +60,7 @@ public class GameWorld
 	
 	
 	public GameWorld(String string)
-	{
-		// TODO Auto-generated constructor stub
-		
+	{	
 		
 		this();
 		
@@ -68,7 +68,122 @@ public class GameWorld
 		//create 3 rooms for default set up
 		
 		
+		Room room1 = new Room();
+		Room room2 = new Room();
+		Room room3 = new Room();
 		
+		rooms.add(room1);
+		rooms.add(room2);
+		rooms.add(room3);
+		
+		
+		room1.setWidthSquares(8);
+		room1.setLengthSquares(12);
+		room1.setxWorldCoor(0);
+		room1.setyWorldCoor(0);
+		
+		room2.setWidthSquares(15);
+		room2.setLengthSquares(20);
+		room2.setxWorldCoor(0);
+		room2.setyWorldCoor(12);
+		
+		room3.setWidthSquares(10);
+		room3.setLengthSquares(30);
+		room3.setxWorldCoor(0);
+		room3.setyWorldCoor(33);
+		
+		Door door1to2 = new Door();
+		Door door2to1 = new Door();
+		Door door2to3 = new Door();
+		Door door3to2 = new Door();
+		
+		
+		door1to2.setMyRoom(room1);
+		door1to2.setRoomIConnectTo(room2);
+		door1to2.setxRoomOneCoor(5);
+		door1to2.setxRoomTwoCoor(5);
+		door1to2.setyRoomOneCoor(room1.getLengthSquares() - 1);
+		door1to2.setyRoomTwoCoor(0);
+
+		door2to1.setMyRoom(room2);
+		door2to1.setRoomIConnectTo(room1);
+		door2to1.setxRoomOneCoor(5);
+		door2to1.setxRoomTwoCoor(5);
+		door2to1.setyRoomOneCoor(room2.getLengthSquares() - 1);
+		door2to1.setyRoomTwoCoor(0);
+		
+		door2to3.setMyRoom(room2);
+		door2to3.setRoomIConnectTo(room3);
+		door2to3.setxRoomOneCoor(5);
+		door2to3.setxRoomTwoCoor(5);
+		door2to3.setyRoomOneCoor(room2.getLengthSquares() - 1);
+		door2to3.setyRoomTwoCoor(0);
+		
+		door3to2.setMyRoom(room3);
+		door3to2.setRoomIConnectTo(room2);
+		door3to2.setxRoomOneCoor(5);
+		door3to2.setxRoomTwoCoor(5);
+		door3to2.setyRoomOneCoor(room3.getLengthSquares() - 1);
+		door3to2.setyRoomTwoCoor(0);
+		
+		
+		room1.getDoors().add(door1to2);
+		room2.getDoors().add(door2to1);
+		room2.getDoors().add(door2to3);
+		room3.getDoors().add(door3to2);
+		
+		
+		
+		//create enemies
+		
+		
+		for(int x = 0; x < 3; x++)
+		{
+			Goblin g = new Goblin();
+			g.setxCoor(x * 2);
+			g.setyCoor(5);
+			room1.getEntities().add(g);
+		}
+		
+		for(int x = 0; x < 6; x++)
+		{
+			Goblin g = new Goblin();
+			g.setxCoor( (x * 2) + 4);
+			g.setyCoor(10);
+			room2.getEntities().add(g);
+		}
+		
+		for(int x = 0; x < 2; x++)
+		{
+			Goblin g = new Goblin();
+			g.setxCoor(x * 2);
+			g.setyCoor(15);
+			room3.getEntities().add(g);
+		}
+		
+		
+		Goblin g = new Goblin("big");
+		g.setxCoor(5);
+		g.setyCoor(20);
+		room3.getEntities().add(g);
+		
+		Chest c = new Chest();
+		c.setxCoor(5);
+		c.setyCoor(25);
+		
+		room3.getContents().add(c);
+		
+		
+		
+		//create objects
+		
+		
+		
+		/*	
+		
+		protected ArrayList<WorldObject> contents;
+		protected ArrayList<WorldEntity> entities;
+		*/
 		
 		
 	}
@@ -518,6 +633,46 @@ public class GameWorld
 			break;
 			
 		case "NE":
+
+			//check the walls of the room
+			
+			//if the current Y coordinate has 1 added to it (go North), does that new Y coordinate exceed the length of the room?
+			//these are zero indexed, so subtract 1 from the Length (just like with subtracting 1 from the size of an array to find the correct index)			
+			if(e.getxCoor() + 1 > e.getContainingRoom().getWidthSquares() - 1 || e.getyCoor() + 1 > e.getContainingRoom().getLengthSquares() - 1)
+			{
+				return false;
+			}
+			
+			
+			//check the other entities in the room
+			for(WorldEntity we : e.getContainingRoom().getEntities())
+			{
+				//if we'd be on the same Y value
+				if(e.getyCoor() + 1 == we.getyCoor())
+				{
+					//if we would be on the same X value
+					if(e.getxCoor() + 1 == we.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			//check the world objects in the room
+			for(WorldObject wo : e.getContainingRoom().getContents())
+			{
+				//if we're on the same X value
+				if(e.getyCoor() + 1 == wo.getyCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getxCoor() + 1 == wo.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
 			
 			
 			
@@ -525,19 +680,135 @@ public class GameWorld
 			
 		case "NW":
 			
+			//check the walls of the room
 			
+			//if the current Y coordinate has 1 added to it (go North), does that new Y coordinate exceed the length of the room?
+			//these are zero indexed, so subtract 1 from the Length (just like with subtracting 1 from the size of an array to find the correct index)			
+			if(e.getxCoor() - 1 < 0 || e.getyCoor() + 1 > e.getContainingRoom().getLengthSquares() - 1)
+			{
+				return false;
+			}
+			
+			
+			//check the other entities in the room
+			for(WorldEntity we : e.getContainingRoom().getEntities())
+			{
+				//if we'd be on the same Y value
+				if(e.getyCoor() + 1 == we.getyCoor())
+				{
+					//if we would be on the same X value
+					if(e.getxCoor() - 1 == we.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			//check the world objects in the room
+			for(WorldObject wo : e.getContainingRoom().getContents())
+			{
+				//if we're on the same X value
+				if(e.getyCoor() + 1 == wo.getyCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getxCoor() - 1 == wo.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}			
 			
 			break;
 			
 		case "SE":
 			
 			
+			//check the walls of the room
+			
+			//if the current Y coordinate has 1 added to it (go North), does that new Y coordinate exceed the length of the room?
+			//these are zero indexed, so subtract 1 from the Length (just like with subtracting 1 from the size of an array to find the correct index)			
+			if(e.getxCoor() + 1 > e.getContainingRoom().getWidthSquares() - 1 || e.getyCoor() - 1 < 0)
+			{
+				return false;
+			}
+			
+			
+			//check the other entities in the room
+			for(WorldEntity we : e.getContainingRoom().getEntities())
+			{
+				//if we'd be on the same Y value
+				if(e.getyCoor() - 1 == we.getyCoor())
+				{
+					//if we would be on the same X value
+					if(e.getxCoor() + 1 == we.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			//check the world objects in the room
+			for(WorldObject wo : e.getContainingRoom().getContents())
+			{
+				//if we're on the same X value
+				if(e.getyCoor() - 1 == wo.getyCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getxCoor() + 1 == wo.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}			
 			
 			break;
 			
+			
 		case "SW":
 			
+			//check the walls of the room
 			
+			//if the current Y coordinate has 1 added to it (go North), does that new Y coordinate exceed the length of the room?
+			//these are zero indexed, so subtract 1 from the Length (just like with subtracting 1 from the size of an array to find the correct index)			
+			if(e.getxCoor() - 1 < 0 || e.getyCoor() - 1 < 0)
+			{
+				return false;
+			}
+			
+			
+			//check the other entities in the room
+			for(WorldEntity we : e.getContainingRoom().getEntities())
+			{
+				//if we'd be on the same Y value
+				if(e.getyCoor() - 1 == we.getyCoor())
+				{
+					//if we would be on the same X value
+					if(e.getxCoor() - 1 == we.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}
+			
+			//check the world objects in the room
+			for(WorldObject wo : e.getContainingRoom().getContents())
+			{
+				//if we're on the same X value
+				if(e.getyCoor() - 1 == wo.getyCoor())
+				{
+					//if we would be on the same Y value
+					if(e.getxCoor() - 1 == wo.getxCoor())
+					{
+						//we would collide, so disallow move
+						return false;
+					}
+				}
+			}			
 			
 			break;
 		
@@ -651,8 +922,8 @@ public class GameWorld
 		
 		ArrayList<WorldObject> objects = new ArrayList<WorldObject>();
 		
-		int eX = e.getxCoor();
-		int eY = e.getyCoor();
+		//int eX = e.getxCoor();
+		//int eY = e.getyCoor();
 		
 		ArrayList<WorldObject> allRoomObjects = e.getContainingRoom().getContents();
 		

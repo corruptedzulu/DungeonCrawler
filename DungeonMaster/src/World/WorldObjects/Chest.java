@@ -5,6 +5,7 @@ import dungeonmaster.WorldEntity;
 import java.util.ArrayList;
 
 import PlayerCharacters.PlayerCharacter;
+
 import dungeonmaster.Treasure;
 
 public class Chest extends WorldObject 

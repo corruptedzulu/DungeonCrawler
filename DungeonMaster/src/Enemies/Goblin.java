@@ -52,7 +52,7 @@ public class Goblin extends Enemy
 		
 		ArrayList<Weapon> weapons = new ArrayList<Weapon>();
 		
-		
+		//TODO weapons
 		
 		
 		this.setWeapons(weapons);
@@ -63,6 +63,27 @@ public class Goblin extends Enemy
 	
 	
 	
+	public Goblin(String string)
+	{
+		// TODO Auto-generated constructor stub
+		
+		this();
+		
+		
+		this.armorClass.setAC(17);
+		this.setMaxHP(27);
+		this.setMovementInSquares(7);
+		
+		
+		
+		
+		
+		
+	}
+
+
+
+
 	public void takeTurn()
 	{
 		

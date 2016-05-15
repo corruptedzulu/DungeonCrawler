@@ -26,5 +26,12 @@ public class EntityClass
 	{
 		return thisClass;
 	}
+
+	public int getHitDiceFaceValue()
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	
 }
