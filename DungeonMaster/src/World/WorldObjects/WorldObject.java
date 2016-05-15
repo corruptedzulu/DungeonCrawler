@@ -25,6 +25,15 @@ public class WorldObject
 		myWorldObjectID = worldObjectID;
 		worldObjectID++;
 		
+		
+		width = 0;
+		length = 0;
+		
+		xCoor = 0;
+		yCoor = 0;
+		
+		interactionDC = 0;
+		
 	}
 	
 	

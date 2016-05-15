@@ -53,8 +53,8 @@ public class DungeonMaster
 	private IDungeonMasterInput input;
 	private IDungeonMasterOutput output;
 	
-	private boolean gameInProgress = true;
-	private boolean singlePlayerGame = false;
+	private boolean gameInProgress;
+	private boolean singlePlayerGame;
 	
 	private Socket socket;
 	private ServerSocket serverSocket;
@@ -76,6 +76,11 @@ public class DungeonMaster
 		availableCharacters = new ArrayList<PlayerCharacter>();
 		
 		allEntities = new ArrayList<WorldEntity>();
+		
+		clientsConnected = 0;
+		
+		gameInProgress = true;
+		singlePlayerGame = false;
 		
 	}
 	
@@ -224,12 +229,12 @@ public class DungeonMaster
 			
 			
 			
-			sendAvailableCharacters(p); //tells them who is available
 			
 			
-			//TODO: listen for which character they want and their name
-			String playerName = "";
+			
+			//listen for their name
 			p.getOut().println("requestName");
+			String playerName = "";
 			try 
 			{
 				playerName = p.getIn().readLine();
@@ -240,9 +245,21 @@ public class DungeonMaster
 				e1.printStackTrace();
 			}
 			
+			
+			
+			//tell them the classes that are available			
+			String sending = "charactersAvailable:";		
+			for(PlayerCharacter pc : characters)
+			{
+				sending += pc.getPlayerClass().getThisInstanceClass() + ";";
+			}
+			sending += "$$";
+			p.getOut().println(sending);
+			
+			
+			
+			//ask them to pick which class they want
 			p.getOut().println("pickCharacter");
-			
-			
 			String playerCharacterChoice = "";
 			try 
 			{
@@ -255,6 +272,7 @@ public class DungeonMaster
 			}
 			
 			
+			//match that string with the PC
 			for(PlayerCharacter pc : characters)
 			{
 				if(pc.getPlayerClass().getThisInstanceClass().equals(playerCharacterChoice))
@@ -284,17 +302,13 @@ public class DungeonMaster
 			clientsConnected++;
 			
 			
-			
-			
-			
 		}
 		
 		
-		//TODO tell all connected players about each of the other players.
-		
-		for(Player p : players)
+		//tell all connected players about each of the other players.
+		for(Player p : players)//for each player
 		{
-			for(Player player : players)
+			for(Player player : players)//loop through the players
 			{
 				//report to each player what all of the players currently are
 				if(player == p)
@@ -314,6 +328,7 @@ public class DungeonMaster
 		}
 		
 		
+		
 		//wait for all players (in succession) to send the ready signal (ie, they stepped on the teleporter)
 		int clientsHaveReportedReady = 0;
 		
@@ -321,8 +336,6 @@ public class DungeonMaster
 		{
 			p.getOut().println("reportReadyToProceed");
 			String readyToProceed = "";
-			
-			
 			while(readyToProceed != "ready")
 			{
 				try
@@ -340,7 +353,7 @@ public class DungeonMaster
 			
 			
 			//tell the player about the whole game world
-			sendInitialGameState(p);
+			p.getOut().println(gw.toString());
 			
 		}
 		
@@ -386,31 +399,7 @@ public class DungeonMaster
 		
 		gameLoop();
 	}
-	
-	private void sendInitialGameState(Player p) 
-	{
-		// TODO Auto-generated method stub
-		
-		p.getOut().println(gw.toString());
-		
-	}
 
-	private void sendAvailableCharacters(Player p) 
-	{
-		// TODO Auto-generated method stub
-		
-		String sending = "";
-		
-		for(PlayerCharacter pc : characters)
-		{
-			sending += pc.getClass().getName() + ";";
-		}
-		
-		sending += "$$";
-		
-		p.getOut().println(sending);
-		
-	}
 
 	private void gameLoop()
 	{

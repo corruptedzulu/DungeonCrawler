@@ -9,7 +9,7 @@ public class EntityClass
 	
 	public EntityClass()
 	{
-		
+		thisClass = "";
 	}
 	
 	public String[] getClasses()

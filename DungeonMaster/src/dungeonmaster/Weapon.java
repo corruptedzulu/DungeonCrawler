@@ -18,7 +18,16 @@ public class Weapon
 
 	public Weapon()
 	{
+		name = "";
+		damageType = "";
+		weaponType = "";
+		distance = 0;
+		damageDiceNumber = 0;
+		numberOfDamageDice = 0;
+		damageModifier = 0;
+		attackModifier = 0;
 		
+		criticalHit = false;
 	}
 	
 	public Weapon(String n, String dType, String wType, int dist, int dNumber, int diceNumber, int dmgMod, int attMod)
@@ -32,6 +41,7 @@ public class Weapon
 		damageModifier = dmgMod;
 		attackModifier = attMod;
 		
+		criticalHit = false;
 	}
 	
 	public void setName(String n)

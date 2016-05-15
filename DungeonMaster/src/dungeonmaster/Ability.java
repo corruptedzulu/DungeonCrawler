@@ -10,7 +10,9 @@ public class Ability
 	
 	public Ability()
 	{
-		
+		name = "";
+		score = 0;
+		modifier = this.determineModifier(score);
 	}
 	
 	public Ability(String n, int s)

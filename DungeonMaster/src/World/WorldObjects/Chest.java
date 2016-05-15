@@ -24,6 +24,8 @@ public class Chest extends WorldObject
 		
 		isOpen = false;
 		
+		treasures = new ArrayList<Treasure>();
+		
 	}
 	
 	public String toString()
@@ -52,6 +54,22 @@ public class Chest extends WorldObject
 				((PlayerCharacter) entity).addTreasure(t);
 			}			
 		}
+	}
+	
+	
+	public void addTreasure(Treasure t)
+	{
+		treasures.add(t);
+	}
+	
+	public ArrayList<Treasure> getTreasures()
+	{
+		return treasures;
+	}
+	
+	public void clearTreasures()
+	{
+		treasures.clear();
 	}
 
 }

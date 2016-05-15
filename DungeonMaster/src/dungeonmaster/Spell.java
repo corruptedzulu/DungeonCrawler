@@ -14,5 +14,18 @@ public class Spell
 	private int damageDiceFaceValue;
 	
 	
+	public Spell()
+	{
+		name = "";
+		associatedClass = "";
+		school = "";
+		
+		level = 0;
+		requiresSave = false;
+		numberDamageDice = 0;
+		damageDiceFaceValue = 0;
+	}
+	
+	
 	
 }

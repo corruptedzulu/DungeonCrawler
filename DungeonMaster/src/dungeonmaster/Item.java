@@ -1,5 +1,14 @@
 package dungeonmaster;
 
-public class Item {
+public class Item 
+{
 
+	
+	
+	public Item()
+	{
+		
+	}
+	
+	
 }

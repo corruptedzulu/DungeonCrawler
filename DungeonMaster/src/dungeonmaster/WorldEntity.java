@@ -32,6 +32,11 @@ public abstract class WorldEntity implements Comparable
 		worldEntityID++;
 		
 		shouldRemoveSelfFromGame = false;
+		
+		xCoor = 0;
+		yCoor = 0;
+		
+		rand = new Random();
 	}
 
 	public int rollInitiative()

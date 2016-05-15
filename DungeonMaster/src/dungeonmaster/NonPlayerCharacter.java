@@ -57,10 +57,36 @@ public class NonPlayerCharacter extends WorldEntity implements Comparable
 		super();
 		
 		dying = false;
+		dead = false;
+		npcName = "";
+		
+		level = 0;
+		initiativeModifier = 0;
+		currentInitiative = 0;
+		deathSaveFailures = 0;
+		deathSaveSuccesses = 0;
+		maxHP = 0;
+		currentHP = 0;
+		maxHitDice = 0;
+		currentHitDice = 0;
+		hitDiceFaceValue = 0;
+		
+		movementInSquares = 0;
+		movementRemaining = 0;
 		
 		rand = new Random();
 		
 		this.resetTurnSpecificValues();
+		
+		savingThrows = new ArrayList<SavingThrow>();
+		skills = new ArrayList<Skill>();
+		abilities = new ArrayList<Ability>();
+		treasures = new ArrayList<Treasure>();
+		weapons = new ArrayList<Weapon>();
+		inventory = new ArrayList<Item>();
+		spells = new ArrayList<Spell>();
+		
+		
 	}
 	
 	public void resetTurnSpecificValues()

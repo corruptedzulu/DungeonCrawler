@@ -45,6 +45,11 @@ public class GameWorld
 		roomMaxDimension = 25;
 		
 		fillArrays();
+		
+		rooms = new ArrayList<Room>();
+		characters = new ArrayList<PlayerCharacter>();
+		roomTypes = new ArrayList<String>();
+		
 	}
 	
 	public GameWorld(int w, int l)
@@ -56,6 +61,10 @@ public class GameWorld
 		roomMaxDimension = 25;
 		
 		fillArrays();
+		
+		rooms = new ArrayList<Room>();
+		characters = new ArrayList<PlayerCharacter>();
+		roomTypes = new ArrayList<String>();
 	}
 	
 	

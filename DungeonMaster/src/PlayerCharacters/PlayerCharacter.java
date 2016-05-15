@@ -70,6 +70,7 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		
 		super();
 		
+		playerName = "";//needed for object culling when we're only in single player mode
 		dying = false;
 		dead = false;
 		deathSaveFailures = 0;
@@ -78,6 +79,38 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		rand = new Random();
 		
 		this.resetTurnSpecificValues();
+		
+		name = "";
+		alignment = "";
+		level = 0;
+		inspiration = false;
+		initiativeModifier = 0;
+		currentInitiative = 0;
+		
+		deathSaveFailures = 0;
+		deathSaveSuccesses = 0;
+		
+		maxHP = 0;
+		currentHP = 0;
+		maxHitDice = 0;
+		currentHitDice = 0;
+		hitDiceFaceValue = 0;
+		
+		movementInSquares = 0;
+		movementRemaining = 0;
+		visionDistanceSquares = 0;
+		
+		rand = new Random();
+		
+		this.resetTurnSpecificValues();
+		
+		savingThrows = new ArrayList<SavingThrow>();
+		skills = new ArrayList<Skill>();
+		abilities = new ArrayList<Ability>();
+		treasures = new ArrayList<Treasure>();
+		weapons = new ArrayList<Weapon>();
+		inventory = new ArrayList<Item>();
+		spells = new ArrayList<Spell>();
 	}
 	
 	
@@ -132,8 +165,6 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 	
 	public void move(String moveInDirection)
 	{
-		
-		//TODO make move in direction
 		
 		switch (moveInDirection)
 		{
@@ -296,7 +327,19 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 	
 	public void lootWorldEntity(WorldEntity entity)
 	{
-		
+		if(entity instanceof NonPlayerCharacter)
+		{
+			//take all the treasures and add them to me
+			for(Treasure t : ((NonPlayerCharacter) entity).getTreasures())
+			{
+				this.addTreasure(t);
+			}
+			
+			//remove them from the other guy
+			((NonPlayerCharacter) entity).getTreasures().clear();
+			
+
+		}
 	}
 	
 
@@ -471,7 +514,7 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 
 	public void removeTreasure(Treasure t)
 	{
-		
+		treasures.remove(t);
 	}
 
 	
@@ -489,7 +532,7 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 	
 	public void removeWeapon(Weapon w)
 	{
-		
+		weapons.remove(w);
 	}
 
 	
@@ -506,14 +549,13 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 	
 	public void removeItem(Item i)
 	{
-		
+		inventory.remove(i);
 	}
 
 
 	public int makeAttackRoll(String string) 
 	{
-		// TODO Auto-generated method stub
-		
+	
 		if(string.equals("melee"))
 		{
 			return meleeWeapon.rollToAttack();
@@ -529,9 +571,7 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 
 
 	public int makeDamageRoll(String string) 
-	{
-		// TODO Auto-generated method stub
-		
+	{		
 		
 		if(string.equals("melee"))
 		{
@@ -549,23 +589,19 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 
 	public int getRangedAttackDistance() 
 	{
-		// TODO Auto-generated method stub
 		return rangedWeapon.getDistance();
 	}
 
 
 	public int getCurrentInitiative()
 	{
-		// TODO Auto-generated method stub
 		return currentInitiative;
 	}
 	
 	
 	@Override
 	public int compareTo(Object o)
-	{
-		// TODO Auto-generated method stub
-		
+	{		
 		
 		if(o instanceof NonPlayerCharacter)
 		{
