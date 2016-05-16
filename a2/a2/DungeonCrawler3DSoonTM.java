@@ -1,10 +1,7 @@
 package a2;
 
 import a2.newdc.GhostAvatar;
-import a2.newdc.assets.AssetInfo;
-import a2.newdc.assets.ObjectInteractableAsset;
-import a2.newdc.assets.ObjectNonInteractableAsset;
-import a2.newdc.assets.TileAsset;
+import a2.newdc.assets.*;
 
 import myGameEngine.GameClientTCP;
 import myGameEngine.GameServerTCP;
@@ -13,14 +10,12 @@ import myGameEngine.MoveBackAction;
 import myGameEngine.MoveForwardAction;
 import myGameEngine.MoveLeftAction;
 import myGameEngine.MoveRightAction;
-import myGameEngine.MoveUpAction;
 import myGameEngine.MyDisplaySystem;
 import myGameEngine.PitchDownAction;
 import myGameEngine.PitchUpAction;
 import myGameEngine.YawLeftAction;
 import myGameEngine.YawRightAction;
 
-import net.java.games.input.*;
 import net.java.games.input.Event;
 import sage.app.BaseGame;
 import sage.display.*;
@@ -33,6 +28,7 @@ import sage.input.*;
 import sage.input.action.*;
 import sage.renderer.IRenderer;
 import sage.camera.*;
+import sage.scene.state.BlendState;
 import sage.scene.state.TextureState;
 import sage.terrain.TerrainBlock;
 import sage.terrain.AbstractHeightMap;
@@ -61,6 +57,21 @@ import javax.script.ScriptException;
 
 public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 {
+    private final double TILE_SIZE = 2.0;
+    private final double TS = TILE_SIZE;
+    private final double TILE_HALF_SIZE = TILE_SIZE * .5f;
+    private final Point3D TILE_SCALE = new Point3D(1.2,1.2,1.2); // 1.32
+    private final Quaternion TILE_ROT = new Quaternion();
+
+    private final int TERRAIN_SEED = 22348;
+    private final int TERRAIN_SIZE = 50;
+    private final int TERRAIN_ITERATIONS = 2000;
+    private final float TERRAIN_HEIGHT = 0.01f; // .5f
+    private final float TERRAIN_HILL_MIN_RADIUS = 5f;
+    private final float TERRAIN_HILL_MAX_RADIUS = 20f;
+
+    private final double TERRAIN_SIZE_MINUS_TILE = TERRAIN_SIZE - TILE_SIZE * 1.5f;
+
     private float time;
     private HUDString player1ID;
     private HUDString timeStringPOne;
@@ -84,6 +95,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     // http://www.farmpeeps.com/fp_skyboxes.html
     private String terrainTexture = googleDrivePath + "SkyBoxes\\_countrypaths_1\\down.jpg";
 
+    private BlendState rsBlendTransparent;
+
 
     //private IDisplaySystem display;
     private IDisplaySystem display;
@@ -97,6 +110,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private GameServerTCP hostedServer;
     private GameClientTCP client;
     private boolean connected;
+    ;
 
     public DungeonCrawler3DSoonTM()
     {
@@ -119,39 +133,11 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         client.sendJoinMessage();
     }
 
-    protected void initGame()
-    {
-        display.setTitle("DungeonCrawler");
-
-        renderer = display.getRenderer();
-
-        assetInfo = new AssetInfo(googleDrivePath);
-
-        try
-        {
-            createPlayers();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        createPlayerHUDs();
-        initEnvironment();
-        //initScriptEngines();
-        initGameObjects();
-        associateDefaultKeyAndControllerBindings();
-
-        camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
-        client.sendJoinMessage();
-
-        super.update((float) 0.0);
-    }
-
     protected void initSystem()
     {
         display = createDisplaySystem();
         setDisplaySystem(display);
-
+        random = new Random();
 
         im = new InputManager();
         setInputManager(im);
@@ -160,6 +146,38 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         setGameWorld(gameWorld);
         //super.initSystem();
     }
+
+    protected void initGame()
+    {
+        display.setTitle("DungeonCrawler");
+
+        renderer = display.getRenderer();
+        eventManager = EventManager.getInstance();
+
+        assetInfo = new AssetInfo(googleDrivePath);
+        initWorldEnvironment();
+        try
+        {
+            addObjectsToWorld();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        //createPlayerHUDs();
+
+
+        //initScriptEngines();
+
+        associateDefaultKeyAndControllerBindings();
+        camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
+        client.sendJoinMessage();
+
+        super.update((float) 0.0);
+    }
+
+
 
     private IDisplaySystem createDisplaySystem()
     {
@@ -195,7 +213,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     }
 
 
-    private void createPlayers() throws Exception
+    private void addObjectsToWorld() throws Exception
     {
         //System.out.println("Working Directory = " + System.getProperty("user.dir"));
 
@@ -222,24 +240,40 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
         ObjectInteractableAsset chest = assetInfo.objectInteractables.get("chest");
         chestGroup = chest
-                .makeAni(new Point3D(0, 0, -2), new Point3D(.01, .01, .01), new Quaternion(1, new double[]{0, 0, 0}));
+                .makeAni(new Point3D(0, 0, 0), new Point3D(.01, .01, .01), new Quaternion(1, new double[]{0, 0, 0}));
         animateGroup.addChild(chestGroup);
 
 
         addGameWorldObject(animateGroup);
 
+        // testing transparency
+        ObjectInteractableAsset testBoxAsset = assetInfo.objectInteractables.get("transtest");
+        SceneNode transparentBox = testBoxAsset
+                .make(new Point3D(0, 0, 1), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
+        enableTransparency(transparentBox);
+        addGameWorldObject(transparentBox);
+
+        // testing transparency
+        ObjectNonInteractableAsset treeAsset = assetInfo.objectNonInteractables.get("tree");
+        SceneNode tree = treeAsset
+                .make(new Point3D(0, 0, 1), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
+        enableTransparency(tree);
+        addGameWorldObject(tree);
+
+        for (int i = 0 ; i < 20 ; i++)
+            makeTreeAtRandomLocation(treeAsset);
 
 
         TileAsset tile = assetInfo.tiles.get("tile");
         tile.setRandomTexture(true);
-        addGameWorldObject(tile.make(new Point3D(0, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        addGameWorldObject(tile.make(new Point3D(0, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        addGameWorldObject(tile.make(new Point3D(0, 0, 4), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        addGameWorldObject(tile.make(new Point3D(0, 0, 6), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        addGameWorldObject(tile.make(new Point3D(2, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        addGameWorldObject(tile.make(new Point3D(4, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        addGameWorldObject(tile.make(new Point3D(6, 0, 0), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-        addGameWorldObject(tile.make(new Point3D(6, 0, 2), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS*2), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS*3), TILE_SCALE,TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(TS, 0, 0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(TS*2, 0, 0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(TS*3, 0, 0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(TS*3, 0, TS*2), TILE_SCALE, TILE_ROT));
 
         avatarOne = cleric;
         cameraOne = new JOGLCamera(renderer);
@@ -254,29 +288,24 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         timeStringPOne.setLocation(0, 0.05);
         cameraOne.addToHUD(timeStringPOne);
 
-        player1ID = new HUDString("Player 1: ");// + scorePOne);
+        player1ID = new HUDString("Player 1: ");
         player1ID.setName("Player1ID");
         player1ID.setLocation(0, 0.10);
         player1ID.setRenderMode(sage.scene.SceneNode.RENDER_MODE.ORTHO);
-        player1ID.setColor(Color.red);
+        player1ID.setColor(Color.WHITE);
+
         player1ID.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
         cameraOne.addToHUD(player1ID);
     }
 
-    private void initEnvironment()
-    {
-        eventManager = EventManager.getInstance();
-        random = new Random();
-    }
 
-    private void initGameObjects()
+
+    private void initWorldEnvironment()
     {
         skyBox = assetInfo.skyBoxes.get("countrypaths").make(200, 200, 200, false);
         addGameWorldObject(skyBox);
 
         theTerrain = initTerrain();
-
-
         background = new Group();
         background.addChild(theTerrain);
         addGameWorldObject(background);
@@ -285,7 +314,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private TerrainBlock initTerrain()
     {
-        HillHeightMap myHillHeightMap = new HillHeightMap(129, 2000, 5.0f, 20.0f, (byte) 2, 12345);
+        HillHeightMap myHillHeightMap = new HillHeightMap(TERRAIN_SIZE, TERRAIN_ITERATIONS, TERRAIN_HILL_MIN_RADIUS, TERRAIN_HILL_MAX_RADIUS, (byte) 2, TERRAIN_SEED);
         myHillHeightMap.setHeightScale(0.1f);
         TerrainBlock hillTerrain = createTerBlock(myHillHeightMap);
         Texture groundTexture = TextureManager.loadTexture2D(terrainTexture);
@@ -298,12 +327,11 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         return hillTerrain;
     }
 
-    private static TerrainBlock createTerBlock(AbstractHeightMap heightMap)
+    private TerrainBlock createTerBlock(AbstractHeightMap heightMap)
     {
-        float heightScale = 0.05f;
-        Vector3D terrainScale = new Vector3D(2, heightScale, 2);
+        Vector3D terrainScale = new Vector3D(1, TERRAIN_HEIGHT, 1);
         int terrainSize = heightMap.getSize();
-        float cornerHeight = heightMap.getTrueHeightAtPoint(0, 0) * heightScale;
+        float cornerHeight = heightMap.getTrueHeightAtPoint(0, 0) * TERRAIN_HEIGHT;
         Point3D terrainOrigin = new Point3D(0, -cornerHeight, 0);
         String name = "Terrain:" + heightMap.getClass().getSimpleName();
         return new TerrainBlock(name, terrainSize, terrainScale, heightMap.getHeightData(), terrainOrigin);
@@ -312,9 +340,9 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private void initWorldAxes()
     {
         Point3D origin = new Point3D(0, 0, 0);
-        Point3D xEnd = new Point3D(100, 0, 0);
-        Point3D yEnd = new Point3D(0, 100, 0);
-        Point3D zEnd = new Point3D(0, 0, 100);
+        Point3D xEnd = new Point3D(TERRAIN_SIZE_MINUS_TILE, 0, 0);
+        Point3D yEnd = new Point3D(0, TERRAIN_SIZE_MINUS_TILE, 0);
+        Point3D zEnd = new Point3D(0, 0, TERRAIN_SIZE_MINUS_TILE);
         Line xAxis = new Line(origin, xEnd, Color.red, 2);
         Line yAxis = new Line(origin, yEnd, Color.green, 2);
         Line zAxis = new Line(origin, zEnd, Color.blue, 2);
@@ -415,9 +443,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                            mvBackActionPOne,
                            IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
-        //NOTE: This is attached to mvFwdAction.
-        //The Fwd/Backward need to the on the same object when attached to an AXIS
-        //The button ones should be too, but I'm not going worry about that yet
+
 
         //MOVE LEFT
         im.associateAction(kbName,
@@ -440,25 +466,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                            mvRightActionPOne,
                            IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
-        //MOVE UP
-        //im.associateAction(kbName,
-        //                   net.java.games.input.Component.Identifier.Key.SPACE,
-        //                   mvUpActionPOne,
-        //                   IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        //im.associateAction(kbName,
-        //                   net.java.games.input.Component.Identifier.Key.SPACE,
-        //                   mvUpActionPOne,
-        //                   IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
-        //		//MOVE DOWN
-        //		im.associateAction(kbName,
-        //				net.java.games.input.Component.Identifier.Key.F,
-        //				mvDownAction,
-        //				IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        //		im.associateAction(kbName,
-        //				net.java.games.input.Component.Identifier.Key.F,
-        //				mvDownAction,
-        //				IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
 
 
         //TODO: Note - Roll should be mapped to Left/Right and Yaw should be Q/E to match cockpit controls
@@ -585,10 +593,13 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     {
         //scoreString.setText("Score = " + score);
         time += elapsedTimeMS;
-        DecimalFormat df = new DecimalFormat("0.0");
-        timeStringPOne.setText("Time = " + df.format(time / 1000));
+        //DecimalFormat df = new DecimalFormat("0.0");
+        //timeStringPOne.setText("Time = " + df.format(time / 1000));
 
         updateAnimations(elapsedTimeMS);
+
+        //
+        mapBoundaryFix(avatarOne);
 
         updateSkybox();
         camOne.update(elapsedTimeMS);
@@ -629,6 +640,58 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     {
         super.addGameWorldObject(s);
     }
+
+    private void enableTransparency(SceneNode target)
+    {
+        if (rsBlendTransparent == null)
+            rsBlendTransparent = (BlendState) renderer.createRenderState(RenderState.RenderStateType.Blend);
+        rsBlendTransparent.setBlendEnabled(false);
+        rsBlendTransparent.setSourceFunction(BlendState.SourceFunction.SourceAlpha);
+        rsBlendTransparent.setDestinationFunction(BlendState.DestinationFunction.DestinationAlpha);
+        rsBlendTransparent.setTestEnabled(true);
+        rsBlendTransparent.setTestFunction(BlendState.TestFunction.GreaterThan);
+        rsBlendTransparent.setEnabled(true);
+        target.setRenderMode(SceneNode.RENDER_MODE.TRANSPARENT);
+        target.setRenderState(rsBlendTransparent);
+        target.updateRenderStates();
+    }
+
+    private void mapBoundaryFix(SceneNode node)
+    {
+        Vector3D pos = node.getLocalTranslation().getCol(3);
+        if (pos.getX() < TILE_HALF_SIZE)
+            node.getLocalTranslation().setElementAt(0,3,TILE_HALF_SIZE);
+        if (pos.getZ() < TILE_HALF_SIZE)
+            node.getLocalTranslation().setElementAt(2,3,TILE_HALF_SIZE);
+        if (pos.getX() > TERRAIN_SIZE_MINUS_TILE)
+            node.getLocalTranslation().setElementAt(0,3,TERRAIN_SIZE_MINUS_TILE);
+        if (pos.getZ() > TERRAIN_SIZE_MINUS_TILE)
+            node.getLocalTranslation().setElementAt(2,3,TERRAIN_SIZE_MINUS_TILE);
+    }
+
+    private void makeTreeAtRandomLocation(Asset asset)
+    {
+        double scaleMax = 2.5;
+        double scaleMin = 2.0;
+        double skew = 0.2;
+        double scaleX = scaleMin + (scaleMax-scaleMin)*random.nextDouble();
+        double scaleY = scaleX + ((0.5 - random.nextFloat())*2.0)*skew;
+        double scaleZ = scaleX + ((0.5 - random.nextFloat())*2.0)*skew;
+
+        double posX = random.nextDouble()*(TERRAIN_SIZE_MINUS_TILE-TILE_HALF_SIZE) + TILE_HALF_SIZE;
+        double posZ = random.nextDouble()*(TERRAIN_SIZE_MINUS_TILE-TILE_HALF_SIZE) + TILE_HALF_SIZE;
+        double posY =  theTerrain.getHeight((float)posX,(float)posZ) - (.5f*scaleY);
+
+        double rotMax = 4;
+        double rotY = 360.0 * random.nextDouble();
+        double rotX = ((0.5 - random.nextDouble())*2.0)*rotMax;
+        double rotZ = ((0.5 - random.nextDouble())*2.0)*rotMax;
+
+        SceneNode tree = asset.make(new Point3D(posX, posY, posZ), new Point3D(scaleX,scaleY,scaleZ), new Quaternion(1, new double[] {rotX,rotY,rotZ}));
+        enableTransparency(tree);
+        addGameWorldObject(tree);
+    }
+
 
     // ### TJ Networking
     public void setConnected(boolean connected)
