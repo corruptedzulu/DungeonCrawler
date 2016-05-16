@@ -3,9 +3,10 @@ package dungeonmaster;
 import java.util.ArrayList;
 import java.util.Random;
 
+import PlayerCharacters.PlayerCharacter;
 import Race.Race;
 
-public class NonPlayerCharacter extends WorldEntity
+public class NonPlayerCharacter extends WorldEntity implements Comparable
 {
 	
 	//protected RangedAttack ranged;
@@ -20,8 +21,10 @@ public class NonPlayerCharacter extends WorldEntity
 	protected int level;
 	protected ArmorClass armorClass;
 	protected int initiativeModifier;
+	protected int currentInitiative;
 	
 	protected boolean dying;
+	protected boolean dead;
 	protected int deathSaveFailures;
 	protected int deathSaveSuccesses;
 	
@@ -45,6 +48,9 @@ public class NonPlayerCharacter extends WorldEntity
 	protected ArrayList<Weapon> weapons;
 	protected ArrayList<Item> inventory;
 	
+	protected Weapon meleeWeapon;
+	protected Weapon rangedWeapon;
+	
 	
 	protected ArrayList<Spell> spells;
 
@@ -54,10 +60,36 @@ public class NonPlayerCharacter extends WorldEntity
 		super();
 		
 		dying = false;
+		dead = false;
+		npcName = "";
+		
+		level = 0;
+		initiativeModifier = 0;
+		currentInitiative = 0;
+		deathSaveFailures = 0;
+		deathSaveSuccesses = 0;
+		maxHP = 0;
+		currentHP = 0;
+		maxHitDice = 0;
+		currentHitDice = 0;
+		hitDiceFaceValue = 0;
+		
+		movementInSquares = 0;
+		movementRemaining = 0;
 		
 		rand = new Random();
 		
 		this.resetTurnSpecificValues();
+		
+		savingThrows = new ArrayList<SavingThrow>();
+		skills = new ArrayList<Skill>();
+		abilities = new ArrayList<Ability>();
+		treasures = new ArrayList<Treasure>();
+		weapons = new ArrayList<Weapon>();
+		inventory = new ArrayList<Item>();
+		spells = new ArrayList<Spell>();
+		
+		
 	}
 	
 	public void resetTurnSpecificValues()
@@ -78,6 +110,8 @@ public class NonPlayerCharacter extends WorldEntity
 		{
 			s += "shouldRemoveSelfFromGame;";
 		}
+		
+		s += "$$";
 		
 		return s;
 		
@@ -112,9 +146,76 @@ public class NonPlayerCharacter extends WorldEntity
 		
 	}
 	
-	public void move()
+	public void move(String moveInDirection)
 	{
-		
+		//TODO make move in direction
+		switch (moveInDirection)
+		{
+		case "N":
+			
+			this.setxCoor(this.getxCoor());
+			this.setyCoor(this.getyCoor() + 1);
+			
+			
+			break;
+			
+		case "S":
+			
+			this.setxCoor(this.getxCoor());
+			this.setyCoor(this.getyCoor() - 1);
+			
+			
+			break;
+			
+		case "E":
+			
+			this.setxCoor(this.getxCoor() + 1);
+			this.setyCoor(this.getyCoor());
+			
+			
+			break;
+			
+		case "W":
+			
+			this.setxCoor(this.getxCoor() - 1);
+			this.setyCoor(this.getyCoor());
+			
+			
+			break;
+			
+		case "NE":
+			
+			this.setxCoor(this.getxCoor() + 1);
+			this.setyCoor(this.getyCoor() + 1);
+			
+			
+			break;
+			
+		case "SE":
+			
+			this.setxCoor(this.getxCoor() + 1);
+			this.setyCoor(this.getyCoor() - 1);
+			
+			
+			break;
+			
+		case "NW":
+			
+			this.setxCoor(this.getxCoor() - 1);
+			this.setyCoor(this.getyCoor() + 1);
+			
+			
+			break;
+			
+		case "SW":
+			
+			this.setxCoor(this.getxCoor() - 1);
+			this.setyCoor(this.getyCoor() - 1);
+			
+			break;
+			
+	
+		}
 	}
 	
 	public void dash()
@@ -147,8 +248,14 @@ public class NonPlayerCharacter extends WorldEntity
 		
 	}
 	
+	public boolean isDead()
+	{
+		return dead;
+	}
+	
 	public int rollInitiative()
 	{
+		currentInitiative = 0;
 		int initiativeRoll = rand.nextInt(20) + 1;
 		initiativeRoll += this.initiativeModifier;
 		return initiativeRoll;
@@ -481,6 +588,29 @@ public class NonPlayerCharacter extends WorldEntity
 
 	public void setInventory(ArrayList<Item> inventory) {
 		this.inventory = inventory;
+	}
+
+	public int getCurrentInitiative()
+	{
+		return currentInitiative;
+	}
+	
+	@Override
+	public int compareTo(Object o)
+	{	
+		
+		if(o instanceof NonPlayerCharacter)
+		{
+			return (this.currentInitiative - ((NonPlayerCharacter) o).currentInitiative);
+		}
+		
+		if(o instanceof PlayerCharacter)
+		{
+			return (this.currentInitiative - ((PlayerCharacter) o).getCurrentInitiative());
+		}
+		
+		
+		return 0;
 	}
 	
 	

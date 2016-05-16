@@ -9,7 +9,8 @@ public class ArmorClass
 	
 	public ArmorClass()
 	{
-		
+		ac = 0;
+		modifier = 0;
 	}
 
 

@@ -24,5 +24,23 @@ public class Enemy extends NonPlayerCharacter
 	{
 		
 	}
+
+	public int getRangedAttackDistance()
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int makeAttackRoll(String string)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int makeDamageRoll(String string)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
 	
 }

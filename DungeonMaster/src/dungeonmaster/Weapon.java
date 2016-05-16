@@ -18,20 +18,30 @@ public class Weapon
 
 	public Weapon()
 	{
+		name = "";
+		setDamageType("");
+		weaponType = "";
+		distance = 0;
+		damageDiceNumber = 0;
+		numberOfDamageDice = 0;
+		damageModifier = 0;
+		setAttackModifier(0);
 		
+		criticalHit = false;
 	}
 	
 	public Weapon(String n, String dType, String wType, int dist, int dNumber, int diceNumber, int dmgMod, int attMod)
 	{
 		name = n;
-		damageType = dType;
+		setDamageType(dType);
 		weaponType = wType;
 		distance = dist;
 		damageDiceNumber = dNumber;
 		numberOfDamageDice = diceNumber;
 		damageModifier = dmgMod;
-		attackModifier = attMod;
+		setAttackModifier(attMod);
 		
+		criticalHit = false;
 	}
 	
 	public void setName(String n)
@@ -91,6 +101,66 @@ public class Weapon
 	public int getDistance()
 	{
 		return distance;
+	}
+
+	public String getDamageType()
+	{
+		return damageType;
+	}
+
+	public void setDamageType(String damageType)
+	{
+		this.damageType = damageType;
+	}
+
+	public int getAttackModifier()
+	{
+		return attackModifier;
+	}
+
+	public void setAttackModifier(int attackModifier)
+	{
+		this.attackModifier = attackModifier;
+	}
+
+	public int getDamageDiceNumber()
+	{
+		return damageDiceNumber;
+	}
+
+	public void setDamageDiceNumber(int damageDiceNumber)
+	{
+		this.damageDiceNumber = damageDiceNumber;
+	}
+
+	public int getNumberOfDamageDice()
+	{
+		return numberOfDamageDice;
+	}
+
+	public void setNumberOfDamageDice(int numberOfDamageDice)
+	{
+		this.numberOfDamageDice = numberOfDamageDice;
+	}
+
+	public int getDamageModifier()
+	{
+		return damageModifier;
+	}
+
+	public void setDamageModifier(int damageModifier)
+	{
+		this.damageModifier = damageModifier;
+	}
+
+	public void setWeaponType(String weaponType)
+	{
+		this.weaponType = weaponType;
+	}
+
+	public void setDistance(int distance)
+	{
+		this.distance = distance;
 	}
 	
 }

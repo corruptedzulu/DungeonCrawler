@@ -9,7 +9,7 @@ public class EntityClass
 	
 	public EntityClass()
 	{
-		
+		thisClass = "";
 	}
 	
 	public String[] getClasses()
@@ -19,12 +19,19 @@ public class EntityClass
 	
 	public void setThisInstanceClass(int index)
 	{
-		thisClass = classes[index];
+		thisClass = classes[index - 1];
 	}
 	
 	public String getThisInstanceClass()
 	{
 		return thisClass;
 	}
+
+	public int getHitDiceFaceValue()
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	
 }

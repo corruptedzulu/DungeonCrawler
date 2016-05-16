@@ -69,6 +69,31 @@ public class Room
 		myRoomID = roomID;
 		roomID++;
 		
+		
+		r = new Random();		
+		
+		roomName = "";
+		
+		roomType = "";
+		
+		widthSquares = 0;
+		lengthSquares = 0;
+		
+		minWidthSquares = 0;
+		maxWidthSquares = 0;
+		minLengthSquares = 0;
+		maxLengthSquares = 0;
+		maxDoors = 0;
+		oddsThatDoorIsSecret = 0.0;
+		maxEnemies = 0;
+		minSquaresPerEnemy = 0;
+		maxTreasures = 0;
+
+		xWorldCoor = 0;
+		yWorldCoor = 0;
+		
+		dungeonEntrance = false;
+		
 	}
 	
 	public Room(String scriptedConstruction)
@@ -226,6 +251,11 @@ public class Room
 		
 		entities.remove(attackedEnemy);	
 		
+	}
+	
+	public void addEntity(WorldEntity e)
+	{
+		entities.add(e);
 	}
 	
 	

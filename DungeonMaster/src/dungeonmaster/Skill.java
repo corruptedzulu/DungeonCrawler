@@ -77,7 +77,12 @@ public class Skill
 	
 	public Skill()
 	{
+		name = "";
+		ability = "";
+		modifier = 0;
 		
+		proficient = false;
+		expertise = false;
 	}
 	
 	public Skill(String n, int m, boolean prof, int profBonus, boolean exp)
