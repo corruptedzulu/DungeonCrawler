@@ -32,6 +32,8 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 	protected int initiativeModifier;
 	protected int currentInitiative;
 	
+	protected int proficiencyBonus;
+	
 	
 	protected int maxHP;
 	protected int currentHP;
@@ -52,8 +54,13 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 	
 	protected ArrayList<SavingThrow> savingThrows;
 	protected ArrayList<Skill> skills;
-	protected ArrayList<Ability> abilities;
 	
+	protected Ability strength;
+	protected Ability dexterity;
+	protected Ability constitution;
+	protected Ability intelligence;
+	protected Ability wisdom;
+	protected Ability charisma;
 	
 	protected ArrayList<Treasure> treasures;
 	protected ArrayList<Weapon> weapons;
@@ -106,7 +113,6 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		
 		savingThrows = new ArrayList<SavingThrow>();
 		skills = new ArrayList<Skill>();
-		abilities = new ArrayList<Ability>();
 		treasures = new ArrayList<Treasure>();
 		weapons = new ArrayList<Weapon>();
 		inventory = new ArrayList<Item>();
@@ -465,15 +471,17 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 
 	public ArrayList<Ability> getAbilities() 
 	{
+		ArrayList<Ability> abilities = new ArrayList<Ability>();
+		
+		abilities.add(this.strength);
+		abilities.add(this.dexterity);
+		abilities.add(this.constitution);
+		abilities.add(intelligence);
+		abilities.add(wisdom);
+		abilities.add(charisma);
+		
 		return abilities;
 	}
-
-
-	public void setAbilities(ArrayList<Ability> abilities) 
-	{
-		this.abilities = abilities;
-	}
-
 
 	public void setMovementInSquares(int squares)
 	{

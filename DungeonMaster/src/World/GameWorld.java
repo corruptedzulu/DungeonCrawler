@@ -152,6 +152,7 @@ public class GameWorld
 			g.setxCoor(x * 2);
 			g.setyCoor(5);
 			room1.getEntities().add(g);
+			g.setContainingRoom(room1);
 		}
 		
 		for(int x = 0; x < 6; x++)
@@ -160,6 +161,7 @@ public class GameWorld
 			g.setxCoor( (x * 2) + 4);
 			g.setyCoor(10);
 			room2.getEntities().add(g);
+			g.setContainingRoom(room2);
 		}
 		
 		for(int x = 0; x < 2; x++)
@@ -168,6 +170,7 @@ public class GameWorld
 			g.setxCoor(x * 2);
 			g.setyCoor(15);
 			room3.getEntities().add(g);
+			g.setContainingRoom(room3);
 		}
 		
 		
@@ -175,6 +178,7 @@ public class GameWorld
 		g.setxCoor(5);
 		g.setyCoor(20);
 		room3.getEntities().add(g);
+		g.setContainingRoom(room3);
 		
 		Chest c = new Chest();
 		c.setxCoor(5);
@@ -197,6 +201,11 @@ public class GameWorld
 		
 	}
 
+	public Room getRoomOne()
+	{
+		return rooms.get(0);
+	}
+	
 	public void initializeWorld()
 	{
 		

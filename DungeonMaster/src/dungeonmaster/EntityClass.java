@@ -19,7 +19,7 @@ public class EntityClass
 	
 	public void setThisInstanceClass(int index)
 	{
-		thisClass = classes[index];
+		thisClass = classes[index - 1];
 	}
 	
 	public String getThisInstanceClass()

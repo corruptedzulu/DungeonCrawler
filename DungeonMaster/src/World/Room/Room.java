@@ -253,6 +253,11 @@ public class Room
 		
 	}
 	
+	public void addEntity(WorldEntity e)
+	{
+		entities.add(e);
+	}
+	
 	
 	public String toString()
 	{

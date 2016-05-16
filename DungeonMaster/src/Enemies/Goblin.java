@@ -50,12 +50,12 @@ public class Goblin extends Enemy
 		this.challengeRating = 1/4;
 		
 		
-		ArrayList<Weapon> weapons = new ArrayList<Weapon>();
 		
 		//TODO weapons
 		
+		meleeWeapon = new Weapon();
+		rangedWeapon = new Weapon();
 		
-		this.setWeapons(weapons);
 		
 	
 	}
@@ -115,6 +115,48 @@ public class Goblin extends Enemy
 		
 		
 		
+	}
+	
+	
+	//TODO fill these methods for the Goblins to attack with
+	
+	public int makeAttackRoll(String string) 
+	{
+	
+		if(string.equals("melee"))
+		{
+			return meleeWeapon.rollToAttack();
+		}
+		
+		if(string.equals("ranged"))
+		{
+			return rangedWeapon.rollToAttack();
+		}
+		
+		return 0;
+	}
+
+
+	public int makeDamageRoll(String string) 
+	{		
+		
+		if(string.equals("melee"))
+		{
+			return meleeWeapon.rollDamage();
+		}
+		
+		if(string.equals("ranged"))
+		{
+			return rangedWeapon.rollDamage();
+		}
+		
+		return 0;
+	}
+
+
+	public int getRangedAttackDistance() 
+	{
+		return rangedWeapon.getDistance();
 	}
 	
 	

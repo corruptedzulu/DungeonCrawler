@@ -48,6 +48,9 @@ public class NonPlayerCharacter extends WorldEntity implements Comparable
 	protected ArrayList<Weapon> weapons;
 	protected ArrayList<Item> inventory;
 	
+	protected Weapon meleeWeapon;
+	protected Weapon rangedWeapon;
+	
 	
 	protected ArrayList<Spell> spells;
 

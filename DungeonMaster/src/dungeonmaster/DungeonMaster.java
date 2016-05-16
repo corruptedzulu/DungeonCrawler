@@ -80,7 +80,7 @@ public class DungeonMaster
 		clientsConnected = 0;
 		
 		gameInProgress = true;
-		singlePlayerGame = false;
+		singlePlayerGame = true;
 		
 	}
 	
@@ -163,28 +163,37 @@ public class DungeonMaster
 			//gw = new GameWorld();
 			gw = new GameWorld("simple");
 			gw.setDM(this);
+			allEntities = gw.getAllEnemies();
+			gw.setPCArrayList(characters);
 			
+			//TODO: uncomment
 			
 			
 			Cleric cleric = new Cleric();
-			Fighter figher = new Fighter();
+			Fighter fighter = new Fighter();
 			Rogue rogue = new Rogue();
 			Wizard wizard = new Wizard();
 			
 			
 			characters.add(cleric);
-			characters.add(figher);
+			characters.add(fighter);
 			characters.add(rogue);
 			characters.add(wizard);
+		
+			
+			cleric.setxCoor(0);
+			cleric.setyCoor(0);
+			fighter.setxCoor(0);
+			fighter.setyCoor(1);
+			rogue.setxCoor(0);
+			rogue.setyCoor(2);
+			wizard.setxCoor(0);
+			wizard.setyCoor(3);
 			
 		}
 		
 		
-		gw.setPCArrayList(characters);
-		
-		//TODO: uncomment
-		allEntities = gw.getAllEnemies();
-		
+
 		
 		//start networking
 		
@@ -284,20 +293,19 @@ public class DungeonMaster
 			
 			
 			
+			int index = 0;
+			allEntities.add(p.getMyCharacter());
 			
 			//if this is a single player game, do the loop once, then break
 			if(singlePlayerGame == true)
 			{
-				//go ahead and remove all of the characters that are not the single player
-				for(PlayerCharacter pc : characters)
-				{
-					if(pc.getPlayerName().equals(""))
-					{
-						characters.remove(pc);
-					}
-				}
+				characters.clear();
+				characters.add(p.getMyCharacter());
+
 				break;
 			}
+			
+			
 			
 			clientsConnected++;
 			
@@ -311,16 +319,7 @@ public class DungeonMaster
 			for(Player player : players)//loop through the players
 			{
 				//report to each player what all of the players currently are
-				if(player == p)
-				{
-					
-				}
-				else
-				{
-					p.getOut().println(player.getMyCharacter().toString());
-				}
-
-				
+				p.getOut().println(player.getMyCharacter().toString());
 			}
 			
 			//p.getOut().println("nextReportWhenReadyToProceed");//tell the client that the next communcation from the server will be asking them to report they're ready
@@ -336,7 +335,7 @@ public class DungeonMaster
 		{
 			p.getOut().println("reportReadyToProceed");
 			String readyToProceed = "";
-			while(readyToProceed != "ready")
+			while( !readyToProceed.equals("ready"))
 			{
 				try
 				{
@@ -354,6 +353,9 @@ public class DungeonMaster
 			
 			//tell the player about the whole game world
 			p.getOut().println(gw.toString());
+			
+			gw.getRoomOne().addEntity(p.getMyCharacter());
+			p.getMyCharacter().setContainingRoom(gw.getRoomOne());
 			
 		}
 		
@@ -1219,14 +1221,14 @@ public class DungeonMaster
 							
 							
 							//make the attack roll
-							int attackRoll = ((PlayerCharacter) e).makeAttackRoll("melee");
+							int attackRoll = ((Enemy) e).makeAttackRoll("melee");
 							
 							
 							//if it beats the enemy's AC
 							if(attackRoll >= attackedEnemy.getArmorClass().getAC())
 							{
 								//make the damage roll
-								int damage = ((PlayerCharacter) e).makeDamageRoll("melee");
+								int damage = ((Enemy) e).makeDamageRoll("melee");
 								
 								
 								//tell the enemy to take the damage
@@ -1237,7 +1239,7 @@ public class DungeonMaster
 							}
 							
 							hasActioned = true;
-							break;
+							continue;
 												
 						}
 						else//otherwise, move to the nearest enemy
@@ -1823,14 +1825,14 @@ public class DungeonMaster
 									//TODO MELEE attack
 									
 									//make the attack roll
-									int attackRoll = ((PlayerCharacter) e).makeAttackRoll("melee");
+									int attackRoll = ((Enemy) e).makeAttackRoll("melee");
 									
 									
 									//if it beats the enemy's AC
 									if(attackRoll >= attackedEnemy.getArmorClass().getAC())
 									{
 										//make the damage roll
-										int damage = ((PlayerCharacter) e).makeDamageRoll("melee");
+										int damage = ((Enemy) e).makeDamageRoll("melee");
 										
 										
 										//tell the enemy to take the damage
@@ -1839,7 +1841,7 @@ public class DungeonMaster
 									}
 																		
 									hasActioned = true;
-									break;
+									continue;
 									
 									
 								}
@@ -1850,7 +1852,7 @@ public class DungeonMaster
 								
 								hasMoved = true;
 								
-								break;
+								continue;
 							}
 							else//ranged attack
 							{
@@ -1923,7 +1925,7 @@ public class DungeonMaster
 									
 									
 									hasActioned = true;
-									break;
+									continue;
 									
 									
 								}
@@ -1931,7 +1933,7 @@ public class DungeonMaster
 								{
 									//no enemies within ranged attack range, nor movement
 									//so just quit our turn
-									break;
+									continue;
 								}						
 							}							
 						}								
@@ -1955,12 +1957,16 @@ public class DungeonMaster
 		
 		//compute angle from where i am to where i'm going and assign a direction (1/8th of a circle)
 		//woohoo, trig
-		int deltaX = moverX - moveToX;//adjacent
-		int deltaY = moverY - moveToY;//opposite
+		int deltaX = moveToX - moverX;//adjacent
+		int deltaY = moveToY - moverY;//opposite
 		
 		
 		double angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
 		
+		if(angle < 0)
+		{
+			angle += 360;
+		}
 		
 		//0-359 degrees
 		
@@ -2019,12 +2025,16 @@ public class DungeonMaster
 		
 		//compute angle from where i am to where i'm going and assign a direction (1/8th of a circle)
 		//woohoo, trig
-		int deltaX = moverX - moveToX;//adjacent
-		int deltaY = moverY - moveToY;//opposite
+		int deltaX = moveToX - moverX;//adjacent
+		int deltaY = moveToY - moverY;//opposite
 		
 		
 		double angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
 		
+		if(angle < 0)
+		{
+			angle += 360;
+		}
 		
 		//0-359 degrees
 		

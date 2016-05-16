@@ -1,5 +1,6 @@
 package Race;
 
-public class Human extends Race {
+public class Human extends Race 
+{
 
 }

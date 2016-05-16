@@ -2,6 +2,7 @@ package PlayerCharacters;
 
 import java.util.ArrayList;
 
+import Race.Human;
 import Race.Race;
 import dungeonmaster.Ability;
 import dungeonmaster.ArmorClass;
@@ -19,42 +20,13 @@ public class Cleric extends PlayerCharacter
 	
 	public Cleric()
 	{
-		/*
-		private String playerName;
-		private Race playerRace;
-		
-		private int level;
-		private ArmorClass armorClass;
-		private int initiativeModifier;
-		
-		
-		private int maxHP;
-		private int currentHP;
-		private int maxHitDice;
-		private int currentHitDice;
-		private int hitDiceFaceValue;
-		
-		
-		private ArrayList<SavingThrow> savingThrows;
-		private ArrayList<Skill> skills;
-		private ArrayList<Ability> abilities;
-		
-		
-		private ArrayList<Treasure> treasures;
-		private ArrayList<Weapon> weapons;
-		private ArrayList<Item> inventory;
-		
-		
-		private ArrayList<Spell> spells;*/
-		
-		
-		
+	
 		super();
 		
 		
 		
 		this.name = "Cleric";
-		//this.playerRace = new Race();
+		this.playerRace = new Human();
 		this.alignment = "Lawful Good";
 		
 		this.playerClass = new EntityClass();
@@ -62,17 +34,19 @@ public class Cleric extends PlayerCharacter
 		
 		this.level = 6;
 		this.inspiration = false;
-		
+		this.proficiencyBonus = 3;
+		this.movementInSquares = 6;
+		this.movementRemaining = 6;
 		
 		this.createAbilites();
 		this.createSkills();
 		this.createSavingThrows();
 				
 		this.armorClass = new ArmorClass();
-		//this.armorClass.setAC(ac);
+		this.armorClass.setAC(14 + this.dexterity.getModifier());
 		
 		
-		//this.initiativeModifier = s
+		this.initiativeModifier = this.dexterity.getModifier();
 		
 		this.computeMaxHP();
 		this.currentHP = maxHP;
@@ -100,11 +74,37 @@ public class Cleric extends PlayerCharacter
 	{
 		// TODO Auto-generated method stub
 		
+		//scale mail
+		
+		
 	}
 
 	private void createInitialWeapons()
 	{
 		// TODO Auto-generated method stub
+		
+		//mace		
+		this.meleeWeapon = new Weapon();
+		this.meleeWeapon.setName("Mace");
+		this.meleeWeapon.setDamageType("Bludgeoning");
+		this.meleeWeapon.setWeaponType("melee");
+		this.meleeWeapon.setDistance(1);
+		this.meleeWeapon.setDamageDiceNumber(6);
+		this.meleeWeapon.setNumberOfDamageDice(1);
+		this.meleeWeapon.setDamageModifier(this.strength.getModifier());
+		this.meleeWeapon.setAttackModifier(this.proficiencyBonus + this.strength.getModifier());
+		
+		//light crossbow
+		this.rangedWeapon = new Weapon();
+		this.rangedWeapon.setName("Light crossbow");
+		this.rangedWeapon.setDamageType("Piercing");
+		this.rangedWeapon.setWeaponType("ranged");
+		this.rangedWeapon.setDistance(20);
+		this.rangedWeapon.setDamageDiceNumber(8);
+		this.rangedWeapon.setNumberOfDamageDice(1);
+		this.rangedWeapon.setDamageModifier(this.strength.getModifier());
+		this.rangedWeapon.setAttackModifier(this.proficiencyBonus + this.strength.getModifier());
+		
 		
 	}
 
@@ -118,6 +118,9 @@ public class Cleric extends PlayerCharacter
 	{
 		// TODO Auto-generated method stub
 		
+		maxHP = 44;
+	
+		
 	}
 
 	private void createSavingThrows()
@@ -130,11 +133,32 @@ public class Cleric extends PlayerCharacter
 	{
 		// TODO Auto-generated method stub
 		
+		skills = Skill.getAllSkillsAtDefaultModifiers(this.strength.getModifier(), this.dexterity.getModifier(), this.constitution.getModifier(), this.intelligence.getModifier(), this.wisdom.getModifier(), this.charisma.getModifier());
+		
+		for(Skill s : skills)
+		{
+			if(s.getName().equals("Arcana"))
+			{
+				s = new Skill("Arcana", 0, true, this.proficiencyBonus, false);
+			}
+			if(s.getName().equals("History"))
+			{
+				s = new Skill("History", 0, true, this.proficiencyBonus, false);
+			}
+		}
+		
 	}
 
 	private void createAbilites()
 	{
 		// TODO Auto-generated method stub
+		
+		charisma = new Ability("Charisma", 11);
+		dexterity = new Ability("Dexterity", 16);
+		strength = new Ability("Strength", 16);
+		intelligence = new Ability("Intelligence", 11);
+		wisdom = new Ability("Wisdom", 18);
+		constitution = new Ability("Constitution", 15);	
 		
 	}
 
