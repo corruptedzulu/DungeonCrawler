@@ -1,4 +1,4 @@
-package a2.newdc.assets;
+package a2.assets;
 
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;

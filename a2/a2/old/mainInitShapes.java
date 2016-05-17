@@ -3,7 +3,7 @@ package a2.old;
 import a2.old.MyPyramid;
 import a2.old.MySphere;
 import a2.old.PyramidGroup;
-import a2.RotationController;
+import a2.old.RotationController;
 import graphicslib3D.Matrix3D;
 
 import java.awt.*;

@@ -1,10 +1,10 @@
-package a2.newdc.assets;
+package a2.assets;
 
-public class NPCFriendlyAsset extends Asset
+public class ObjectInteractableAsset extends Asset
 {
     //
 
-    public NPCFriendlyAsset(String[] s)
+    public ObjectInteractableAsset(String[] s)
     {
         super.setFileName(String.join("_",s));
         super.setName(s[1]);

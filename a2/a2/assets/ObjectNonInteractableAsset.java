@@ -1,11 +1,10 @@
-package a2.newdc.assets;
+package a2.assets;
 
-
-public class NPCEnemyAsset extends Asset
+public class ObjectNonInteractableAsset extends Asset
 {
     //
 
-    public NPCEnemyAsset(String[] s)
+    public ObjectNonInteractableAsset(String[] s)
     {
         super.setFileName(String.join("_",s));
         super.setName(s[1]);

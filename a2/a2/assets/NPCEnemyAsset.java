@@ -1,8 +1,11 @@
-package a2.newdc.assets;
+package a2.assets;
 
-public class PlayableAsset extends Asset
+
+public class NPCEnemyAsset extends Asset
 {
-    public PlayableAsset(String[] s)
+    //
+
+    public NPCEnemyAsset(String[] s)
     {
         super.setFileName(String.join("_",s));
         super.setName(s[1]);
