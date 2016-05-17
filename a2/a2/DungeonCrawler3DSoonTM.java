@@ -1,7 +1,6 @@
 package a2;
 
-import a2.newdc.GhostAvatar;
-import a2.newdc.assets.*;
+import a2.assets.*;
 
 import myGameEngine.GameClientTCP;
 import myGameEngine.GameServerTCP;
@@ -18,6 +17,9 @@ import myGameEngine.YawRightAction;
 
 import net.java.games.input.Event;
 import sage.app.BaseGame;
+import sage.audio.AudioResource;
+import sage.audio.IAudioManager;
+import sage.audio.Sound;
 import sage.display.*;
 import sage.event.EventManager;
 import sage.event.IEventManager;
@@ -48,20 +50,40 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.*;
-import java.text.DecimalFormat;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
+public class DungeonCrawler3DSoonTM extends BaseGame
 {
     private final double TILE_SIZE = 2.0;
     private final double TS = TILE_SIZE;
     private final double TILE_HALF_SIZE = TILE_SIZE * .5f;
-    private final Point3D TILE_SCALE = new Point3D(1.2,1.2,1.2); // 1.32
-    private final Quaternion TILE_ROT = new Quaternion();
+    private final Point3D TILE_SCALE = new Point3D(1.32,1.32,1.32); // 1.32
+
+    private final Quaternion ROT_E = new Quaternion(); // default model orientation
+    private final Quaternion ROT_NE = new Quaternion(1, new double[]{0,45,0});
+    private final Quaternion ROT_N = new Quaternion(1, new double[]{0,90,0});
+    private final Quaternion ROT_NW = new Quaternion(1, new double[]{0,135,0});
+    private final Quaternion ROT_W = new Quaternion(1, new double[]{0,180,0});
+    private final Quaternion ROT_SW = new Quaternion(1, new double[]{0,225,0});
+    private final Quaternion ROT_S = new Quaternion(1, new double[]{0,270,0});
+    private final Quaternion ROT_SE = new Quaternion(1, new double[]{0,315,0});
+    private final Quaternion COLUMN_ROT_NE = ROT_E;
+    private final Quaternion COLUMN_ROT_NW = ROT_N;
+    private final Quaternion COLUMN_ROT_SW = ROT_W;
+    private final Quaternion COLUMN_ROT_SE = ROT_S;
+
+    private final Vector3D DISTANCE_N = new Vector3D(TILE_SIZE, 0, 0);
+    private final Vector3D DISTANCE_NE = new Vector3D(TILE_SIZE, 0, TILE_SIZE);
+    private final Vector3D DISTANCE_E = new Vector3D(0, 0, TILE_SIZE);
+    private final Vector3D DISTANCE_SE = new Vector3D(-TILE_SIZE, 0, TILE_SIZE);
+    private final Vector3D DISTANCE_S = new Vector3D(-TILE_SIZE, 0, 0);
+    private final Vector3D DISTANCE_SW = new Vector3D(-TILE_SIZE, 0, -TILE_SIZE);
+    private final Vector3D DISTANCE_W = new Vector3D(0, 0, -TILE_SIZE);
+    private final Vector3D DISTANCE_NW = new Vector3D(TILE_SIZE, 0, -TILE_SIZE);
 
     private final int TERRAIN_SEED = 22348;
     private final int TERRAIN_SIZE = 50;
@@ -69,7 +91,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private final float TERRAIN_HEIGHT = 0.01f; // .5f
     private final float TERRAIN_HILL_MIN_RADIUS = 5f;
     private final float TERRAIN_HILL_MAX_RADIUS = 20f;
-
     private final double TERRAIN_SIZE_MINUS_TILE = TERRAIN_SIZE - TILE_SIZE * 1.5f;
 
     private float time;
@@ -97,7 +118,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     private BlendState rsBlendTransparent;
 
-
     //private IDisplaySystem display;
     private IDisplaySystem display;
     private IRenderer renderer;
@@ -105,12 +125,16 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     private IInputManager im;
     private IEventManager eventManager;
 
+    private IAudioManager audioManager;
+    private Sound sound;
+    private AudioResource resource1;
+
     private Camera3PController camOne;
 
     private GameServerTCP hostedServer;
     private GameClientTCP client;
     private boolean connected;
-    ;
+
 
     public DungeonCrawler3DSoonTM()
     {
@@ -135,8 +159,12 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     protected void initSystem()
     {
-        display = createDisplaySystem();
+        display = MyDisplaySystem.getDisplaySystem();  //new MyDisplaySystem(1920, 1080, 24, 20, true, "sage.renderer.jogl.JOGLRenderer");
+        display.setTitle("DungeonCrawler");
         setDisplaySystem(display);
+
+        //display = createDisplaySystem();
+        //setDisplaySystem(display);
         random = new Random();
 
         im = new InputManager();
@@ -149,8 +177,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
     protected void initGame()
     {
-        display.setTitle("DungeonCrawler");
-
         renderer = display.getRenderer();
         eventManager = EventManager.getInstance();
 
@@ -167,58 +193,19 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
         //createPlayerHUDs();
 
-
         //initScriptEngines();
 
         associateDefaultKeyAndControllerBindings();
         camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
         client.sendJoinMessage();
 
-        super.update((float) 0.0);
-    }
-
-
-
-    private IDisplaySystem createDisplaySystem()
-    {
-        IDisplaySystem display = new MyDisplaySystem(1280, 720, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
-        System.out.print("\nWaiting for display creation...");
-        int count = 0;
-        // wait until display creation completes or a timeout occurs
-        while (!display.isCreated())
-        {
-            try
-            {
-                Thread.sleep(10);
-            }
-            catch (InterruptedException e)
-            {
-                throw new RuntimeException("Display creation interrupted");
-            }
-
-            count++;
-            System.out.print("+");
-
-            if (count % 80 == 0)
-            {
-                System.out.println();
-            }
-            if (count > 2000) // 20 seconds (approx.)
-            {
-                throw new RuntimeException("Unable to create display");
-            }
-        }
-        System.out.println();
-        return display;
+        super.update(0f);
     }
 
 
     private void addObjectsToWorld() throws Exception
     {
         //System.out.println("Working Directory = " + System.getProperty("user.dir"));
-
-
-
 
         // MISC
         ObjectNonInteractableAsset barrel = assetInfo.objectNonInteractables.get("barrel");
@@ -246,44 +233,43 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
             makeTreeAtRandomLocation(treeAsset);
 
 
-
         // DUNGEON
         // column
         WallAsset columnAsset = assetInfo.walls.get("column");
-        addGameWorldObject(columnAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(columnAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
 
-        //WallAsset wallAsset = assetInfo.walls.get("wall");
-        //addGameWorldObject(wallAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT)); // add more constants for rot
+        WallAsset wallAsset = assetInfo.walls.get("wall");
+        addGameWorldObject(wallAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_N)); // add more constants for rot
 
         WallAsset doorAsset = assetInfo.walls.get("door");
-        addGameWorldObject(doorAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(doorAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
 
         TileAsset tile = assetInfo.tiles.get("tile");
         tile.setRandomTexture(true);
-        addGameWorldObject(tile.make(new Point3D(0, 0, 0), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS*2), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS*3), TILE_SCALE,TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(TS, 0, 0), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(TS*2, 0, 0), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(TS*3, 0, 0), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(TS*3, 0, TS*2), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(0, 0, 0), TILE_SCALE, ROT_E));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS), TILE_SCALE, ROT_E));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS*2), TILE_SCALE, ROT_E));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS*3), TILE_SCALE, ROT_E));
+        addGameWorldObject(tile.make(new Point3D(TS, 0, 0), TILE_SCALE, ROT_E));
+        addGameWorldObject(tile.make(new Point3D(TS*2, 0, 0), TILE_SCALE, ROT_E));
+        addGameWorldObject(tile.make(new Point3D(TS*3, 0, 0), TILE_SCALE, ROT_E));
+        addGameWorldObject(tile.make(new Point3D(TS*3, 0, TS*2), TILE_SCALE, ROT_E));
 
 
         // ENEMIES
         NPCEnemyAsset goblinAsset = assetInfo.npcEnemies.get("goblin");
         NPCEnemyAsset gobSword = assetInfo.npcEnemies.get("swordgoblin");
         Group goblin1 = new Group("goblin1");
-        goblin1.addChild(goblinAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
-        goblin1.addChild(gobSword.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
+        goblin1.addChild(goblinAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
+        goblin1.addChild(gobSword.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
         addGameWorldObject(goblin1);
 
         // HP
         PlayableAsset hpAsset = assetInfo.playables.get("hp");
         PlayableAsset hpBar = assetInfo.playables.get("hpborder");
         Group hp1 = new Group("hp1");
-        hp1.addChild(hpAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
-        SceneNode snhp1 = hpBar.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT);
+        hp1.addChild(hpAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
+        SceneNode snhp1 = hpBar.make(new Point3D(0,0,0), TILE_SCALE, ROT_E);
         hp1.addChild(snhp1);
         addGameWorldObject(hp1);
         //snhp1.getLocalScale().setElementAt(0,0,0); figure out later
@@ -303,7 +289,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                 .make(new Point3D(6, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
         addGameWorldObject(fighter);
 
-        // Sc
+
 
 
         // camera
@@ -329,8 +315,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         player1ID.setCullMode(sage.scene.SceneNode.CULL_MODE.NEVER);
         cameraOne.addToHUD(player1ID);
     }
-
-
 
     private void initWorldEnvironment()
     {
@@ -426,18 +410,12 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         mvLeftActionPOne.setTerrainFollow(true);
         mvRightActionPOne.setTerrainFollow(true);
 
-
-
-        //MoveUpAction mvUpActionPOne = new MoveUpAction(cameraOne, (float) 0.1);
-        //MoveDownAction mvDownActionPOne = new MoveDownAction(cameraOne, (float) 0.1);
-
         PitchUpAction pitchUpActionPOne = new PitchUpAction(cameraOne, (float) 0.1);
         PitchDownAction pitchDownActionPOne = new PitchDownAction(cameraOne, (float) 0.1);
         RollRightAction rollRightActionPOne = new RollRightAction(cameraOne, (float) 0.1);
         RollLeftAction rollLeftActionPOne = new RollLeftAction(cameraOne, (float) 0.1);
         YawRightAction yawRightActionPOne = new YawRightAction(cameraOne, (float) 0.1);
         YawLeftAction yawLeftActionPOne = new YawLeftAction(cameraOne, (float) 0.1);
-
 
         mvFwdActionPOne.setAvatar(avatarOne);
         mvBackActionPOne.setAvatar(avatarOne);
@@ -447,146 +425,95 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         yawLeftActionPOne.setAvatar(avatarOne);
         yawRightActionPOne.setAvatar(avatarOne);
 
-        //TODO: Switch all of the actions over to the correct objects
+
+        IInputManager.INPUT_ACTION_TYPE ATpressOnly = IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY;
+        IInputManager.INPUT_ACTION_TYPE ATrepeat = IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN;
+
 
         //QUIT
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.ESCAPE,
-                           quitActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.ESCAPE,
+                           quitActionPOne, ATpressOnly);
 
         //MOVE FORWARD
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.W,
-                           mvFwdActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.W,
-                           mvFwdActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.W,
+                           mvFwdActionPOne, ATpressOnly);
+
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.W,
+                           mvFwdActionPOne, ATrepeat);
 
         //MOVE BACKWARD
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.S,
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.S,
                            mvBackActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.S,
-                           mvBackActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-
+                           ATpressOnly);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.S,
+                           mvBackActionPOne,ATrepeat);
 
         //MOVE LEFT
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.A,
-                           mvLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.A,
-                           mvLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.A,
+                           mvLeftActionPOne,ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.A,
+                           mvLeftActionPOne,ATrepeat);
 
         //MOVE RIGHT
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.D,
-                           mvRightActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.D,
-                           mvRightActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
-
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.D,
+                           mvRightActionPOne,ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.D,
+                           mvRightActionPOne,ATrepeat);
 
 
         //TODO: Note - Roll should be mapped to Left/Right and Yaw should be Q/E to match cockpit controls
 
         //YAW
         //ROTATE LEFT
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.Q,
-                           yawLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.Q,
-                           yawLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.Q,
+                           yawLeftActionPOne,ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.Q,
+                           yawLeftActionPOne,ATrepeat);
 
         //ROTATE RIGHT
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.E,
-                           yawRightActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.E,
-                           yawRightActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.E,
+                           yawRightActionPOne, ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.E,
+                           yawRightActionPOne,ATrepeat);
 
         //PITCH -- TODO: Pitch commands should be switched to match actual cockpit controls
         //ROTATE UP
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.UP,
-                           pitchUpActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.UP,
-                           pitchUpActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.UP,
+                           pitchUpActionPOne,ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.UP,
+                           pitchUpActionPOne,ATrepeat);
 
         //ROTATE DOWN
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.DOWN,
-                           pitchDownActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.DOWN,
-                           pitchDownActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.DOWN,
+                           pitchDownActionPOne, ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.DOWN,
+                           pitchDownActionPOne,ATrepeat);
 
         //ROLL
         //ROTATE COUNTERCLOCKWISE
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.LEFT,
-                           rollRightActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.LEFT,
-                           rollRightActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.LEFT,
+                           rollRightActionPOne,ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.LEFT,
+                           rollRightActionPOne,ATrepeat);
 
         //ROTATE CLOCKWISE
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.RIGHT,
-                           rollLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.RIGHT,
-                           rollLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.RIGHT,
+                           rollLeftActionPOne, ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.RIGHT,
+                           rollLeftActionPOne,ATrepeat);
 
         //ZOOM IN
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.Z,
+                           rollLeftActionPOne,ATpressOnly);
         im.associateAction(kbName,
                            net.java.games.input.Component.Identifier.Key.Z,
-                           rollLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.Z,
-                           rollLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
-
+                           rollLeftActionPOne,ATrepeat);
 
         //ZOOM OUT
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.C,
-                           rollLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-        im.associateAction(kbName,
-                           net.java.games.input.Component.Identifier.Key.C,
-                           rollLeftActionPOne,
-                           IInputManager.INPUT_ACTION_TYPE.REPEAT_WHILE_DOWN);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.C,
+                           rollLeftActionPOne,ATpressOnly);
+        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.C,
+                           rollLeftActionPOne,ATrepeat);
 
         // OPEN CHEST
         im.associateAction(kbName,
@@ -598,7 +525,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                                    Iterator<SceneNode> itr = chestGroup.getChildren();
                                    while (itr.hasNext())
                                    {
-                                       Model3DTriMesh mesh = ((Model3DTriMesh)itr.next());
+                                       Model3DTriMesh mesh = ((Model3DTriMesh) itr.next());
                                        if (mesh.hasAnimations())
                                        {
                                            mesh.startAnimation("my_animation");
@@ -606,8 +533,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                                    }
                                }
                            },
-                           IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY);
-
+                           ATpressOnly);
 
 
     }
@@ -618,7 +544,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         Matrix3D camTrans = new Matrix3D();
         camTrans.translate(camLoc1.getX(), camLoc1.getY(), camLoc1.getZ());
         skyBox.setLocalTranslation(camTrans);
-        // not 2
     }
 
     public void update(float elapsedTimeMS)
@@ -630,8 +555,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
 
         updateAnimations(elapsedTimeMS);
 
-        //
-        mapBoundaryFix(avatarOne);
+
+        mapBoundaryFix(avatarOne); //
 
         updateSkybox();
         camOne.update(elapsedTimeMS);
@@ -742,12 +667,12 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
         // TODO random stub method
     }
 
-    public void removeGameWorldObject(GhostAvatar ghost)
+    public void removeGameWorldObject(MoveToDoghouseEvent.GhostAvatar ghost)
     {
         // TODO list of ghostAvatars
     }
 
-    public void textureObj(GhostAvatar ghost, String s)
+    public void textureObj(MoveToDoghouseEvent.GhostAvatar ghost, String s)
     {
         // TODO
     }
