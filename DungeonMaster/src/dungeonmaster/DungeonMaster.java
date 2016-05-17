@@ -242,7 +242,7 @@ public class DungeonMaster
 			
 			
 			//listen for their name
-			p.getOut().println("requestName");
+			/*p.getOut().println("requestName");
 			String playerName = "";
 			try 
 			{
@@ -252,7 +252,7 @@ public class DungeonMaster
 			{
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}
+			}*/
 			
 			
 			
@@ -286,7 +286,7 @@ public class DungeonMaster
 			{
 				if(pc.getPlayerClass().getThisInstanceClass().equals(playerCharacterChoice))
 				{
-					pc.setPlayerName(playerName);
+					//pc.setPlayerName(playerName);
 					p.setMyCharacter(pc);
 				}
 			}
@@ -432,6 +432,8 @@ public class DungeonMaster
 				//String minor = "MinorAction";
 				String ender = "End turn";
 				
+				e.resetTurnSpecificValues();
+				
 				
 				if(e instanceof PlayerCharacter)
 				{
@@ -515,7 +517,8 @@ public class DungeonMaster
 						
 						p.getOut().println(ender);
 						
-											
+						/*p.getMyCharacter().setxCoor(5);
+						p.getMyCharacter().setyCoor(10);*/
 						
 						String playerMove = null;
 						//get the player's next move
@@ -1003,7 +1006,7 @@ public class DungeonMaster
 								//if yes, object.interact();
 								
 								Room movingFrom = e.getContainingRoom(); //save this in case we need to rereport it
-								Skill skill = interactingWith.getApplicableInteractionSkill();
+								String skill = interactingWith.getApplicableInteractionSkill();
 								int roll = ((PlayerCharacter) e).useSkill(skill);
 								
 								if(interactingWith.meetsInteractionDC(roll))
@@ -1150,6 +1153,11 @@ public class DungeonMaster
 				{
 					if(e instanceof Enemy)
 					{
+						//if the enemy is dead, just skip it
+						if(e.shouldRemoveSelfFromGame)
+						{
+							continue;
+						}
 						
 						//check if we've attacked
 						//if no, check for melee attack
@@ -1777,7 +1785,7 @@ public class DungeonMaster
 																		
 									for(Player player : players)
 									{
-										player.getOut().println(e.xCoor + ", " + e.yCoor);
+										player.getOut().println( ((Enemy)e).toString());
 									}
 								}
 								

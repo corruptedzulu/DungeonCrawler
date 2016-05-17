@@ -70,6 +70,8 @@ public class Weapon
 			criticalHit = true;
 		}
 		
+		result += this.attackModifier;
+		
 		
 		return result;
 	}

@@ -28,14 +28,12 @@ public class Goblin extends Enemy
 		this.resetTurnSpecificValues();
 		
 		
-		ArrayList<Ability> abilities = new ArrayList<Ability>();
-		abilities.add(new Ability("Strength", 8));
-		abilities.add(new Ability("Dexterity", 14));
-		abilities.add(new Ability("Constitution", 10));
-		abilities.add(new Ability("Intelligence", 10));
-		abilities.add(new Ability("Wisdom", 8));
-		abilities.add(new Ability("Charisma", 8));
-		this.setAbilities(abilities);
+		charisma = new Ability("Charisma", 8);
+		dexterity = new Ability("Dexterity", 14);
+		strength = new Ability("Strength", 8);
+		intelligence = new Ability("Intelligence", 10);
+		wisdom = new Ability("Wisdom", 8);
+		constitution = new Ability("Constitution", 10);	
 		
 		
 		ArrayList<Skill> skills = Skill.getAllSkillsAtDefaultModifiers(8, 14, 10, 10, 8, 8);
@@ -55,6 +53,28 @@ public class Goblin extends Enemy
 		
 		meleeWeapon = new Weapon();
 		rangedWeapon = new Weapon();
+		
+		//Scimitar		
+		this.meleeWeapon = new Weapon();
+		this.meleeWeapon.setName("Scimitar");
+		this.meleeWeapon.setDamageType("Slashing");
+		this.meleeWeapon.setWeaponType("melee");
+		this.meleeWeapon.setDistance(1);
+		this.meleeWeapon.setDamageDiceNumber(6);
+		this.meleeWeapon.setNumberOfDamageDice(1);
+		this.meleeWeapon.setDamageModifier(2);
+		this.meleeWeapon.setAttackModifier(4);
+		
+		//Shortbow
+		this.rangedWeapon = new Weapon();
+		this.rangedWeapon.setName("Shortbow");
+		this.rangedWeapon.setDamageType("Piercing");
+		this.rangedWeapon.setWeaponType("ranged");
+		this.rangedWeapon.setDistance(20);
+		this.rangedWeapon.setDamageDiceNumber(6);
+		this.rangedWeapon.setNumberOfDamageDice(1);
+		this.rangedWeapon.setDamageModifier(2);
+		this.rangedWeapon.setAttackModifier(4);
 		
 		
 	
