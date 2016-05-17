@@ -1,4 +1,4 @@
-package a2.newdc.assets;
+package a2.assets;
 
 import java.io.File;
 import java.util.ArrayList;

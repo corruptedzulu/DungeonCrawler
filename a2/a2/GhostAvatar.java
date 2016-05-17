@@ -1,4 +1,4 @@
-package a2.newdc;
+package a2;
 
 import graphicslib3D.Point3D;
 import sage.scene.TriMesh;

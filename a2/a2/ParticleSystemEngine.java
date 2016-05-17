@@ -1,7 +1,7 @@
-package a2.newdc;
+package a2;
 
-import a2.newdc.assets.AssetInfo;
-import a2.newdc.assets.ObjectNonInteractableAsset;
+import a2.assets.AssetInfo;
+import a2.assets.ObjectNonInteractableAsset;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Quaternion;

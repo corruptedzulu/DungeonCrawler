@@ -1,7 +1,7 @@
 package myGameEngine;
 
 import a2.DungeonCrawler3DSoonTM;
-import a2.newdc.GhostAvatar;
+import a2.MoveToDoghouseEvent;
 import graphicslib3D.Point3D;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public class GameClientTCP extends GameConnectionClient
 { 
 	private DungeonCrawler3DSoonTM game;
 	private UUID id; 
-	private GhostAvatar ghost;
+	private MoveToDoghouseEvent.GhostAvatar ghost;
  
 	public GameClientTCP(InetAddress remAddr, int remPort, ProtocolType pType, DungeonCrawler3DSoonTM game) throws IOException
 	{ 
@@ -112,7 +112,7 @@ public class GameClientTCP extends GameConnectionClient
 	}
 
 	private void createGhostAvatar(UUID ghostID, Point3D ghostPosition) {
-		ghost = new GhostAvatar(ghostID, ghostPosition);
+		ghost = new MoveToDoghouseEvent.GhostAvatar(ghostID, ghostPosition);
 		ghost.scale(.30f,.30f,.30f);
 		// ghost.rotate(-90, new Vector3D(1,0,0));
 		game.textureObj(ghost, "ghostfighter.png");

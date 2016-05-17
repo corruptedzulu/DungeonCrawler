@@ -1,4 +1,4 @@
-package a2.newdc.assets;
+package a2.assets;
 
 public class TileAsset extends Asset
 {
