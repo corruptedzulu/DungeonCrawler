@@ -80,7 +80,8 @@ public class AssetBuilder
             String mesh = fileName;
             String material = fileName.substring(0, fileName.length() - 9) + ".material";
             String skeleton = fileName.substring(0, fileName.length() - 9) + ".skeleton.xml";
-            group = parser.loadModel(mesh, material, skeleton);
+            String path = fileName.substring(0, fileName.lastIndexOf("\\")+1);
+            group = parser.loadModel(mesh, material, skeleton,path);
             Iterator<SceneNode> itr = group.getChildren();
             while (itr.hasNext())
             {
