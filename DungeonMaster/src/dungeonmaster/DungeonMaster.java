@@ -1159,6 +1159,9 @@ public class DungeonMaster
 							continue;
 						}
 						
+						
+						
+						
 						//check if we've attacked
 						//if no, check for melee attack
 					
@@ -1220,6 +1223,24 @@ public class DungeonMaster
 						if(playerCharactersAttackable.size() != 0)
 						{
 						
+							for(Player player : players)
+							{
+								//if this enemy is in the same room as any of the players, then sleep for a second in between taking actions
+								if(e.getContainingRoom() == player.getMyCharacter().getContainingRoom())
+								{
+									try
+									{
+										Thread.sleep(1000);
+									}
+									catch (InterruptedException e1)
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
+								}
+							}
+							
+							
 							Random random = new Random();
 							
 							int attackIndex = random.nextInt(playerCharactersAttackable.size());
@@ -1308,6 +1329,25 @@ public class DungeonMaster
 								
 								while(hasMoved == false)
 								{
+									
+									for(Player player : players)
+									{
+										//if this enemy is in the same room as any of the players, then sleep for a second in between taking actions
+										if(e.getContainingRoom() == player.getMyCharacter().getContainingRoom())
+										{
+											try
+											{
+												Thread.sleep(1000);
+											}
+											catch (InterruptedException e1)
+											{
+												// TODO Auto-generated catch block
+												e1.printStackTrace();
+											}
+										}
+									}
+									
+									
 									String moveInDirection = determineDirectionTowardsEntity(e, reachableCharacters.get(moveTowards));
 
 									
@@ -1824,6 +1864,23 @@ public class DungeonMaster
 								//if there are characters adjacent to me after i completed my movement, attack one
 								if(playerCharactersAttackable.size() != 0 && hasActioned == false)
 								{
+									for(Player player : players)
+									{
+										//if this enemy is in the same room as any of the players, then sleep for a second in between taking actions
+										if(e.getContainingRoom() == player.getMyCharacter().getContainingRoom())
+										{
+											try
+											{
+												Thread.sleep(1000);
+											}
+											catch (InterruptedException e1)
+											{
+												// TODO Auto-generated catch block
+												e1.printStackTrace();
+											}
+										}
+									}
+									
 									int attackIndex = random.nextInt(playerCharactersAttackable.size());
 									
 									//TODO fill in the attack for adjacent enemy (picked from the list based on attackIndex)
@@ -1899,6 +1956,22 @@ public class DungeonMaster
 								if(playerCharactersAttackable.size() != 0)
 								{
 									
+									for(Player player : players)
+									{
+										//if this enemy is in the same room as any of the players, then sleep for a second in between taking actions
+										if(e.getContainingRoom() == player.getMyCharacter().getContainingRoom())
+										{
+											try
+											{
+												Thread.sleep(1000);
+											}
+											catch (InterruptedException e1)
+											{
+												// TODO Auto-generated catch block
+												e1.printStackTrace();
+											}
+										}
+									}
 									
 									Random random = new Random();
 									
