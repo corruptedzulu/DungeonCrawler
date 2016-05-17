@@ -84,35 +84,35 @@ public abstract class Asset
         this.isRandomTexture = isRandomTexture;
     }
 
-    public TriMesh make(Matrix3D position, Matrix3D rotation, String textureName)
+    public TriMesh make(Matrix3D position, Matrix3D rotation, String name)
     {
-        TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture(textureName));
+        TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture(name));
         newNode.setLocalTranslation(position);
         newNode.setLocalRotation(rotation);
         return newNode;
     }
 
-    public TriMesh make(Point3D position, String textureName)
+    public TriMesh make(Point3D position, String name)
     {
-        TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture(textureName));
+        TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture(name));
         Matrix3D trans = new Matrix3D();
         trans.translate(position.getX(),position.getY(),position.getZ());
         newNode.setLocalTranslation(trans);
         return newNode;
     }
 
-    public TriMesh make(Point3D position, Quaternion rotation, String textureName)
+    public TriMesh make(Point3D position, Quaternion rotation, String name)
     {
-        TriMesh newNode = make(position, textureName);
+        TriMesh newNode = make(position, name);
         Matrix3D rot = new Matrix3D();
         rot.rotate(rotation.getAngleAxis()[1],rotation.getAngleAxis()[2],rotation.getAngleAxis()[3]);
         newNode.setLocalRotation(rot);
         return newNode;
     }
 
-    public TriMesh make(Point3D position, Point3D scale, Quaternion rotation, String textureName)
+    public TriMesh make(Point3D position, Point3D scale, Quaternion rotation, String name)
     {
-        TriMesh newNode = make(position, rotation, textureName);
+        TriMesh newNode = make(position, rotation, name);
         Matrix3D sc = new Matrix3D();
         sc.scale(scale.getX(),scale.getY(),scale.getZ());
         newNode.setLocalScale(sc);
@@ -210,10 +210,10 @@ public abstract class Asset
     {
         if (textures == null)
             setTextures();
+
         if (textures.containsKey(shortName))
             return textures.get(shortName);
 
-        System.out.println("Texture '"+shortName +"' not found");
         return "";
     }
 
@@ -228,20 +228,20 @@ public abstract class Asset
             {
                 if (split[i] == "t")
                 {
-
                     String path = dir.getParent() + "\\Tiles\\_tile_stone_" +split[i+1]+"_.png";
                     textures.put(getName(),path);
                 }
             }
         }
-
         else if (dir.isDirectory())
         {
             for (File file : dir.listFiles())
             {
                 String f = file.getName(); // _sameName_xyz.png of _sameName_xyz.jpg
                 if (f.startsWith("_" + getName()+"_") && (f.endsWith(".png") || f.endsWith(".jpg")) && !textures.containsKey(f))
+                {
                     textures.put(f, file.getAbsolutePath());
+                }
             }
         }
     }

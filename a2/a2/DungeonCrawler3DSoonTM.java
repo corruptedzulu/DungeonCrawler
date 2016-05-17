@@ -217,6 +217,79 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
     {
         //System.out.println("Working Directory = " + System.getProperty("user.dir"));
 
+
+
+
+        // MISC
+        ObjectNonInteractableAsset barrel = assetInfo.objectNonInteractables.get("barrel");
+        addGameWorldObject(barrel.make(new Point3D(0, 0, 1.5), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+
+        // animation objects
+        animateGroup = new Group("animateGroup");
+
+        ObjectInteractableAsset chest = assetInfo.objectInteractables.get("chest");
+        chestGroup = chest
+                .makeAni(new Point3D(0, 0, 0), new Point3D(.01, .01, .01), new Quaternion(1, new double[]{0, 0, 0}));
+        animateGroup.addChild(chestGroup);
+        addGameWorldObject(animateGroup);
+
+        // testing transparency
+        ObjectInteractableAsset testBoxAsset = assetInfo.objectInteractables.get("transtest");
+        SceneNode transparentBox = testBoxAsset
+                .make(new Point3D(0, 0, 1), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
+        enableTransparency(transparentBox);
+        addGameWorldObject(transparentBox);
+
+        // testing transparency
+        ObjectNonInteractableAsset treeAsset = assetInfo.objectNonInteractables.get("tree");
+        for (int i = 0 ; i < 20 ; i++)
+            makeTreeAtRandomLocation(treeAsset);
+
+
+
+        // DUNGEON
+        // column
+        WallAsset columnAsset = assetInfo.walls.get("column");
+        addGameWorldObject(columnAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
+
+        //WallAsset wallAsset = assetInfo.walls.get("wall");
+        //addGameWorldObject(wallAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT)); // add more constants for rot
+
+        WallAsset doorAsset = assetInfo.walls.get("door");
+        addGameWorldObject(doorAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
+
+        TileAsset tile = assetInfo.tiles.get("tile");
+        tile.setRandomTexture(true);
+        addGameWorldObject(tile.make(new Point3D(0, 0, 0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS*2), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(0, 0, TS*3), TILE_SCALE,TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(TS, 0, 0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(TS*2, 0, 0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(TS*3, 0, 0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(tile.make(new Point3D(TS*3, 0, TS*2), TILE_SCALE, TILE_ROT));
+
+
+        // ENEMIES
+        NPCEnemyAsset goblinAsset = assetInfo.npcEnemies.get("goblin");
+        NPCEnemyAsset gobSword = assetInfo.npcEnemies.get("swordgoblin");
+        Group goblin1 = new Group("goblin1");
+        goblin1.addChild(goblinAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
+        goblin1.addChild(gobSword.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
+        addGameWorldObject(goblin1);
+
+        // HP
+        PlayableAsset hpAsset = assetInfo.playables.get("hp");
+        PlayableAsset hpBar = assetInfo.playables.get("hpborder");
+        Group hp1 = new Group("hp1");
+        hp1.addChild(hpAsset.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT));
+        SceneNode snhp1 = hpBar.make(new Point3D(0,0,0), TILE_SCALE, TILE_ROT);
+        hp1.addChild(snhp1);
+        addGameWorldObject(hp1);
+        //snhp1.getLocalScale().setElementAt(0,0,0); figure out later
+
+
+        // PLAYERS
         SceneNode cleric = assetInfo.playables.get("cleric")
                 .make(new Point3D(0, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
         addGameWorldObject(cleric);
@@ -230,51 +303,10 @@ public class DungeonCrawler3DSoonTM extends BaseGame //implements MouseListener
                 .make(new Point3D(6, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
         addGameWorldObject(fighter);
 
-        ObjectNonInteractableAsset barrel = assetInfo.objectNonInteractables.get("barrel");
-        addGameWorldObject(barrel.make(new Point3D(0, 0, 1.5), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
+        // Sc
 
 
-
-        // animation objects
-        animateGroup = new Group("animateGroup");
-
-        ObjectInteractableAsset chest = assetInfo.objectInteractables.get("chest");
-        chestGroup = chest
-                .makeAni(new Point3D(0, 0, 0), new Point3D(.01, .01, .01), new Quaternion(1, new double[]{0, 0, 0}));
-        animateGroup.addChild(chestGroup);
-
-
-        addGameWorldObject(animateGroup);
-
-        // testing transparency
-        ObjectInteractableAsset testBoxAsset = assetInfo.objectInteractables.get("transtest");
-        SceneNode transparentBox = testBoxAsset
-                .make(new Point3D(0, 0, 1), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
-        enableTransparency(transparentBox);
-        addGameWorldObject(transparentBox);
-
-        // testing transparency
-        ObjectNonInteractableAsset treeAsset = assetInfo.objectNonInteractables.get("tree");
-        SceneNode tree = treeAsset
-                .make(new Point3D(0, 0, 1), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
-        enableTransparency(tree);
-        addGameWorldObject(tree);
-
-        for (int i = 0 ; i < 20 ; i++)
-            makeTreeAtRandomLocation(treeAsset);
-
-
-        TileAsset tile = assetInfo.tiles.get("tile");
-        tile.setRandomTexture(true);
-        addGameWorldObject(tile.make(new Point3D(0, 0, 0), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS*2), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS*3), TILE_SCALE,TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(TS, 0, 0), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(TS*2, 0, 0), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(TS*3, 0, 0), TILE_SCALE, TILE_ROT));
-        addGameWorldObject(tile.make(new Point3D(TS*3, 0, TS*2), TILE_SCALE, TILE_ROT));
-
+        // camera
         avatarOne = cleric;
         cameraOne = new JOGLCamera(renderer);
         cameraOne.setPerspectiveFrustum(60, 2, .2, 1000);

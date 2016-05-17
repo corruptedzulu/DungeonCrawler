@@ -6,7 +6,7 @@ public class WallAsset extends Asset
     {
         super.setFileName(String.join("_",s));
         super.setName(s[1]);
-        super.setVersion(Integer.parseInt(s[3]));
+        super.setVersion(Integer.parseInt(s[2]));
     }
     public String toString()
     {
