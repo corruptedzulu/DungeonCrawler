@@ -133,6 +133,7 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		
 		s = "WorldEntity" + myWorldEntityID + ":" + xCoor + "," + yCoor + ";";
 		
+		s += currentHP + "," + maxHP + ";";
 		
 		if(dead)
 		{
@@ -247,11 +248,22 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 		
 	}
 	
-	public int useSkill(Skill skill)
+	public int useSkill(String skill)
 	{
 		//TODO fill in
 		
-		return 0;
+		int result = 0;
+		
+		for(Skill s : skills)
+		{
+			if(s.getName().equals(skill))
+			{
+				Dice d = new Dice(20);
+				result = d.roll(1) + s.getModifier();
+			}
+		}
+		
+		return result;
 	}
 	
 	public void makeSave()

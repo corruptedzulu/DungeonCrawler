@@ -113,13 +113,17 @@ public class GameWorld
 		door1to2.setxRoomTwoCoor(5);
 		door1to2.setyRoomOneCoor(room1.getLengthSquares() - 1);
 		door1to2.setyRoomTwoCoor(0);
+		door1to2.setxCoor(5);
+		door1to2.setyCoor(room1.getLengthSquares() - 1);
 
 		door2to1.setMyRoom(room2);
 		door2to1.setRoomIConnectTo(room1);
 		door2to1.setxRoomOneCoor(5);
 		door2to1.setxRoomTwoCoor(5);
-		door2to1.setyRoomOneCoor(room2.getLengthSquares() - 1);
-		door2to1.setyRoomTwoCoor(0);
+		door2to1.setyRoomOneCoor(0);
+		door2to1.setyRoomTwoCoor(room2.getLengthSquares() - 1);
+		door2to1.setxCoor(5);
+		door2to1.setyCoor(room2.getLengthSquares() - 1);
 		
 		door2to3.setMyRoom(room2);
 		door2to3.setRoomIConnectTo(room3);
@@ -127,13 +131,17 @@ public class GameWorld
 		door2to3.setxRoomTwoCoor(5);
 		door2to3.setyRoomOneCoor(room2.getLengthSquares() - 1);
 		door2to3.setyRoomTwoCoor(0);
+		door2to3.setxCoor(5);
+		door2to3.setyCoor(room2.getLengthSquares() - 1);
 		
 		door3to2.setMyRoom(room3);
 		door3to2.setRoomIConnectTo(room2);
 		door3to2.setxRoomOneCoor(5);
 		door3to2.setxRoomTwoCoor(5);
-		door3to2.setyRoomOneCoor(room3.getLengthSquares() - 1);
-		door3to2.setyRoomTwoCoor(0);
+		door3to2.setyRoomOneCoor(0);
+		door3to2.setyRoomTwoCoor(room3.getLengthSquares() - 1);
+		door3to2.setxCoor(5);
+		door3to2.setyCoor(room3.getLengthSquares() - 1);
 		
 		
 		room1.getDoors().add(door1to2);

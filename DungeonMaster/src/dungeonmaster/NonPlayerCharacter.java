@@ -41,7 +41,14 @@ public class NonPlayerCharacter extends WorldEntity implements Comparable
 	
 	protected ArrayList<SavingThrow> savingThrows;
 	protected ArrayList<Skill> skills;
-	protected ArrayList<Ability> abilities;
+	
+	
+	protected Ability strength;
+	protected Ability dexterity;
+	protected Ability constitution;
+	protected Ability intelligence;
+	protected Ability wisdom;
+	protected Ability charisma;
 	
 	
 	protected ArrayList<Treasure> treasures;
@@ -83,7 +90,6 @@ public class NonPlayerCharacter extends WorldEntity implements Comparable
 		
 		savingThrows = new ArrayList<SavingThrow>();
 		skills = new ArrayList<Skill>();
-		abilities = new ArrayList<Ability>();
 		treasures = new ArrayList<Treasure>();
 		weapons = new ArrayList<Weapon>();
 		inventory = new ArrayList<Item>();
@@ -357,19 +363,7 @@ public class NonPlayerCharacter extends WorldEntity implements Comparable
 		this.skills = skills;
 	}
 
-
-	public ArrayList<Ability> getAbilities() 
-	{
-		return abilities;
-	}
-
-
-	public void setAbilities(ArrayList<Ability> abilities) 
-	{
-		this.abilities = abilities;
-	}
-
-
+	
 	
 	public void setMovementInSquares(int squares)
 	{

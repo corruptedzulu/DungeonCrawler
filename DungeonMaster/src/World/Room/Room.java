@@ -175,7 +175,11 @@ public class Room
 
 
 	public ArrayList<WorldObject> getContents() {
-		return contents;
+		ArrayList<WorldObject> result = new ArrayList<WorldObject>();
+		result.addAll(contents);
+		result.addAll(doors);
+		
+		return result;
 	}
 
 

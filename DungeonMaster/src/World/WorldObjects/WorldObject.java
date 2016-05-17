@@ -16,7 +16,7 @@ public class WorldObject
 	public static int worldObjectID = 0;
 	protected int myWorldObjectID;
 	
-	private Skill interactionSkill;
+	private String interactionSkill;
 	private int interactionDC;
 	
 	
@@ -62,11 +62,11 @@ public class WorldObject
 	public void setyCoor(int yCoor) {
 		this.yCoor = yCoor;
 	}
-	public Skill getInteractionSkill()
+	public String getInteractionSkill()
 	{
 		return interactionSkill;
 	}
-	public void setInteractionSkill(Skill interactionSkill)
+	public void setInteractionSkill(String interactionSkill)
 	{
 		this.interactionSkill = interactionSkill;
 	}
@@ -93,7 +93,7 @@ public class WorldObject
 
 
 
-	public Skill getApplicableInteractionSkill()
+	public String getApplicableInteractionSkill()
 	{
 		return getInteractionSkill();
 	}

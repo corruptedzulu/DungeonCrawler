@@ -39,6 +39,11 @@ public abstract class WorldEntity implements Comparable
 		rand = new Random();
 	}
 
+	public void resetTurnSpecificValues()
+	{
+		
+	}
+	
 	public int rollInitiative()
 	{
 		return 0;

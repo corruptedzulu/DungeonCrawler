@@ -1,6 +1,7 @@
 package World.WorldObjects;
 
 import World.Room.Room;
+import dungeonmaster.Skill;
 
 public class Door extends WorldObject
 {
@@ -38,6 +39,10 @@ public class Door extends WorldObject
 		
 		setxRoomTwoCoor(-1);
 		setyRoomTwoCoor(-1);
+		
+		this.setInteractionDC(13);
+		String s = "Sleight of Hand";
+		this.setInteractionSkill(s);
 		
 		
 		myDoorID = doorID;
