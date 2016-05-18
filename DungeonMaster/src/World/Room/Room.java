@@ -269,8 +269,8 @@ public class Room
 		
 		
 		result += "Room" + myRoomID + ":" + roomType + ";";
-		result += widthSquares + "," + lengthSquares + ";";
-		result += xWorldCoor + "," + yWorldCoor + ";";
+		result += "WidthLength " + widthSquares + "," + lengthSquares + ";";
+		result += "WorldXYofSECorner " + xWorldCoor + "," + yWorldCoor + ";";
 		
 		
 		for(WorldEntity we : entities)
@@ -278,31 +278,40 @@ public class Room
 			result += we.toString();
 			
 		}
-		result += ";";
+		if(entities.size() != 0)
+		{
+			result += ";";
+		}
 		
 		
 		for(WorldObject wo : contents)
 		{
 			result += wo.toString();
 		}
-		result += ";";
+		if(contents.size() != 0)
+		{
+			result += ";";
+		}
 		
 		
 		for(Door d : doors)
 		{
 			result += d.toString();
 		}
-		result += ";";
+		if(doors.size() != 0)
+		{
+			result += ";";
+		}
 		
 		
-		if(dungeonEntrance)
+		/*if(dungeonEntrance)
 		{
 			result += "true;";
 		}
 		else
 		{
 			result += "false;";
-		}
+		}*/
 		 
 		
 		

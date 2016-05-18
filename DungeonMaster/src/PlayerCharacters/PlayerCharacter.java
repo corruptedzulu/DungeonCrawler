@@ -131,9 +131,9 @@ public class PlayerCharacter extends WorldEntity implements Comparable
 	{
 		String s = null;
 		
-		s = "WorldEntity" + myWorldEntityID + ":" + xCoor + "," + yCoor + ";";
+		s = "PlayerCharacter" + myWorldEntityID + ":XY " + xCoor + "," + yCoor + ";";
 		
-		s += currentHP + "," + maxHP + ";";
+		s += "HPMaxHP " +  currentHP + "," + maxHP + ";";
 		
 		if(dead)
 		{
