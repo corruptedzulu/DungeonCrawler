@@ -274,7 +274,7 @@ public class Room
 		
 		result += "Room" + myRoomID + ":" + roomType + ";";
 		result += "WidthLength " + widthSquares + "," + lengthSquares + ";";
-		result += "WorldXYofSECorner " + xWorldCoor + "," + yWorldCoor + ";";
+		result += "WorldXYofSWCorner " + xWorldCoor + "," + yWorldCoor + ";";
 		
 		
 		for(WorldEntity we : entities)

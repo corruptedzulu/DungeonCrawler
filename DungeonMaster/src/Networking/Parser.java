@@ -150,8 +150,8 @@ public class Parser
 	
 	public void parseRoom(String s)
 	{
-		//objects
 		//entities
+		//objects
 		//doors
 		//entrance/not entrance
 	}
