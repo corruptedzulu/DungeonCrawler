@@ -12,7 +12,7 @@ public class RollRightAction extends RollAction
 	public RollRightAction(ICamera c, float rotRateDeg) 
 	{
 		super(c, rotRateDeg);
-		//rotationRateDeg = rotationRateDeg * -1;
+		rotationRateDeg = rotRateDeg * -1;
 	}
 
 	public void performAction(float time, Event event)

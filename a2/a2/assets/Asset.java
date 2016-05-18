@@ -84,35 +84,36 @@ public abstract class Asset
         this.isRandomTexture = isRandomTexture;
     }
 
-    public TriMesh make(Matrix3D position, Matrix3D rotation, String name)
+    public TriMesh make(Matrix3D position, Matrix3D rotation, String tx)
     {
-        TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture(name));
+        TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture(tx));
         newNode.setLocalTranslation(position);
         newNode.setLocalRotation(rotation);
         return newNode;
     }
 
-    public TriMesh make(Point3D position, String name)
+    public TriMesh make(Point3D position, String tx)
     {
-        TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture(name));
+        TriMesh newNode = AssetBuilder.BuildMesh(getFileName(), getName(), getTexture(tx));
         Matrix3D trans = new Matrix3D();
         trans.translate(position.getX(),position.getY(),position.getZ());
         newNode.setLocalTranslation(trans);
         return newNode;
     }
 
-    public TriMesh make(Point3D position, Quaternion rotation, String name)
+    public TriMesh make(Point3D position, Quaternion rotation, String tx)
     {
-        TriMesh newNode = make(position, name);
+        TriMesh newNode = make(position, tx);
         Matrix3D rot = new Matrix3D();
         rot.rotate(rotation.getAngleAxis()[1],rotation.getAngleAxis()[2],rotation.getAngleAxis()[3]);
         newNode.setLocalRotation(rot);
         return newNode;
     }
 
-    public TriMesh make(Point3D position, Point3D scale, Quaternion rotation, String name)
+    public TriMesh make(Point3D position, Point3D scale, Quaternion rotation, String tx)
     {
-        TriMesh newNode = make(position, rotation, name);
+        TriMesh newNode = make(position, rotation, tx);
+
         Matrix3D sc = new Matrix3D();
         sc.scale(scale.getX(),scale.getY(),scale.getZ());
         newNode.setLocalScale(sc);
@@ -163,6 +164,16 @@ public abstract class Asset
     public TriMesh make(Point3D position, Point3D scale, Quaternion rotation)
     {
         TriMesh newNode = make(position, rotation);
+        Matrix3D sc = new Matrix3D();
+        sc.scale(scale.getX(),scale.getY(),scale.getZ());
+        newNode.setLocalScale(sc);
+        return newNode;
+    }
+
+    public TriMesh make(String name, Point3D position, Point3D scale, Quaternion rotation)
+    {
+        TriMesh newNode = make(position, rotation);
+        newNode.setName(name);
         Matrix3D sc = new Matrix3D();
         sc.scale(scale.getX(),scale.getY(),scale.getZ());
         newNode.setLocalScale(sc);
