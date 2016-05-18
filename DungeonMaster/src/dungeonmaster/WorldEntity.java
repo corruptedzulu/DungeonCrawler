@@ -73,7 +73,7 @@ public abstract class WorldEntity implements Comparable
 	{
 		String s = null;
 		
-		s = "WorldEntity" + myWorldEntityID + ":" + xCoor + "," + yCoor + ";";
+		s = "WorldEntity" + myWorldEntityID + ":XY " + xCoor + "," + yCoor + ";";
 		
 		return s;
 	}

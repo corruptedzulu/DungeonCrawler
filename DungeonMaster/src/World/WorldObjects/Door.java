@@ -153,7 +153,7 @@ public class Door extends WorldObject
 	{
 		String result = "";
 		
-		result += "Door" + myDoorID + ":" + xRoomOneCoor + "," + yRoomOneCoor + ";" + + xRoomTwoCoor + "," + yRoomTwoCoor + ";" + "$$";
+		result += "Door" + myDoorID + ":" + "ThisRoomXY " +  xRoomOneCoor + "," + yRoomOneCoor + ";" + "OtherRoomXY " +  xRoomTwoCoor + "," + yRoomTwoCoor + ";" + "$$";
 		
 		return result;
 	}

@@ -85,6 +85,9 @@ public class GameWorld
 		rooms.add(room2);
 		rooms.add(room3);
 		
+		room1.setRoomType("StandardRoom");
+		room2.setRoomType("StandardRoom");
+		room3.setRoomType("StandardRoom");
 		
 		room1.setWidthSquares(8);
 		room1.setLengthSquares(12);
@@ -121,7 +124,7 @@ public class GameWorld
 		door2to1.setxRoomOneCoor(5);
 		door2to1.setxRoomTwoCoor(5);
 		door2to1.setyRoomOneCoor(0);
-		door2to1.setyRoomTwoCoor(room2.getLengthSquares() - 1);
+		door2to1.setyRoomTwoCoor(room1.getLengthSquares() - 1);
 		door2to1.setxCoor(5);
 		door2to1.setyCoor(room2.getLengthSquares() - 1);
 		
@@ -139,7 +142,7 @@ public class GameWorld
 		door3to2.setxRoomOneCoor(5);
 		door3to2.setxRoomTwoCoor(5);
 		door3to2.setyRoomOneCoor(0);
-		door3to2.setyRoomTwoCoor(room3.getLengthSquares() - 1);
+		door3to2.setyRoomTwoCoor(room2.getLengthSquares() - 1);
 		door3to2.setxCoor(5);
 		door3to2.setyCoor(room3.getLengthSquares() - 1);
 		
@@ -192,7 +195,7 @@ public class GameWorld
 		c.setxCoor(5);
 		c.setyCoor(25);
 		
-		room3.getContents().add(c);
+		room3.addWorldObject(c);
 		
 		
 		
@@ -911,7 +914,7 @@ public class GameWorld
 		//report width, length of the world
 		//report the rooms (call each room's toString)
 		
-		result += "GW:" + worldLength + "," + worldWidth + ";";
+		result += "GW:WorldSize " + worldLength + "," + worldWidth + ";";
 		
 		
 		for(Room r : rooms)

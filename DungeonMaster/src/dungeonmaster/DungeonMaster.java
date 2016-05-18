@@ -288,6 +288,7 @@ public class DungeonMaster
 				{
 					//pc.setPlayerName(playerName);
 					p.setMyCharacter(pc);
+					p.getOut().println(p.getMyCharacter().toString());
 				}
 			}
 			
@@ -350,12 +351,13 @@ public class DungeonMaster
 			
 			clientsHaveReportedReady += 1;
 			
+			gw.getRoomOne().addEntity(p.getMyCharacter());
+			p.getMyCharacter().setContainingRoom(gw.getRoomOne());
 			
 			//tell the player about the whole game world
 			p.getOut().println(gw.toString());
 			
-			gw.getRoomOne().addEntity(p.getMyCharacter());
-			p.getMyCharacter().setContainingRoom(gw.getRoomOne());
+			
 			
 		}
 		
@@ -1264,7 +1266,15 @@ public class DungeonMaster
 								attackedEnemy.takeDamage(damage);
 								
 								
-								//if that took the player to 0 or fewer HP, then on their turn they will start making death saving throws								
+								//if that took the player to 0 or fewer HP, then on their turn they will start making death saving throws	
+								
+								for(Player p : players)
+								{
+									if(p.getMyCharacter() == attackedEnemy)
+									{
+										p.getOut().println(attackedEnemy.toString());
+									}
+								}
 							}
 							
 							hasActioned = true;
@@ -1902,6 +1912,14 @@ public class DungeonMaster
 										
 										//tell the enemy to take the damage
 										attackedEnemy.takeDamage(damage);
+										
+										for(Player p : players)
+										{
+											if(p.getMyCharacter() == attackedEnemy)
+											{
+												p.getOut().println(attackedEnemy.toString());
+											}
+										}
 																				
 									}
 																		
@@ -1998,6 +2016,15 @@ public class DungeonMaster
 										
 										//tell the enemy to take the damage
 										attackedEnemy.takeDamage(damage);
+										
+										for(Player p : players)
+										{
+											if(p.getMyCharacter() == attackedEnemy)
+											{
+												p.getOut().println(attackedEnemy.toString());
+											}
+										}
+										
 										
 									}
 									

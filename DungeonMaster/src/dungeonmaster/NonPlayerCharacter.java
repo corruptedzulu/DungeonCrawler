@@ -110,7 +110,7 @@ public class NonPlayerCharacter extends WorldEntity implements Comparable
 	{
 		String s = super.toString();
 		
-		s += race + ";";
+		//s += race + ";";
 		
 		if(shouldRemoveSelfFromGame)
 		{

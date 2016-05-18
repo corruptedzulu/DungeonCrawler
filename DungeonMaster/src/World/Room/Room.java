@@ -182,6 +182,10 @@ public class Room
 		return result;
 	}
 
+	public void addWorldObject(WorldObject obj)
+	{
+		this.contents.add(obj);//not doors
+	}
 
 	public void setContents(ArrayList<WorldObject> contents) {
 		this.contents = contents;
@@ -269,8 +273,8 @@ public class Room
 		
 		
 		result += "Room" + myRoomID + ":" + roomType + ";";
-		result += widthSquares + "," + lengthSquares + ";";
-		result += xWorldCoor + "," + yWorldCoor + ";";
+		result += "WidthLength " + widthSquares + "," + lengthSquares + ";";
+		result += "WorldXYofSWCorner " + xWorldCoor + "," + yWorldCoor + ";";
 		
 		
 		for(WorldEntity we : entities)
@@ -278,31 +282,40 @@ public class Room
 			result += we.toString();
 			
 		}
-		result += ";";
+		if(entities.size() != 0)
+		{
+			result += ";";
+		}
 		
 		
 		for(WorldObject wo : contents)
 		{
 			result += wo.toString();
 		}
-		result += ";";
+		if(contents.size() != 0)
+		{
+			result += ";";
+		}
 		
 		
 		for(Door d : doors)
 		{
 			result += d.toString();
 		}
-		result += ";";
+		if(doors.size() != 0)
+		{
+			result += ";";
+		}
 		
 		
-		if(dungeonEntrance)
+		/*if(dungeonEntrance)
 		{
 			result += "true;";
 		}
 		else
 		{
 			result += "false;";
-		}
+		}*/
 		 
 		
 		
