@@ -136,6 +136,14 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private boolean connected;
 
 
+    private TileAsset tileAsset;
+    private WallAsset wallAsset;
+    private WallAsset columnAsset;
+    private WallAsset doorAsset;
+    private NPCEnemyAsset goblinAsset;
+    private NPCEnemyAsset gobSword;
+
+
     public DungeonCrawler3DSoonTM()
     {
         super();
@@ -159,7 +167,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
 
     protected void initSystem()
     {
-        display = MyDisplaySystem.getDisplaySystem();  //new MyDisplaySystem(1920, 1080, 24, 20, true, "sage.renderer.jogl.JOGLRenderer");
+        display = new MyDisplaySystem(1920, 1080, 24, 20, true, "sage.renderer.jogl.JOGLRenderer");
         display.setTitle("DungeonCrawler");
         setDisplaySystem(display);
 
@@ -233,36 +241,19 @@ public class DungeonCrawler3DSoonTM extends BaseGame
             makeTreeAtRandomLocation(treeAsset);
 
 
-        // DUNGEON
-        // column
-        WallAsset columnAsset = assetInfo.walls.get("column");
-        addGameWorldObject(columnAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
-
-        WallAsset wallAsset = assetInfo.walls.get("wall");
-        addGameWorldObject(wallAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_N)); // add more constants for rot
-
-        WallAsset doorAsset = assetInfo.walls.get("door");
-        addGameWorldObject(doorAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
-
-        TileAsset tile = assetInfo.tiles.get("tile");
-        tile.setRandomTexture(true);
-        addGameWorldObject(tile.make(new Point3D(0, 0, 0), TILE_SCALE, ROT_E));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS), TILE_SCALE, ROT_E));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS*2), TILE_SCALE, ROT_E));
-        addGameWorldObject(tile.make(new Point3D(0, 0, TS*3), TILE_SCALE, ROT_E));
-        addGameWorldObject(tile.make(new Point3D(TS, 0, 0), TILE_SCALE, ROT_E));
-        addGameWorldObject(tile.make(new Point3D(TS*2, 0, 0), TILE_SCALE, ROT_E));
-        addGameWorldObject(tile.make(new Point3D(TS*3, 0, 0), TILE_SCALE, ROT_E));
-        addGameWorldObject(tile.make(new Point3D(TS*3, 0, TS*2), TILE_SCALE, ROT_E));
 
 
-        // ENEMIES
-        NPCEnemyAsset goblinAsset = assetInfo.npcEnemies.get("goblin");
-        NPCEnemyAsset gobSword = assetInfo.npcEnemies.get("swordgoblin");
-        Group goblin1 = new Group("goblin1");
-        goblin1.addChild(goblinAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
-        goblin1.addChild(gobSword.make(new Point3D(0,0,0), TILE_SCALE, ROT_E));
-        addGameWorldObject(goblin1);
+
+        Group room = constructRoom(0, 8, 12, 0, 0);
+        addDoorToRoom(room,0,5,11);
+        addEnemyToRoom(room,0,0,5);
+        addEnemyToRoom(room,1,2,5);
+        addEnemyToRoom(room,2,4,5);
+        addGameWorldObject(room);
+
+
+        // client parse
+        // todo the below items
 
         // HP
         PlayableAsset hpAsset = assetInfo.playables.get("hp");
@@ -412,8 +403,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame
 
         PitchUpAction pitchUpActionPOne = new PitchUpAction(cameraOne, (float) 0.1);
         PitchDownAction pitchDownActionPOne = new PitchDownAction(cameraOne, (float) 0.1);
-        RollRightAction rollRightActionPOne = new RollRightAction(cameraOne, (float) 0.1);
-        RollLeftAction rollLeftActionPOne = new RollLeftAction(cameraOne, (float) 0.1);
+        RollRightAction rollRightActionPOne = new RollRightAction(cameraOne, (float) 10);
+        RollLeftAction rollLeftActionPOne = new RollLeftAction(cameraOne, (float) 10);
         YawRightAction yawRightActionPOne = new YawRightAction(cameraOne, (float) 0.1);
         YawLeftAction yawLeftActionPOne = new YawLeftAction(cameraOne, (float) 0.1);
 
@@ -714,5 +705,118 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         {
             System.out.println("Null ptr exception in " + scriptFileName + e4);
         }
+    }
+
+    private Group constructRoom(int number, int sizeX, int sizeY, int posX, int posY)
+    {
+        Group room = new Group("Room " + number);
+
+        if (tileAsset == null)
+        {
+            tileAsset = assetInfo.tiles.get("tile");
+            tileAsset.setRandomTexture(true);
+        }
+        if (wallAsset == null)
+            wallAsset = assetInfo.walls.get("wall");
+        if (columnAsset == null)
+            columnAsset = assetInfo.walls.get("column");
+
+
+
+        // tiles
+        for (int x = 0; x < sizeX; x++)
+            for (int y = 0; y < sizeY; y++)
+                room.addChild(tileAsset.make(number + " Tile " + x + "x" + y,
+                                             new Point3D((y + posY) * TILE_SIZE, 0, (x + posX) * TILE_SIZE), TILE_SCALE,
+                                             ROT_E));
+
+
+        // walls
+        for (int x = 0; x < sizeX; x++) // north
+            room.addChild(wallAsset.make(number + " Wall North " + x,
+                                         new Point3D((posY + sizeY - 1) * TILE_SIZE, 0, (x + posX) * TILE_SIZE),
+                                         TILE_SCALE, ROT_N));
+
+        for (int x = 0; x < sizeX; x++) // south
+            room.addChild(wallAsset.make(number + " Wall South " + x,
+                                         new Point3D(posY * TILE_SIZE, 0, (x + posX) * TILE_SIZE), TILE_SCALE, ROT_S));
+
+        for (int y = 0; y < sizeY; y++) // west
+            room.addChild(
+                    wallAsset.make(number + " Wall West " + y, new Point3D((y + posY) * TILE_SIZE, 0, posX * TILE_SIZE),
+                                   TILE_SCALE, ROT_W));
+
+        for (int y = 0; y < sizeY; y++) // east
+            room.addChild(wallAsset.make(number + " Wall East " + y,
+                                         new Point3D((y + posY) * TILE_SIZE, 0, (posX + sizeX - 1) * TILE_SIZE),
+                                         TILE_SCALE, ROT_E));
+
+
+        // columns
+        for (int x = 0; x < sizeX; x++) // north
+            room.addChild(columnAsset.make(number + " Column North " + x,
+                                           new Point3D((posY + sizeY - 1) * TILE_SIZE, 0, (x + posX) * TILE_SIZE),
+                                           TILE_SCALE, COLUMN_ROT_NW));
+        for (int x = 0; x < sizeX; x++) // south
+            room.addChild(columnAsset.make(number + " Column South " + x,
+                                           new Point3D(posY * TILE_SIZE, 0, (x + posX) * TILE_SIZE), TILE_SCALE,
+                                           COLUMN_ROT_SE));
+        for (int y = 0; y < sizeY; y++) // west
+            room.addChild(columnAsset.make(number + " Column West " + y,
+                                           new Point3D((y + posY) * TILE_SIZE, 0, posX * TILE_SIZE), TILE_SCALE,
+                                           COLUMN_ROT_SW));
+        for (int y = 0; y < sizeY; y++) // east
+            room.addChild(columnAsset.make(number + " Column East " + y,
+                                           new Point3D((y + posY) * TILE_SIZE, 0, (posX + sizeX) * TILE_SIZE),
+                                           TILE_SCALE, COLUMN_ROT_NW));
+
+        return room;
+    }
+
+    private void addDoorToRoom(Group room, int number, int posX, int posY)
+    {
+        if (doorAsset == null)
+            doorAsset = assetInfo.walls.get("door");
+
+        String target = "";
+        Matrix3D tarRot = null;
+        Iterator<SceneNode> iterator = room.iterator();
+        int tarZ = (int)(posX*TILE_SIZE);
+        int tarX = (int)(posY*TILE_SIZE);
+        while ( iterator.hasNext())
+        {
+            SceneNode node = iterator.next();
+            Vector3D pos = node.getLocalTranslation().getCol(3);
+            if (tarZ == pos.getZ() &&  tarX== pos.getX() && node.getName().contains("Wall"))
+            {
+                target = node.getName();
+                tarRot = node.getLocalRotation();
+                System.out.println(target);
+                break;
+            }
+        }
+        if (tarRot != null)
+        {
+            String roomNumber = room.getName().split(" ")[1];
+            room.removeChild(room.getChild(target));
+            SceneNode door = doorAsset.make(roomNumber + " Door " + number, new Point3D(tarX,0,tarZ), TILE_SCALE, new Quaternion());
+            door.setLocalRotation(tarRot);
+            room.addChild(door);
+        }
+    }
+
+    private void addEnemyToRoom(Group room, int number, int posX, int posY)
+    {
+        if (goblinAsset == null)
+            goblinAsset = assetInfo.npcEnemies.get("goblin");
+        if (gobSword == null)
+            gobSword = assetInfo.npcEnemies.get("swordgoblin");
+
+        String roomNumber = room.getName().split(" ")[1];
+        Group goblin = new Group(roomNumber + "Goblin " + number);
+        goblin.addChild(goblinAsset.make(new Point3D(posY*TILE_SIZE,0,posX*TILE_SIZE), TILE_SCALE, ROT_E));
+        goblin.addChild(gobSword.make(new Point3D(posY*TILE_SIZE,0,posX*TILE_SIZE), TILE_SCALE, ROT_E));
+
+        room.addChild(goblin);
     }
 }

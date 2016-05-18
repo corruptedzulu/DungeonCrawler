@@ -16,7 +16,7 @@ public class RollAction extends AbstractInputAction
 	{
 		camera = c;
 		rotationRateDeg = rotRateDeg;
-		rotationRateDeg = (float) 3;
+		rotationRateDeg = (float) 20;
 		
 		timeSinceLastRollMS = 0;
 	}
