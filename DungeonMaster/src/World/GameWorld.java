@@ -195,7 +195,7 @@ public class GameWorld
 		c.setxCoor(5);
 		c.setyCoor(25);
 		
-		room3.getContents().add(c);
+		room3.addWorldObject(c);
 		
 		
 		

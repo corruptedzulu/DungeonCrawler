@@ -182,6 +182,10 @@ public class Room
 		return result;
 	}
 
+	public void addWorldObject(WorldObject obj)
+	{
+		this.contents.add(obj);//not doors
+	}
 
 	public void setContents(ArrayList<WorldObject> contents) {
 		this.contents = contents;
