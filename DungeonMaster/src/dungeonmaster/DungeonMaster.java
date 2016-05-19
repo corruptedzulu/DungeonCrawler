@@ -80,7 +80,7 @@ public class DungeonMaster
 		clientsConnected = 0;
 		
 		gameInProgress = true;
-		singlePlayerGame = true;
+		singlePlayerGame = false;
 		
 	}
 	

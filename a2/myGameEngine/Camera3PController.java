@@ -15,10 +15,10 @@ public class Camera3PController
 {
 	private ICamera cam; //the camera being controlled
 	private SceneNode target; //the target the camera looks at
-	public float cameraAzimuth; //rotation of camera around target Y axis
-	public float cameraElevation; //elevation of camera above target
-	public float cameraDistanceFromTarget;
-	public Point3D targetPos; // avatar?s position in the world
+	private float cameraAzimuth; //rotation of camera around target Y axis
+	private float cameraElevation; //elevation of camera above target
+	private float cameraDistanceFromTarget;
+	private Point3D targetPos; // avatar?s position in the world
 	private Vector3D worldUpVec;
 	private String type;
 
@@ -46,6 +46,11 @@ public class Camera3PController
 		updateTarget();
 		updateCameraPosition();
 		cam.lookAt(targetPos, worldUpVec); // SAGE built-in function
+	}
+
+	public float getCameraAzimuth()
+	{
+		return cameraAzimuth;
 	}
 
 	private void updateTarget()

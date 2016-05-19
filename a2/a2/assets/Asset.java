@@ -235,6 +235,11 @@ public abstract class Asset
         return AssetBuilder.getTexture(getFirstTexture());
     }
 
+    public Texture giveMeTexture(String tex)
+    {
+        return AssetBuilder.getTexture(getTexture(tex));
+    }
+
     private void setTextures()
     {
         textures = new HashMap<>();
