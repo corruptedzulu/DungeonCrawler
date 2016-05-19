@@ -1,0 +1,89 @@
+everything with // in front is client input
+//Move on line 19 was incorrect
+//NE on line 32 was incorrect
+
+
+charactersAvailable:Cleric;Fighter;Rogue;Wizard;$$
+pickCharacter
+//Cleric
+PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$
+PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$
+reportReadyToProceed
+//ready
+GW:WorldSize 1000,1000;Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;WorldEntity0:XY 0,5;$$WorldEntity1:XY 2,5;$$WorldEntity2:XY 4,5;$$PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;$$Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;WorldEntity3:XY 4,10;$$WorldEntity4:XY 6,10;$$WorldEntity5:XY 8,10;$$WorldEntity6:XY 10,10;$$WorldEntity7:XY 12,10;$$WorldEntity8:XY 14,10;$$;Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;$$Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;WorldEntity9:XY 0,15;$$WorldEntity10:XY 2,15;$$WorldEntity11:XY 5,20;$$;WorldObject4:5,25;$$;Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;$$$$
+readyToProceed
+yourMove
+Move
+StandardAction
+End turn
+//Move
+yourMove
+Move
+StandardAction
+End turn
+//move
+moveDirection
+//NE
+PlayerCharacter12:XY 1,1;HPMaxHP 44,44;$$
+yourMove
+Move
+StandardAction
+End turn
+//NE
+yourMove
+Move
+StandardAction
+End turn
+//move
+moveDirection
+//NE
+PlayerCharacter12:XY 2,2;HPMaxHP 44,44;$$
+yourMove
+Move
+StandardAction
+End turn
+//move
+moveDirection
+//N
+PlayerCharacter12:XY 2,3;HPMaxHP 44,44;$$
+yourMove
+Move
+StandardAction
+End turn
+//standard
+standardActionType
+//attack
+attackType
+//ranged
+EnemyListWorldEntity0:XY 0,5;$$WorldEntity1:XY 2,5;$$WorldEntity2:XY 4,5;$$$$
+selectEnemyWorldEntityID
+//0
+yourMove
+Move
+End turn
+//end
+WorldEntity2:XY 3,4;$$
+WorldEntity2:XY 2,4;$$
+WorldEntity2:XY 3,3;$$
+WorldEntity2:XY 2,4;$$
+WorldEntity2:XY 3,3;$$
+WorldEntity2:XY 2,4;$$
+WorldEntity1:XY 3,4;$$
+WorldEntity1:XY 3,3;$$
+WorldEntity1:XY 2,2;$$
+WorldEntity1:XY 3,3;$$
+WorldEntity1:XY 2,2;$$
+WorldEntity1:XY 3,3;$$
+WorldEntity0:XY 1,4;$$
+WorldEntity0:XY 1,3;$$
+WorldEntity0:XY 2,2;$$
+WorldEntity0:XY 1,3;$$
+WorldEntity0:XY 2,2;$$
+WorldEntity0:XY 1,3;$$
+PlayerCharacter12:XY 2,3;HPMaxHP 38,44;$$
+yourMove
+Move
+StandardAction
+End turn
+//move
+moveDirection
