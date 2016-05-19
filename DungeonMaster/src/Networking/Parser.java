@@ -1,5 +1,7 @@
 package Networking;
 
+import java.util.ArrayList;
+
 import World.Room.Room;
 import World.WorldObjects.Door;
 import World.WorldObjects.WorldObject;
@@ -51,7 +53,7 @@ public class Parser
 			
 			
 		}
-		else if(s.contains("pickCharacter"))
+		else if(s.regionMatches(0, "pickCharacter", 0, 13))
 		{
 			//the client needs to reply with which character it wants
 			
@@ -61,87 +63,119 @@ public class Parser
 			
 			
 		}
-		else if(s.contains("reportReadyToProceed"))
+		else if(s.regionMatches(0, "reportReadyToProceed", 0, 20))
 		{
 			//TODO the initialization is completed. the client needs to reply with "ready" once it has moved to the teleporter
 			
 			
 			
 		}
-		else if(s.contains("readyToProceed"))
+		else if(s.regionMatches(0, "readyToProceed", 0, 14))
 		{
 			//TODO move the player to the tile-world and start listening for updates
 			//the game begins here
+			
+			
 		}
-		else if(s.contains("dead"))
+		else if(s.regionMatches(0, "dead", 0, 4))
 		{
 			//TODO the player has died and will no longer be able to make movements. it will still get the world updates
+			
+			
 		}		
-		else if(s.contains("dying"))
+		else if(s.regionMatches(0, "dying", 0, 5))
 		{
 			//TODO the player is dying and will not be able to make movements. it will still get the world updates
+			
+			
 		}		
-		else if(s.contains("yourMove"))
+		else if(s.regionMatches(0, "yourMove", 0, 8))
 		{
 			//TODO it is now the client's turn. the next three will list the options the player has. not all will be sent
+			
+			
 		}		
-		else if(s.contains("Move"))
+		else if(s.regionMatches(0, "Move", 0, 4))
 		{
 			
-		}
-		else if(s.contains("Standard Action"))
-		{
+			
 			
 		}
-		else if(s.contains("End Turn"))
+		else if(s.regionMatches(0, "Standard Action", 0, 15))
 		{
+			
+			
+			
+		}
+		else if(s.regionMatches(0, "End Turn", 0, 8))
+		{
+			
+			
 			
 		}
 		
-		else if(s.contains("moveDirection"))
+		else if(s.regionMatches(0, "moveDirection", 0, 13))
 		{
 			//TODO reply with the direction you want to move
+			
+			
 		}		
-		else if(s.contains("standardActionType"))
+		else if(s.regionMatches(0, "standardActionType", 0, 18))
 		{
 			//TODO reply with attack or interactWithObject
+			
+			
 		}		
-		else if(s.contains("attackType"))
+		else if(s.regionMatches(0, "attackType", 0, 11))
 		{
 			//TODO reply with melee or ranged
+			
+			
 		}		
-		else if(s.contains("EnemyList:"))
+		else if(s.regionMatches(0, "EnemyList:", 0, 10))
 		{
 			//this is a player report
+			
+			
 		}		
-		else if(s.contains("selectEnemyWorldEntityID"))
+		else if(s.regionMatches(0, "selectEnemyWorldEntityID", 0, 24))
 		{
 			//TODO reply with the enemy ID
+			
+			
 		}		
-		else if(s.contains("interactionDirection"))
+		else if(s.regionMatches(0, "interactionDirection", 0, 20))
 		{
 			//TODO reply with the direction to interact in
+			
+			
 		}		
-		/*else if()//PlayerCharacter
+		else if(s.regionMatches(0, "PlayerCharacter", 0, 15))//PlayerCharacter
 		{
+			
+			this.parsePlayerCharacter(s);
 			
 		}
-		else if()//Door
+		else if(s.regionMatches(0, "Door", 0, 4))//Door
 		{
+			this.parseWorldObject(s);
 			
 		}
-		else if()//GameWorld
+		else if(s.regionMatches(0, "GW", 0, 2))//GameWorld
 		{
+			this.parseGameWorld(s);
 			
 		}
-		else if()//world entity
+		else if(s.regionMatches(0, "WorldEntity", 0, 11))//world entity
 		{
+			this.parseWorldEntity(s);
 			
 		}
-		else if()//world object (chest)
+		else if(s.regionMatches(0, "WorldObject", 0, 11))//world object (chest)
 		{
+			this.parseWorldObject(s);
 			
-		}*/
+		}
 		
 		
 	}
@@ -151,27 +185,574 @@ public class Parser
 	public void parseRoom(String s)
 	{
 		//entities
+		//PlayerCharacters
 		//objects
 		//doors
-		//entrance/not entrance
+		
+		
+		
+		
+		int roomID = Integer.parseInt(s.substring(4,5));
+		
+		int roomLength = 0;
+		int roomWidth = 0;
+		int worldX = 0;
+		int worldY = 0;
+		ArrayList<String> worldEntityStrings = new ArrayList<String>();
+		ArrayList<String> worldObjectStrings = new ArrayList<String>();
+		ArrayList<String> playerStrings = new ArrayList<String>();
+		ArrayList<String> doorStrings = new ArrayList<String>();
+		
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			
+			if(s.charAt(x) == 'W' && s.charAt(x + 10) == 'h')
+			{
+				if(s.charAt(x+13) == ',')
+				{
+					roomWidth = Integer.parseInt(s.substring(x+12, x+13));
+					roomLength = Integer.parseInt(s.substring(x+14, x+16));
+				}
+				else
+				{
+					roomWidth = Integer.parseInt(s.substring(x+12, x+14));
+					roomLength = Integer.parseInt(s.substring(x+15, x+17));
+				}
+			}
+			
+			if(s.charAt(x) == 'W' && s.charAt(x + 16) == 'r')
+			{
+				worldX = 0;
+				if(s.charAt(x+21) == ';')
+				{
+					worldY = Integer.parseInt(s.substring(x+20, x+21));
+				}
+				else
+				{
+					worldY = Integer.parseInt(s.substring(x+20, x+22));
+				}
+			}
+			
+			
+		}
+		
+
+		
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			
+			if(s.charAt(x) == 'W' && s.charAt(x+10) == 'y')
+			{
+				String worldEntity = "";
+				//world entity
+				for(int y = x; y < s.length(); y++)
+				{
+					if(s.charAt(y) == '$')
+					{
+						worldEntity = s.substring(x, y + 2);
+						worldEntityStrings.add(worldEntity);
+						break;
+					}
+				}
+			}
+			
+			
+			if(s.charAt(x) == 'W' && s.charAt(x+10) == 't')
+			{
+				//world object
+				String worldObject = "";
+				//world entity
+				for(int y = x; y < s.length(); y++)
+				{
+					if(s.charAt(y) == '$')
+					{
+						worldObject = s.substring(x, y + 2);
+						worldObjectStrings.add(worldObject);
+						break;
+					}
+				}
+				
+			}
+			
+			
+			if(s.charAt(x) == 'P' && s.charAt(x+1) == 'l' && s.charAt(x+14) == 'r')
+			{
+				//player character
+				
+				String pc = "";
+				//world entity
+				for(int y = x; y < s.length(); y++)
+				{
+					if(s.charAt(y) == '$')
+					{
+						pc = s.substring(x, y + 3);
+						playerStrings.add(pc);
+						break;
+					}
+				}
+				
+			}
+			
+			
+			if(s.charAt(x) == 'D' && s.charAt(x+3) == 'r')
+			{
+				//door
+				String door = "";
+				//world entity
+				for(int y = x; y < s.length(); y++)
+				{
+					if(s.charAt(y) == '$')
+					{
+						door = s.substring(x, y + 2);
+						doorStrings.add(door);
+						break;
+					}
+				}
+				
+			}
+			
+			
+			
+			
+		}
+		
+		
+		
+		
+		
+		for(String string : worldObjectStrings)
+		{
+			this.parseWorldObject(string);
+		}
+		for(String string : worldEntityStrings)
+		{
+			this.parseWorldEntity(string);
+		}
+		for(String string : doorStrings)
+		{
+			this.parseDoorObject(string);
+		}
+		for(String string : playerStrings)
+		{
+			this.parsePlayerCharacter(string);
+		}
+		
+		
+		
+		
 	}
 	
 	public void parseGameWorld(String s)
 	{
 		//rooms basically
+		/*
+		 * GW:WorldSize 1000,1000;
+		 * Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;
+		 * WorldEntity0:XY 0,5;$$
+		 * WorldEntity1:XY 2,5;$$
+		 * WorldEntity2:XY 4,5;$$
+		 * PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
+		 * Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;
+		 * WorldEntity3:XY 4,10;$$
+		 * WorldEntity4:XY 6,10;$$
+		 * WorldEntity5:XY 8,10;$$
+		 * WorldEntity6:XY 10,10;$$
+		 * WorldEntity7:XY 12,10;$$
+		 * WorldEntity8:XY 14,10;$$;
+		 * Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$
+		 * Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;
+		 * WorldEntity9:XY 0,15;$$
+		 * WorldEntity10:XY 2,15;$$
+		 * WorldEntity11:XY 5,20;$$;
+		 * WorldObject4:5,25;$$;
+		 * Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;
+		 * $$
+		 * $$
+		 */
+		
+		
+		String notGameWorld = s.substring(23, s.length() - 2);//remove the header and the final $$
+		String room1string = "";
+		String room2string = "";
+		String room3string = "";
+		
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			if(s.charAt(x) == 'R' && s.charAt(x+1) == 'o' && s.charAt(x+2) == 'o' && s.charAt(x+3) == 'm' && s.charAt(x+4) == '0')
+			{
+				int endIndex = 0;
+				//this is the Room0 string
+				//look for Room1 and go back to the $$ for the substring index
+				
+				for(int y = x; y < s.length(); y++)
+				{
+					if(s.charAt(y) == 'R' && s.charAt(y+1) == 'o' && s.charAt(y+2) == 'o' && s.charAt(y+3) == 'm' && s.charAt(y+4) == '1')
+					{
+						endIndex = y;//we can use this because substring's terminator is exclusive
+						break;
+					}
+				}
+				
+				room1string = s.substring(x, endIndex);
+				
+			}
+			
+			if(s.charAt(x) == 'R' && s.charAt(x+1) == 'o' && s.charAt(x+2) == 'o' && s.charAt(x+3) == 'm' && s.charAt(x+4) == '1')
+			{
+				int endIndex = 0;
+				//this is the Room0 string
+				//look for Room1 and go back to the $$ for the substring index
+				
+				for(int y = x; y < s.length(); y++)
+				{
+					if(s.charAt(y) == 'R' && s.charAt(y+1) == 'o' && s.charAt(y+2) == 'o' && s.charAt(y+3) == 'm' && s.charAt(y+4) == '2')
+					{
+						endIndex = y;//we can use this because substring's terminator is exclusive
+						break;
+					}
+				}
+				
+				room2string = s.substring(x, endIndex);
+				
+			}
+			
+			if(s.charAt(x) == 'R' && s.charAt(x+1) == 'o' && s.charAt(x+2) == 'o' && s.charAt(x+3) == 'm' && s.charAt(x+4) == '2')
+			{
+				int endIndex = 0;
+				//this is the Room0 string
+				//look for Room1 and go back to the $$ for the substring index
+				
+				//we're just going to the end of the string, so no need for a terminator here
+				room3string = s.substring(x, s.length() - 2);
+				
+			}
+			
+		}
+		
+		
+		
+		parseRoom(room1string);
+		parseRoom(room2string);
+		parseRoom(room3string);
+				
+		
 	}
 	
 	public void parseWorldEntity(String s)
 	{
-		//enemy and player character
+		//enemy	
+		
+		int worldEntityID = 0;
+		int roomX = 0;
+		int roomY = 0;
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			
+			if(s.charAt(x) == 'W' && s.charAt(x+10) == 'y')
+			{
+				if(s.charAt(x+12) == ':')
+				{
+					worldEntityID = Integer.parseInt(s.substring(x+11, x+12));
+				}
+				else
+				{
+					worldEntityID = Integer.parseInt(s.substring(x+11, x+13));
+				}
+			}
+			
+			
+			if(s.charAt(x) == 'X' && s.charAt(x+1) == 'Y')
+			{
+				if(s.charAt(x+4) == ',')
+				{
+					roomX = Integer.parseInt(s.substring(x+3, x+4));
+					
+					if(s.charAt(x+6) == ';')
+					{
+						roomY = Integer.parseInt(s.substring(x+5, x+6));
+					}
+					else
+					{
+						roomY = Integer.parseInt(s.substring(x+5, x+7));
+					}
+					
+				}
+				else
+				{
+					roomX = Integer.parseInt(s.substring(x+3, x+5));
+					
+					if(s.charAt(x+8) == ';')
+					{
+						roomY = Integer.parseInt(s.substring(x+6, x+7));
+					}
+					else
+					{
+						roomY = Integer.parseInt(s.substring(x+6, x+8));
+					}
+				}	
+				
+				break;
+				
+			}
+			
+			
+			
+		}
+		
+		
+		
+		
+		
 	}
 	
 	public void parseWorldObject(String s)
 	{
-		//chest and door
+		//chest		
+		
+		int worldObjectID = Integer.parseInt(s.substring(11, 12));
+		
+		int objectX = 5;
+		int objectY = 25;
+		//yeah, hardcoded. need to simplify for demo
+		
+	
 		
 	}
 	
+	public void parseDoorObject(String s)
+	{
+		
+		
+		
+		
+		int doorID = Integer.parseInt(s.substring(4, 5));
+		
+		int primaryRoomX = 0;
+		int primaryRoomY = 0;
+		
+		int otherRoomX = 0;
+		int otherRoomY = 0;
+		
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			
+			if(s.charAt(x) == 'X' && s.charAt(x+1) == 'Y')
+			{
+				
+				
+				if(primaryRoomX == 0 && primaryRoomY == 0)
+				{
+					
+					if(s.charAt(x+4) == ',')
+					{
+						primaryRoomX = Integer.parseInt(s.substring(x+3, x+4));
+						
+						if(s.charAt(x+6) == ';')
+						{
+							primaryRoomY = Integer.parseInt(s.substring(x+5, x+6));
+						}
+						else
+						{
+							primaryRoomY = Integer.parseInt(s.substring(x+5, x+7));
+						}
+						
+						
+						
+					}
+					else
+					{
+						primaryRoomX = Integer.parseInt(s.substring(x+3, x+5));
+						
+						if(s.charAt(x+7) == ';')
+						{
+							primaryRoomY = Integer.parseInt(s.substring(x+6, x+7));
+						}
+						else
+						{
+							primaryRoomY = Integer.parseInt(s.substring(x+6, x+8));
+						}
+						
+					}
+					
+					
+					
+				}
+				else
+				{
+					
+					if(s.charAt(x+4) == ',')
+					{
+						otherRoomX = Integer.parseInt(s.substring(x+3, x+4));
+						
+						if(s.charAt(x+6) == ';')
+						{
+							otherRoomY = Integer.parseInt(s.substring(x+5, x+6));
+						}
+						else
+						{
+							otherRoomY = Integer.parseInt(s.substring(x+5, x+7));
+						}
+						
+						
+						
+					}
+					else
+					{
+						otherRoomX = Integer.parseInt(s.substring(x+3, x+5));
+						
+						if(s.charAt(x+7) == ';')
+						{
+							otherRoomY = Integer.parseInt(s.substring(x+6, x+7));
+						}
+						else
+						{
+							otherRoomY = Integer.parseInt(s.substring(x+6, x+8));
+						}
+						
+					}
+					
+					
+				}
+				
+				
+				
+			}
+			
+			
+		}
+		
+		
+		
+		
+	}
+
+	public void parsePlayerCharacter(String s)
+	{
+		/*
+		 * Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;
+		 * WorldEntity0:XY 0,5;$$
+		 * WorldEntity1:XY 2,5;$$
+		 * WorldEntity2:XY 4,5;$$
+		 * PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
+		 * Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;
+		 * WorldEntity3:XY 4,10;$$
+		 * WorldEntity4:XY 6,10;$$
+		 * WorldEntity5:XY 8,10;$$
+		 * WorldEntity6:XY 10,10;$$
+		 * WorldEntity7:XY 12,10;$$
+		 * WorldEntity8:XY 14,10;$$;
+		 * Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$
+		 * Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;
+		 * WorldEntity9:XY 0,15;$$
+		 * WorldEntity10:XY 2,15;$$
+		 * WorldEntity11:XY 5,20;$$;
+		 * WorldObject4:5,25;$$;
+		 * Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;
+		 * $$
+		 * 
+		 */
+		
+		
+		int playerID = Integer.parseInt(s.substring(15, 17));
+		
+		int playerX = 0;
+		int playerY = 0;
+		
+		int playerHealth = 0;
+		int playerMaxHealth = 0;
+		
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			
+			if(s.charAt(x) == 'X' && s.charAt(x+1) == 'Y')
+			{
+				if(s.charAt(x+4) == ',')
+				{
+					playerX = Integer.parseInt(s.substring(x+3, x+4));
+					
+					if(s.charAt(x+6) == ';')
+					{
+						playerY = Integer.parseInt(s.substring(x+5, x+6));
+					}
+					else
+					{
+						playerY = Integer.parseInt(s.substring(x+5, x+7));
+					}
+					
+				}
+				else
+				{
+					playerX = Integer.parseInt(s.substring(x+3, x+5));
+					
+					if(s.charAt(x+8) == ';')
+					{
+						playerY = Integer.parseInt(s.substring(x+6, x+7));
+					}
+					else
+					{
+						playerY = Integer.parseInt(s.substring(x+6, x+8));
+					}
+				}	
+				
+				
+			}
+			
+			// PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
+			if(s.charAt(x) == 'H' && s.charAt(x+6) == 'P')
+			{
+				
+				if(s.charAt(x+9) == ',')
+				{
+					playerHealth = Integer.parseInt(s.substring(x+8, x+9));
+					
+					if(s.charAt(x+12) == ';')
+					{
+						playerMaxHealth = Integer.parseInt(s.substring(x+10, x+11));
+					}
+					else
+					{
+						playerMaxHealth = Integer.parseInt(s.substring(x+10, x+12));
+					}
+					
+				}
+				else
+				{
+					playerHealth = Integer.parseInt(s.substring(x+8, x+10));
+					
+					if(s.charAt(x+12) == ';')
+					{
+						playerMaxHealth = Integer.parseInt(s.substring(x+11, x+12));
+					}
+					else
+					{
+						playerMaxHealth = Integer.parseInt(s.substring(x+11, x+13));
+					}
+				}	
+				
+				break;
+			}
+			
+			
+			
+		}
+		
+		
+		
+	}
 
 	
 }
