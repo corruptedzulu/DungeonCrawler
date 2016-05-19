@@ -333,7 +333,6 @@ public class Parser
 					{
 						door = s.substring(x, y + 2);
 						doorStrings.add(door);
-						break;
 					}
 				}
 				
