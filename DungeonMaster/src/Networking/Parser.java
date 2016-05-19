@@ -296,7 +296,7 @@ public class Parser
 			}
 			
 			
-			if(s.charAt(x) == 'D' && s.charAt(x+4) == 'r')
+			if(s.charAt(x) == 'D' && s.charAt(x+3) == 'r')
 			{
 				//door
 				String door = "";
@@ -307,6 +307,7 @@ public class Parser
 					{
 						door = s.substring(x, y + 2);
 						doorStrings.add(door);
+						break;
 					}
 				}
 				
@@ -316,6 +317,7 @@ public class Parser
 			
 			
 		}
+		
 		
 		
 		
@@ -445,37 +447,7 @@ public class Parser
 	
 	public void parseWorldEntity(String s)
 	{
-		//enemy
-		
-		
-		/*
-		 * Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;
-		 * WorldEntity0:XY 0,5;$$
-		 * WorldEntity1:XY 2,5;$$
-		 * WorldEntity2:XY 4,5;$$
-		 * PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
-		 * Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;
-		 * $$
-		 * Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;
-		 * WorldEntity3:XY 4,10;$$
-		 * WorldEntity4:XY 6,10;$$
-		 * WorldEntity5:XY 8,10;$$
-		 * WorldEntity6:XY 10,10;$$
-		 * WorldEntity7:XY 12,10;$$
-		 * WorldEntity8:XY 14,10;$$;
-		 * Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$
-		 * Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;
-		 * $$
-		 * Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;
-		 * WorldEntity9:XY 0,15;$$
-		 * WorldEntity10:XY 2,15;$$
-		 * WorldEntity11:XY 5,20;$$;
-		 * WorldObject4:5,25;$$;
-		 * Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;
-		 * $$
-		 * 
-		 */
-		
+		//enemy	
 		
 		int worldEntityID = 0;
 		int roomX = 0;
@@ -543,12 +515,148 @@ public class Parser
 	
 	public void parseWorldObject(String s)
 	{
-		//chest
+		//chest		
+		
+		int worldObjectID = Integer.parseInt(s.substring(11, 12));
+		
+		int objectX = 5;
+		int objectY = 25;
+		//yeah, hardcoded. need to simplify for demo
+		
+	
 		
 	}
 	
 	public void parseDoorObject(String s)
 	{
+		
+		/*
+		 * Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;
+		 * WorldEntity0:XY 0,5;$$
+		 * WorldEntity1:XY 2,5;$$
+		 * WorldEntity2:XY 4,5;$$
+		 * PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
+		 * Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;
+		 * WorldEntity3:XY 4,10;$$
+		 * WorldEntity4:XY 6,10;$$
+		 * WorldEntity5:XY 8,10;$$
+		 * WorldEntity6:XY 10,10;$$
+		 * WorldEntity7:XY 12,10;$$
+		 * WorldEntity8:XY 14,10;$$;
+		 * Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$
+		 * Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;
+		 * WorldEntity9:XY 0,15;$$
+		 * WorldEntity10:XY 2,15;$$
+		 * WorldEntity11:XY 5,20;$$;
+		 * WorldObject4:5,25;$$;
+		 * Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;
+		 * $$
+		 * 
+		 */
+		
+		
+		int doorID = Integer.parseInt(s.substring(4, 5));
+		
+		int primaryRoomX = 0;
+		int primaryRoomY = 0;
+		
+		int otherRoomX = 0;
+		int otherRoomY = 0;
+		
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			
+			if(s.charAt(x) == 'X' && s.charAt(x+1) == 'Y')
+			{
+				
+				
+				if(primaryRoomX == 0 && primaryRoomY == 0)
+				{
+					
+					if(s.charAt(x+4) == ',')
+					{
+						primaryRoomX = Integer.parseInt(s.substring(x+3, x+4));
+						
+						if(s.charAt(x+6) == ';')
+						{
+							primaryRoomY = Integer.parseInt(s.substring(x+5, x+6));
+						}
+						else
+						{
+							primaryRoomY = Integer.parseInt(s.substring(x+5, x+7));
+						}
+						
+						
+						
+					}
+					else
+					{
+						primaryRoomX = Integer.parseInt(s.substring(x+3, x+5));
+						
+						if(s.charAt(x+7) == ';')
+						{
+							primaryRoomY = Integer.parseInt(s.substring(x+6, x+7));
+						}
+						else
+						{
+							primaryRoomY = Integer.parseInt(s.substring(x+6, x+8));
+						}
+						
+					}
+					
+					
+					
+				}
+				else
+				{
+					
+					if(s.charAt(x+4) == ',')
+					{
+						otherRoomX = Integer.parseInt(s.substring(x+3, x+4));
+						
+						if(s.charAt(x+6) == ';')
+						{
+							otherRoomY = Integer.parseInt(s.substring(x+5, x+6));
+						}
+						else
+						{
+							otherRoomY = Integer.parseInt(s.substring(x+5, x+7));
+						}
+						
+						
+						
+					}
+					else
+					{
+						otherRoomX = Integer.parseInt(s.substring(x+3, x+5));
+						
+						if(s.charAt(x+7) == ';')
+						{
+							otherRoomY = Integer.parseInt(s.substring(x+6, x+7));
+						}
+						else
+						{
+							otherRoomY = Integer.parseInt(s.substring(x+6, x+8));
+						}
+						
+					}
+					
+					
+				}
+				
+				
+				
+			}
+			
+			
+		}
+		
+		
 		
 		
 	}
