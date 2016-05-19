@@ -238,12 +238,12 @@ public class Parser
 				if(s.charAt(x+13) == ',')
 				{
 					roomWidth = Integer.parseInt(s.substring(x+12, x+13));
-					roomLength = Integer.parseInt(s.substring(x+13, x+15));
+					roomLength = Integer.parseInt(s.substring(x+14, x+16));
 				}
 				else
 				{
 					roomWidth = Integer.parseInt(s.substring(x+12, x+14));
-					roomLength = Integer.parseInt(s.substring(x+14, x+16));
+					roomLength = Integer.parseInt(s.substring(x+15, x+17));
 				}
 			}
 			
@@ -277,8 +277,9 @@ public class Parser
 				{
 					if(s.charAt(y) == '$')
 					{
-						worldEntity = s.substring(x, y);
+						worldEntity = s.substring(x, y + 2);
 						worldEntityStrings.add(worldEntity);
+						break;
 					}
 				}
 			}
@@ -293,8 +294,9 @@ public class Parser
 				{
 					if(s.charAt(y) == '$')
 					{
-						worldObject = s.substring(x, y);
+						worldObject = s.substring(x, y + 2);
 						worldObjectStrings.add(worldObject);
+						break;
 					}
 				}
 				
@@ -311,8 +313,9 @@ public class Parser
 				{
 					if(s.charAt(y) == '$')
 					{
-						pc = s.substring(x, y);
+						pc = s.substring(x, y + 3);
 						playerStrings.add(pc);
+						break;
 					}
 				}
 				
@@ -328,8 +331,9 @@ public class Parser
 				{
 					if(s.charAt(y) == '$')
 					{
-						door = s.substring(x, y);
+						door = s.substring(x, y + 2);
 						doorStrings.add(door);
+						break;
 					}
 				}
 				
@@ -398,7 +402,7 @@ public class Parser
 		 */
 		
 		
-		String notGameWorld = s.substring(21, s.length() - 2);//remove the header and the final $$
+		String notGameWorld = s.substring(23, s.length() - 2);//remove the header and the final $$
 		String room1string = "";
 		String room2string = "";
 		String room3string = "";
@@ -444,14 +448,14 @@ public class Parser
 				
 			}
 			
-			if(s.charAt(x) == 'R' && s.charAt(x+1) == 'o' && s.charAt(x+2) == 'o' && s.charAt(x+3) == 'm' && s.charAt(x+4) == '0')
+			if(s.charAt(x) == 'R' && s.charAt(x+1) == 'o' && s.charAt(x+2) == 'o' && s.charAt(x+3) == 'm' && s.charAt(x+4) == '2')
 			{
 				int endIndex = 0;
 				//this is the Room0 string
 				//look for Room1 and go back to the $$ for the substring index
 				
 				//we're just going to the end of the string, so no need for a terminator here
-				room3string = s.substring(x);
+				room3string = s.substring(x, s.length() - 2);
 				
 			}
 			
