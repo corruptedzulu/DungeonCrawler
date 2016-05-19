@@ -189,36 +189,10 @@ public class Parser
 		//objects
 		//doors
 		
-		/*
-		 * Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;
-		 * WorldEntity0:XY 0,5;$$
-		 * WorldEntity1:XY 2,5;$$
-		 * WorldEntity2:XY 4,5;$$
-		 * PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
-		 * Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;
-		 * $$
-		 * Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;
-		 * WorldEntity3:XY 4,10;$$
-		 * WorldEntity4:XY 6,10;$$
-		 * WorldEntity5:XY 8,10;$$
-		 * WorldEntity6:XY 10,10;$$
-		 * WorldEntity7:XY 12,10;$$
-		 * WorldEntity8:XY 14,10;$$;
-		 * Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$
-		 * Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;
-		 * $$
-		 * Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;
-		 * WorldEntity9:XY 0,15;$$
-		 * WorldEntity10:XY 2,15;$$
-		 * WorldEntity11:XY 5,20;$$;
-		 * WorldObject4:5,25;$$;
-		 * Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;
-		 * $$
-		 * 
-		 */
 		
 		
-		int roomID = 0;
+		
+		int roomID = Integer.parseInt(s.substring(4,5));
 		
 		int roomLength = 0;
 		int roomWidth = 0;
@@ -472,6 +446,99 @@ public class Parser
 	public void parseWorldEntity(String s)
 	{
 		//enemy
+		
+		
+		/*
+		 * Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;
+		 * WorldEntity0:XY 0,5;$$
+		 * WorldEntity1:XY 2,5;$$
+		 * WorldEntity2:XY 4,5;$$
+		 * PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
+		 * Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;
+		 * WorldEntity3:XY 4,10;$$
+		 * WorldEntity4:XY 6,10;$$
+		 * WorldEntity5:XY 8,10;$$
+		 * WorldEntity6:XY 10,10;$$
+		 * WorldEntity7:XY 12,10;$$
+		 * WorldEntity8:XY 14,10;$$;
+		 * Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$
+		 * Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;
+		 * WorldEntity9:XY 0,15;$$
+		 * WorldEntity10:XY 2,15;$$
+		 * WorldEntity11:XY 5,20;$$;
+		 * WorldObject4:5,25;$$;
+		 * Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;
+		 * $$
+		 * 
+		 */
+		
+		
+		int worldEntityID = 0;
+		int roomX = 0;
+		int roomY = 0;
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			
+			if(s.charAt(x) == 'W' && s.charAt(x+10) == 'y')
+			{
+				if(s.charAt(x+12) == ':')
+				{
+					worldEntityID = Integer.parseInt(s.substring(x+11, x+12));
+				}
+				else
+				{
+					worldEntityID = Integer.parseInt(s.substring(x+11, x+13));
+				}
+			}
+			
+			
+			if(s.charAt(x) == 'X' && s.charAt(x+1) == 'Y')
+			{
+				if(s.charAt(x+4) == ',')
+				{
+					roomX = Integer.parseInt(s.substring(x+3, x+4));
+					
+					if(s.charAt(x+6) == ';')
+					{
+						roomY = Integer.parseInt(s.substring(x+5, x+6));
+					}
+					else
+					{
+						roomY = Integer.parseInt(s.substring(x+5, x+7));
+					}
+					
+				}
+				else
+				{
+					roomX = Integer.parseInt(s.substring(x+3, x+5));
+					
+					if(s.charAt(x+8) == ';')
+					{
+						roomY = Integer.parseInt(s.substring(x+6, x+7));
+					}
+					else
+					{
+						roomY = Integer.parseInt(s.substring(x+6, x+8));
+					}
+				}	
+				
+				break;
+				
+			}
+			
+			
+			
+		}
+		
+		
+		
+		
+		
 	}
 	
 	public void parseWorldObject(String s)
