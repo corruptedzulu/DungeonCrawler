@@ -277,7 +277,7 @@ public class Parser
 			}
 			
 			
-			if(s.charAt(x) == 'P' && s.charAt(x+14) == 'r')
+			if(s.charAt(x) == 'P' && s.charAt(x+1) == 'l' && s.charAt(x+14) == 'r')
 			{
 				//player character
 				
@@ -530,33 +530,7 @@ public class Parser
 	public void parseDoorObject(String s)
 	{
 		
-		/*
-		 * Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;
-		 * WorldEntity0:XY 0,5;$$
-		 * WorldEntity1:XY 2,5;$$
-		 * WorldEntity2:XY 4,5;$$
-		 * PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
-		 * Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;
-		 * $$
-		 * Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;
-		 * WorldEntity3:XY 4,10;$$
-		 * WorldEntity4:XY 6,10;$$
-		 * WorldEntity5:XY 8,10;$$
-		 * WorldEntity6:XY 10,10;$$
-		 * WorldEntity7:XY 12,10;$$
-		 * WorldEntity8:XY 14,10;$$;
-		 * Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$
-		 * Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;
-		 * $$
-		 * Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;
-		 * WorldEntity9:XY 0,15;$$
-		 * WorldEntity10:XY 2,15;$$
-		 * WorldEntity11:XY 5,20;$$;
-		 * WorldObject4:5,25;$$;
-		 * Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;
-		 * $$
-		 * 
-		 */
+		
 		
 		
 		int doorID = Integer.parseInt(s.substring(4, 5));
@@ -663,6 +637,119 @@ public class Parser
 
 	public void parsePlayerCharacter(String s)
 	{
+		/*
+		 * Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;
+		 * WorldEntity0:XY 0,5;$$
+		 * WorldEntity1:XY 2,5;$$
+		 * WorldEntity2:XY 4,5;$$
+		 * PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
+		 * Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;
+		 * WorldEntity3:XY 4,10;$$
+		 * WorldEntity4:XY 6,10;$$
+		 * WorldEntity5:XY 8,10;$$
+		 * WorldEntity6:XY 10,10;$$
+		 * WorldEntity7:XY 12,10;$$
+		 * WorldEntity8:XY 14,10;$$;
+		 * Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$
+		 * Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;
+		 * $$
+		 * Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;
+		 * WorldEntity9:XY 0,15;$$
+		 * WorldEntity10:XY 2,15;$$
+		 * WorldEntity11:XY 5,20;$$;
+		 * WorldObject4:5,25;$$;
+		 * Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;
+		 * $$
+		 * 
+		 */
+		
+		
+		int playerID = Integer.parseInt(s.substring(15, 17));
+		
+		int playerX = 0;
+		int playerY = 0;
+		
+		int playerHealth = 0;
+		int playerMaxHealth = 0;
+		
+		
+		for(int x = 0; x < s.length(); x++)
+		{
+			
+			if(s.charAt(x) == 'X' && s.charAt(x+1) == 'Y')
+			{
+				if(s.charAt(x+4) == ',')
+				{
+					playerX = Integer.parseInt(s.substring(x+3, x+4));
+					
+					if(s.charAt(x+6) == ';')
+					{
+						playerY = Integer.parseInt(s.substring(x+5, x+6));
+					}
+					else
+					{
+						playerY = Integer.parseInt(s.substring(x+5, x+7));
+					}
+					
+				}
+				else
+				{
+					playerX = Integer.parseInt(s.substring(x+3, x+5));
+					
+					if(s.charAt(x+8) == ';')
+					{
+						playerY = Integer.parseInt(s.substring(x+6, x+7));
+					}
+					else
+					{
+						playerY = Integer.parseInt(s.substring(x+6, x+8));
+					}
+				}	
+				
+				
+			}
+			
+			// PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;
+			if(s.charAt(x) == 'H' && s.charAt(x+6) == 'P')
+			{
+				
+				if(s.charAt(x+9) == ',')
+				{
+					playerHealth = Integer.parseInt(s.substring(x+8, x+9));
+					
+					if(s.charAt(x+12) == ';')
+					{
+						playerMaxHealth = Integer.parseInt(s.substring(x+10, x+11));
+					}
+					else
+					{
+						playerMaxHealth = Integer.parseInt(s.substring(x+10, x+12));
+					}
+					
+				}
+				else
+				{
+					playerHealth = Integer.parseInt(s.substring(x+8, x+10));
+					
+					if(s.charAt(x+12) == ';')
+					{
+						playerMaxHealth = Integer.parseInt(s.substring(x+11, x+12));
+					}
+					else
+					{
+						playerMaxHealth = Integer.parseInt(s.substring(x+11, x+13));
+					}
+				}	
+				
+				break;
+			}
+			
+			
+			
+		}
+		
 		
 		
 	}
