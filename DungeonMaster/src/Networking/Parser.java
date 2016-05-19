@@ -51,7 +51,7 @@ public class Parser
 			
 			
 		}
-		else if(s.contains("pickCharacter"))
+		else if(s.regionMatches(0, "pickCharacter", 0, 13))
 		{
 			//the client needs to reply with which character it wants
 			
@@ -61,87 +61,119 @@ public class Parser
 			
 			
 		}
-		else if(s.contains("reportReadyToProceed"))
+		else if(s.regionMatches(0, "reportReadyToProceed", 0, 20))
 		{
 			//TODO the initialization is completed. the client needs to reply with "ready" once it has moved to the teleporter
 			
 			
 			
 		}
-		else if(s.contains("readyToProceed"))
+		else if(s.regionMatches(0, "readyToProceed", 0, 14))
 		{
 			//TODO move the player to the tile-world and start listening for updates
 			//the game begins here
+			
+			
 		}
-		else if(s.contains("dead"))
+		else if(s.regionMatches(0, "dead", 0, 4))
 		{
 			//TODO the player has died and will no longer be able to make movements. it will still get the world updates
+			
+			
 		}		
-		else if(s.contains("dying"))
+		else if(s.regionMatches(0, "dying", 0, 5))
 		{
 			//TODO the player is dying and will not be able to make movements. it will still get the world updates
+			
+			
 		}		
-		else if(s.contains("yourMove"))
+		else if(s.regionMatches(0, "yourMove", 0, 8))
 		{
 			//TODO it is now the client's turn. the next three will list the options the player has. not all will be sent
+			
+			
 		}		
-		else if(s.contains("Move"))
+		else if(s.regionMatches(0, "Move", 0, 4))
 		{
 			
-		}
-		else if(s.contains("Standard Action"))
-		{
+			
 			
 		}
-		else if(s.contains("End Turn"))
+		else if(s.regionMatches(0, "Standard Action", 0, 15))
 		{
+			
+			
+			
+		}
+		else if(s.regionMatches(0, "End Turn", 0, 8))
+		{
+			
+			
 			
 		}
 		
-		else if(s.contains("moveDirection"))
+		else if(s.regionMatches(0, "moveDirection", 0, 13))
 		{
 			//TODO reply with the direction you want to move
+			
+			
 		}		
-		else if(s.contains("standardActionType"))
+		else if(s.regionMatches(0, "standardActionType", 0, 18))
 		{
 			//TODO reply with attack or interactWithObject
+			
+			
 		}		
-		else if(s.contains("attackType"))
+		else if(s.regionMatches(0, "attackType", 0, 11))
 		{
 			//TODO reply with melee or ranged
+			
+			
 		}		
-		else if(s.contains("EnemyList:"))
+		else if(s.regionMatches(0, "EnemyList:", 0, 10))
 		{
 			//this is a player report
+			
+			
 		}		
-		else if(s.contains("selectEnemyWorldEntityID"))
+		else if(s.regionMatches(0, "selectEnemyWorldEntityID", 0, 24))
 		{
 			//TODO reply with the enemy ID
+			
+			
 		}		
-		else if(s.contains("interactionDirection"))
+		else if(s.regionMatches(0, "interactionDirection", 0, 20))
 		{
 			//TODO reply with the direction to interact in
+			
+			
 		}		
-		/*else if()//PlayerCharacter
+		else if(s.regionMatches(0, "PlayerCharacter", 0, 15))//PlayerCharacter
 		{
+			
+			this.parsePlayerCharacter(s);
 			
 		}
-		else if()//Door
+		else if(s.regionMatches(0, "Door", 0, 4))//Door
 		{
+			this.parseWorldObject(s);
 			
 		}
-		else if()//GameWorld
+		else if(s.regionMatches(0, "GameWorld", 0, 9))//GameWorld
 		{
+			this.parseGameWorld(s);
 			
 		}
-		else if()//world entity
+		else if(s.regionMatches(0, "WorldEntity", 0, 11))//world entity
 		{
+			this.parseWorldEntity(s);
 			
 		}
-		else if()//world object (chest)
+		else if(s.regionMatches(0, "WorldObject", 0, 11))//world object (chest)
 		{
+			this.parseWorldObject(s);
 			
-		}*/
+		}
 		
 		
 	}
@@ -163,7 +195,7 @@ public class Parser
 	
 	public void parseWorldEntity(String s)
 	{
-		//enemy and player character
+		//enemy
 	}
 	
 	public void parseWorldObject(String s)
@@ -171,7 +203,12 @@ public class Parser
 		//chest and door
 		
 	}
-	
+
+	public void parsePlayerCharacter(String s)
+	{
+		
+		
+	}
 
 	
 }
