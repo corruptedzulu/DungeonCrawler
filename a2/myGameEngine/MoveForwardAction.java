@@ -18,40 +18,37 @@ public class MoveForwardAction extends MoveAction
 	public MoveForwardAction(ICamera c, float s)
 	{
 		super(c, s);
-
-
 	}
 
 
 	public void performAction(float time, Event event)
 	{
-		if(true)
-		{
-			Matrix3D rot = avatar.getLocalRotation();
-			Vector3D dir = new Vector3D(0,0,1);
-			dir = dir.mult(rot);
-			if(event.getComponent().getName().contains("Y Axis"))
-			{
-				if( event.getValue() < -0.2)
-				{
-					dir.scale((double) (speed * time));
-				}
-				else if( event.getValue() > 0.2)
-				{
-					dir.scale((double) (speed * time * -1));
-				}
-				else
-				{
-					return;
-				}
-			}
-			dir.scale((double)(speed * time));
-			avatar.translate((float)dir.getX(),(float)dir.getY(),(float)dir.getZ());
-			if (isTerrainFollow())
-				avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
-
+		if (!isEnabled())
 			return;
-		}
+
+		Matrix3D rot = avatar.getLocalRotation();
+		Vector3D dir = new Vector3D(0,0,1);
+		dir = dir.mult(rot);
+		if(event.getComponent().getName().contains("Y Axis"))
+        {
+            if( event.getValue() < -0.2)
+            {
+                dir.scale((double) (speed * time));
+            }
+            else if( event.getValue() > 0.2)
+            {
+                dir.scale((double) (speed * time * -1));
+            }
+            else
+            {
+                return;
+            }
+        }
+		dir.scale((double)(speed * time));
+		avatar.translate((float)dir.getX(),(float)dir.getY(),(float)dir.getZ());
+		if (isTerrainFollow())
+            avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
+
 
 		timeSinceLastMoveMS += time;
 

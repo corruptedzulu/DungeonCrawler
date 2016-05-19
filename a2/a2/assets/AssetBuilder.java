@@ -111,7 +111,7 @@ public class AssetBuilder
         return skyBox;
     }
 
-    private static Texture getTexture(String name)
+    public static Texture getTexture(String name)
     {
         if (!textures.containsKey(name))
             textures.put(name, TextureManager.loadTexture2D(name));

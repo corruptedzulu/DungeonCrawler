@@ -16,7 +16,6 @@ public class MoveUpAction extends MoveAction
 
 	public void performAction(float time, Event event)
 	{
-		
 		timeSinceLastMoveMS += time;
 		
 		if(timeSinceLastMoveMS > 25)

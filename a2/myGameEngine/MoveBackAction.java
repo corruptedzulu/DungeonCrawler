@@ -23,17 +23,17 @@ public class MoveBackAction extends MoveAction
 
 	public void performAction(float time, Event event)
 	{
+		if (!isEnabled())
+			return;
 
-		if(true){
-			Matrix3D rot = avatar.getLocalRotation();
-			Vector3D dir = new Vector3D(0,0,1);
-			dir = dir.mult(rot);
-			dir.scale((double)(speed * time) * -1);
-			avatar.translate((float)dir.getX(),(float)dir.getY(),(float)dir.getZ());
-			if (isTerrainFollow())
-				avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
+		Matrix3D rot = avatar.getLocalRotation();
+		Vector3D dir = new Vector3D(0,0,1);
+		dir = dir.mult(rot);
+		dir.scale((double)(speed * time) * -1);
+		avatar.translate((float)dir.getX(),(float)dir.getY(),(float)dir.getZ());
+		if (isTerrainFollow())
+            avatar.getLocalTranslation().setElementAt(1, 3, getTerrainHeight(avatar.getLocalTranslation().getCol(3)));
 
-			return;}
 
 		timeSinceLastMoveMS += time;
 
