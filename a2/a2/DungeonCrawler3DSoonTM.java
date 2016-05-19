@@ -85,6 +85,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private final Vector3D DISTANCE_W = new Vector3D(0, 0, -TILE_SIZE);
     private final Vector3D DISTANCE_NW = new Vector3D(TILE_SIZE, 0, -TILE_SIZE);
 
+
     private final int TERRAIN_SEED = 22348;
     private final int TERRAIN_SIZE = 50;
     private final int TERRAIN_ITERATIONS = 2000;
@@ -143,31 +144,14 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private NPCEnemyAsset goblinAsset;
     private NPCEnemyAsset gobSword;
 
-
     public DungeonCrawler3DSoonTM()
     {
         super();
-        hostedServer = null;
-    }
-
-    public DungeonCrawler3DSoonTM(InetAddress address, int port) throws IOException
-    {
-        super();
-        client = new GameClientTCP(address, port, IGameConnection.ProtocolType.TCP, this);
-
-    }
-
-    public DungeonCrawler3DSoonTM(InetAddress address, int port, GameServerTCP server) throws IOException
-    {
-        super();
-        hostedServer = server;
-        client = new GameClientTCP(address, port, IGameConnection.ProtocolType.TCP, this);
-        client.sendJoinMessage();
     }
 
     protected void initSystem()
     {
-        display = new MyDisplaySystem(1920, 1080, 24, 20, true, "sage.renderer.jogl.JOGLRenderer");
+        display = new MyDisplaySystem(1920, 1080, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
         display.setTitle("DungeonCrawler");
         setDisplaySystem(display);
 
@@ -205,7 +189,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
 
         associateDefaultKeyAndControllerBindings();
         camOne = new Camera3PController(cameraOne, avatarOne, im, kbName, "K");
-        client.sendJoinMessage();
+
 
         super.update(0f);
     }
@@ -507,6 +491,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
                            rollLeftActionPOne,ATrepeat);
 
         // OPEN CHEST
+        //IInputManager.INPUT_ACTION_TYPE ATpressOnly = IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY;
         im.associateAction(kbName,
                            net.java.games.input.Component.Identifier.Key.G,
                            new AbstractInputAction()
@@ -816,7 +801,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         Group goblin = new Group(roomNumber + "Goblin " + number);
         goblin.addChild(goblinAsset.make(new Point3D(posY*TILE_SIZE,0,posX*TILE_SIZE), TILE_SCALE, ROT_E));
         goblin.addChild(gobSword.make(new Point3D(posY*TILE_SIZE,0,posX*TILE_SIZE), TILE_SCALE, ROT_E));
-
         room.addChild(goblin);
     }
 }
