@@ -8,19 +8,15 @@ import java.net.Socket;
 
 public class Client 
 {
-
 	private Socket echoSocket;
 	private PrintWriter out;
 	private BufferedReader in;
 	private BufferedReader bufferRead;
 	
-	
 	public Client(String[] args)
 	{
 		String hostName = args[0];
 		int portNumber = Integer.parseInt(args[1]);
-
-		
 		try 
 		{
 		    echoSocket = new Socket(hostName, portNumber);
@@ -41,7 +37,6 @@ public class Client
 		return out;
 	}
 
-
 	public BufferedReader getIn() 
 	{
 		return in;
@@ -59,10 +54,8 @@ public class Client
 	
 	public static void notMain(String args[])
 	{
-	
 		String[] array = {"127.0.0.1", "7856"};
 		Client c = new Client(array);
-		
 		
 		String read = "";
 		
@@ -90,7 +83,6 @@ public class Client
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	
 			
 			try
 			{
@@ -105,12 +97,7 @@ public class Client
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-
-			
-			
-			
 		}
-	
 	}
 }
 
