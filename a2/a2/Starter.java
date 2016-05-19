@@ -5,7 +5,7 @@ import myGameEngine.GameServerTCP;
 import java.io.IOException;
 import java.net.InetAddress;
 
-public class Start
+public class Starter
 {
     public static void main(String [] args) throws IOException
     {
