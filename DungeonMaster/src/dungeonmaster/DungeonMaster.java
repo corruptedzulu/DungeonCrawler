@@ -80,7 +80,7 @@ public class DungeonMaster
 		clientsConnected = 0;
 		
 		gameInProgress = true;
-		singlePlayerGame = true;
+		singlePlayerGame = false;
 		
 	}
 	
@@ -207,6 +207,11 @@ public class DungeonMaster
 			
 		}
 		
+/*		
+		String s = "GW:WorldSize 1000,1000;Room0:StandardRoom;WidthLength 8,12;WorldXYofSWCorner 0,0;WorldEntity0:XY 0,5;$$WorldEntity1:XY 2,5;$$WorldEntity2:XY 4,5;$$PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$;Door0:ThisRoomXY 5,11;OtherRoomXY 5,0;$$;$$Room1:StandardRoom;WidthLength 15,20;WorldXYofSWCorner 0,12;WorldEntity3:XY 4,10;$$WorldEntity4:XY 6,10;$$WorldEntity5:XY 8,10;$$WorldEntity6:XY 10,10;$$WorldEntity7:XY 12,10;$$WorldEntity8:XY 14,10;$$;Door1:ThisRoomXY 5,0;OtherRoomXY 5,11;$$Door2:ThisRoomXY 5,19;OtherRoomXY 5,0;$$;$$Room2:StandardRoom;WidthLength 10,30;WorldXYofSWCorner 0,33;WorldEntity9:XY 0,15;$$WorldEntity10:XY 2,15;$$WorldEntity11:XY 5,20;$$;WorldObject4:5,25;$$;Door3:ThisRoomXY 5,0;OtherRoomXY 5,19;$$;$$$$";
+		Parser p = new Parser();
+		
+		p.parseString(s);*/
 		
 	}
 	
@@ -266,6 +271,15 @@ public class DungeonMaster
 			p.getOut().println(sending);
 			
 			
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 			//ask them to pick which class they want
 			p.getOut().println("pickCharacter");
@@ -288,6 +302,15 @@ public class DungeonMaster
 				{
 					//pc.setPlayerName(playerName);
 					p.setMyCharacter(pc);
+					try
+					{
+						Thread.sleep(100);
+					}
+					catch (InterruptedException e1)
+					{
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					p.getOut().println(p.getMyCharacter().toString());
 				}
 			}
@@ -319,6 +342,15 @@ public class DungeonMaster
 		{
 			for(Player player : players)//loop through the players
 			{
+				try
+				{
+					Thread.sleep(100);
+				}
+				catch (InterruptedException e1)
+				{
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				//report to each player what all of the players currently are
 				p.getOut().println(player.getMyCharacter().toString());
 			}
@@ -334,6 +366,15 @@ public class DungeonMaster
 		
 		for(Player p : players)
 		{
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			p.getOut().println("reportReadyToProceed");
 			String readyToProceed = "";
 			while( !readyToProceed.equals("ready"))
@@ -354,6 +395,15 @@ public class DungeonMaster
 			gw.getRoomOne().addEntity(p.getMyCharacter());
 			p.getMyCharacter().setContainingRoom(gw.getRoomOne());
 			
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			//tell the player about the whole game world
 			p.getOut().println(gw.toString());
 			
@@ -396,6 +446,15 @@ public class DungeonMaster
 		
 		for(Player p : players)
 		{
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			p.getOut().println("readyToProceed");//the game will begin, change display to the internal map, away from the outdoors area
 		}
 		
@@ -465,16 +524,43 @@ public class DungeonMaster
 							{
 								if(player != p)
 								{
+									try
+									{
+										Thread.sleep(100);
+									}
+									catch (InterruptedException e1)
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
 									player.getOut().println(p.getMyCharacter().toString());
 								}
 							}
 								
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (InterruptedException e1)
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 							p.getOut().println("dead");
 			
 						}
 						
 						if( ((PlayerCharacter)e).isDying() )
 						{
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (InterruptedException e1)
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 							p.getOut().println("dying");
 							
 							
@@ -498,6 +584,15 @@ public class DungeonMaster
 					//while the player still has turn options
 					while( hasMoved == false || hasActioned == false)// || hasMinorActioned == false)
 					{
+						try
+						{
+							Thread.sleep(100);
+						}
+						catch (InterruptedException e1)
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						//tell the player that it is their turn
 						//ask the player what they would like to do
 						p.getOut().println("yourMove");
@@ -506,10 +601,28 @@ public class DungeonMaster
 						//these are the things the player can do, dependent of what they've already done
 						if(hasMoved == false)
 						{
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (InterruptedException e1)
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 							p.getOut().println(move);
 						}
 						if(hasActioned == false)
 						{
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (InterruptedException e1)
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 							p.getOut().println(action);
 						}
 						/*if(hasMinorActioned == false)
@@ -517,6 +630,15 @@ public class DungeonMaster
 							//p.getOut().println(minor);
 						}*/
 						
+						try
+						{
+							Thread.sleep(100);
+						}
+						catch (InterruptedException e1)
+						{
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 						p.getOut().println(ender);
 						
 						/*p.getMyCharacter().setxCoor(5);
@@ -540,7 +662,15 @@ public class DungeonMaster
 						
 						if(playerMove.equals("move") && hasMoved == false)
 						{
-							
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (InterruptedException e1)
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 							p.getOut().println("moveDirection");
 							
 							
@@ -577,7 +707,15 @@ public class DungeonMaster
 								
 							}
 							
-							
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (InterruptedException e1)
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 							//send the new X and Y coordinates (in squares coordinate space)
 							p.getOut().println( ((PlayerCharacter) e).toString() );
 							
@@ -592,6 +730,15 @@ public class DungeonMaster
 								}
 								else
 								{
+									try
+									{
+										Thread.sleep(100);
+									}
+									catch (InterruptedException e1)
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
 									player.getOut().println(((PlayerCharacter) e).toString());
 								}
 							}
@@ -614,7 +761,15 @@ public class DungeonMaster
 							//get a list of all of the things that the player could do from this square
 							//attack and interact are the two over arching things
 							
-							
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (InterruptedException e1)
+							{
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
 							p.getOut().println("standardActionType");
 							
 							
@@ -637,7 +792,15 @@ public class DungeonMaster
 							
 							if(standardActionType.equals("attack"))
 							{
-								
+								try
+								{
+									Thread.sleep(100);
+								}
+								catch (InterruptedException e1)
+								{
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
 								p.getOut().println("attackType");
 								
 								//ask if melee or ranged
@@ -720,10 +883,27 @@ public class DungeonMaster
 									}
 									enemiesList += "$$";
 									
+									try
+									{
+										Thread.sleep(100);
+									}
+									catch (InterruptedException e1)
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
 									//send the list of enemies to the client
 									p.getOut().println(enemiesList);
 									
-									
+									try
+									{
+										Thread.sleep(100);
+									}
+									catch (InterruptedException e1)
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
 									p.getOut().println("selectEnemyWorldEntityID");
 									
 									//ask which enemy the player would like to attack
@@ -774,7 +954,15 @@ public class DungeonMaster
 											//then tell the Room to delete the enemy
 											e.getContainingRoom().removeEntity(attackedEnemy);
 											
-											
+											try
+											{
+												Thread.sleep(100);
+											}
+											catch (InterruptedException e1)
+											{
+												// TODO Auto-generated catch block
+												e1.printStackTrace();
+											}
 											//and tell the player clients to remove it as well
 											p.getOut().println(attackedEnemy.toString());
 											
@@ -789,6 +977,15 @@ public class DungeonMaster
 												}
 												else
 												{
+													try
+													{
+														Thread.sleep(100);
+													}
+													catch (InterruptedException e1)
+													{
+														// TODO Auto-generated catch block
+														e1.printStackTrace();
+													}
 													player.getOut().println(attackedEnemy.toString());
 												}
 											}
@@ -866,11 +1063,27 @@ public class DungeonMaster
 									
 									enemiesList += "$$";
 																	
-									
+									try
+									{
+										Thread.sleep(100);
+									}
+									catch (InterruptedException e1)
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
 									//send the list of enemies to the client
 									p.getOut().println(enemiesList);
 									
-									
+									try
+									{
+										Thread.sleep(100);
+									}
+									catch (InterruptedException e1)
+									{
+										// TODO Auto-generated catch block
+										e1.printStackTrace();
+									}
 									p.getOut().println("selectEnemyWorldEntityID");
 									
 									//ask which enemy the player would like to attack
@@ -879,6 +1092,7 @@ public class DungeonMaster
 									//get the attack type that the player would like to make
 									try 
 									{
+										
 										attackEnemyID = p.getIn().readLine();
 									} 
 									catch (IOException e1) 
@@ -921,7 +1135,15 @@ public class DungeonMaster
 											//then tell the Room to delete the enemy
 											e.getContainingRoom().removeEntity(attackedEnemy);
 											
-											
+											try
+											{
+												Thread.sleep(100);
+											}
+											catch (InterruptedException e1)
+											{
+												// TODO Auto-generated catch block
+												e1.printStackTrace();
+											}
 											//and tell the player clients to remove it as well
 											p.getOut().println(attackedEnemy.toString());
 											
@@ -936,6 +1158,15 @@ public class DungeonMaster
 												}
 												else
 												{
+													try
+													{
+														Thread.sleep(100);
+													}
+													catch (InterruptedException e1)
+													{
+														// TODO Auto-generated catch block
+														e1.printStackTrace();
+													}
 													player.getOut().println(attackedEnemy.toString());
 												}
 											}//for(Player player : players)
@@ -958,6 +1189,15 @@ public class DungeonMaster
 								
 								String interactionDirection = null;
 								
+								try
+								{
+									Thread.sleep(100);
+								}
+								catch (InterruptedException e1)
+								{
+									// TODO Auto-generated catch block
+									e1.printStackTrace();
+								}
 								p.getOut().println("interactionDirection");
 								
 								
@@ -1069,7 +1309,15 @@ public class DungeonMaster
 										}
 										
 										
-										
+										try
+										{
+											Thread.sleep(100);
+										}
+										catch (InterruptedException e1)
+										{
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
 										//tell the player about it's character (specifically that it moved)
 										p.getOut().println( ((PlayerCharacter) e).toString() );
 										//TODO tell the player about the new room it' in, but only if we're not saving the whole world map on the client-side on startup
@@ -1081,6 +1329,15 @@ public class DungeonMaster
 										{
 											if(p != player)
 											{
+												try
+												{
+													Thread.sleep(100);
+												}
+												catch (InterruptedException e1)
+												{
+													// TODO Auto-generated catch block
+													e1.printStackTrace();
+												}
 												player.getOut().println( ((PlayerCharacter) e).toString() );
 											}
 										}				
@@ -1093,6 +1350,15 @@ public class DungeonMaster
 										
 										for(Player player : players)
 										{
+											try
+											{
+												Thread.sleep(100);
+											}
+											catch (InterruptedException e1)
+											{
+												// TODO Auto-generated catch block
+												e1.printStackTrace();
+											}
 											player.getOut().println(interactingWith.toString());
 										}
 										//TODO some sort of way to report what happened with an interaction
@@ -1272,6 +1538,15 @@ public class DungeonMaster
 								{
 									if(p.getMyCharacter() == attackedEnemy)
 									{
+										try
+										{
+											Thread.sleep(100);
+										}
+										catch (InterruptedException e1)
+										{
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
 										p.getOut().println(attackedEnemy.toString());
 									}
 								}
@@ -1835,6 +2110,15 @@ public class DungeonMaster
 																		
 									for(Player player : players)
 									{
+										try
+										{
+											Thread.sleep(100);
+										}
+										catch (InterruptedException e1)
+										{
+											// TODO Auto-generated catch block
+											e1.printStackTrace();
+										}
 										player.getOut().println( ((Enemy)e).toString());
 									}
 								}
@@ -1917,6 +2201,15 @@ public class DungeonMaster
 										{
 											if(p.getMyCharacter() == attackedEnemy)
 											{
+												try
+												{
+													Thread.sleep(100);
+												}
+												catch (InterruptedException e1)
+												{
+													// TODO Auto-generated catch block
+													e1.printStackTrace();
+												}
 												p.getOut().println(attackedEnemy.toString());
 											}
 										}
@@ -2021,6 +2314,15 @@ public class DungeonMaster
 										{
 											if(p.getMyCharacter() == attackedEnemy)
 											{
+												try
+												{
+													Thread.sleep(100);
+												}
+												catch (InterruptedException e1)
+												{
+													// TODO Auto-generated catch block
+													e1.printStackTrace();
+												}
 												p.getOut().println(attackedEnemy.toString());
 											}
 										}
