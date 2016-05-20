@@ -17,7 +17,6 @@ public class MoveDownAction extends MoveAction
 	
 	public void performAction(float time, Event event)
 	{
-				
 		timeSinceLastMoveMS += time;
 		
 		if(timeSinceLastMoveMS > 25)
@@ -33,15 +32,7 @@ public class MoveDownAction extends MoveAction
 			Point3D newLoc = new Point3D(newX, newY, newZ);
 			camera.setLocation(newLoc);
 		}
-		
-		//if (runAction.isRunning())
-		//{  
-		//	moveAmount = (float) 0.5 ; 
-		//}
-		//else
-		//{
-			//moveAmount = (float) -0.1 ; 
-		//}
+
 		
 	}
 }

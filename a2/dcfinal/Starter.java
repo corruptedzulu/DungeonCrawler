@@ -1,9 +1,6 @@
-package a2;
-
-import myGameEngine.GameServerTCP;
+package dcfinal;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 public class Starter
 {
@@ -15,6 +12,6 @@ public class Starter
         // -Dsun.java2d.d3d=false sf1 57909     // server and 1 client
         // -Dsun.java2d.d3d=false offline       // no network
 
-        new DungeonCrawler3DSoonTM().start();
+        new DungeonCrawler3D().start();
     }
 }

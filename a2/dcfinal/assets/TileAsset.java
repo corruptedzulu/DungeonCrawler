@@ -1,4 +1,4 @@
-package a2.assets;
+package dcfinal.assets;
 
 public class TileAsset extends Asset
 {

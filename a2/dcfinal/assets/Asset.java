@@ -1,4 +1,4 @@
-package a2.assets;
+package dcfinal.assets;
 
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
@@ -6,6 +6,8 @@ import graphicslib3D.Quaternion;
 import sage.scene.Group;
 import sage.scene.SkyBox;
 import sage.scene.TriMesh;
+import sage.texture.Texture;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Random;
@@ -226,6 +228,16 @@ public abstract class Asset
             return textures.get(shortName);
 
         return "";
+    }
+
+    public Texture giveMeTexture()
+    {
+        return AssetBuilder.getTexture(getFirstTexture());
+    }
+
+    public Texture giveMeTexture(String tex)
+    {
+        return AssetBuilder.getTexture(getTexture(tex));
     }
 
     private void setTextures()

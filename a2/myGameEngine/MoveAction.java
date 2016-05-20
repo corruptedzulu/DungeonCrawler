@@ -18,6 +18,7 @@ public class MoveAction extends AbstractInputAction
 
 	private TerrainBlock terrainBlock;
 	private boolean isTerrainFollow;
+	private boolean isEnabled;
 
 	public MoveAction(ICamera c, float s)
 	{
@@ -26,6 +27,7 @@ public class MoveAction extends AbstractInputAction
 		timeSinceLastMoveMS = 0;
 		isTerrainFollow = false;
 		terrainBlock = null;
+		isEnabled = true;
 	}
 
 	@Override
@@ -80,5 +82,15 @@ public class MoveAction extends AbstractInputAction
 
 		float terHeight = terrainBlock.getHeight((float)position.getX(),(float)position.getZ());
 		return terHeight + (float)terrainBlock.getOrigin().getY(); // plus height offset
+	}
+
+	public void setEnabled(boolean enabled)
+	{
+		isEnabled = enabled;
+	}
+
+	public boolean isEnabled()
+	{
+		return isEnabled;
 	}
 }

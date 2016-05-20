@@ -1,10 +1,10 @@
-package a2.assets;
+package dcfinal.assets;
 
-public class ObjectInteractableAsset extends Asset
+public class ObjectNonInteractableAsset extends Asset
 {
     //
 
-    public ObjectInteractableAsset(String[] s)
+    public ObjectNonInteractableAsset(String[] s)
     {
         super.setFileName(String.join("_",s));
         super.setName(s[1]);

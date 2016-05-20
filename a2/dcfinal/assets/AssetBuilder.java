@@ -1,4 +1,4 @@
-package a2.assets;
+package dcfinal.assets;
 
 import sage.model.loader.OBJLoader;
 import sage.model.loader.ogreXML.OgreXMLParser;
@@ -76,7 +76,6 @@ public class AssetBuilder
         Group group = null;
         if (fileName.endsWith(".mesh.xml"))
         {
-            System.out.println("trying ogre: " + fileName);
             String mesh = fileName;
             String material = fileName.substring(0, fileName.length() - 9) + ".material";
             String skeleton = fileName.substring(0, fileName.length() - 9) + ".skeleton.xml";
@@ -111,7 +110,7 @@ public class AssetBuilder
         return skyBox;
     }
 
-    private static Texture getTexture(String name)
+    public static Texture getTexture(String name)
     {
         if (!textures.containsKey(name))
             textures.put(name, TextureManager.loadTexture2D(name));

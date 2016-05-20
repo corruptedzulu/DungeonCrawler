@@ -21,8 +21,8 @@ public class YawLeftAction extends RollAction
 
 	public void performAction(float time, Event event)
 	{
-		
-		
+		if (!isEnabled())
+			return;
 		
 		timeSinceLastRollMS += time;
 		

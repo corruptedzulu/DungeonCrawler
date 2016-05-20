@@ -1,15 +1,15 @@
 
 package myGameEngine;
 
-import a2.DungeonCrawler3DSoonTM;
+import dcfinal.DungeonCrawler3D;
 import net.java.games.input.Event;
 import sage.input.action.AbstractInputAction;
 
 public class QuitGameAction extends AbstractInputAction 
 {
-	private DungeonCrawler3DSoonTM dg;
+	private DungeonCrawler3D dg;
 	
-	public QuitGameAction(DungeonCrawler3DSoonTM dungeonCrawlerSoon3D)
+	public QuitGameAction(DungeonCrawler3D dungeonCrawlerSoon3D)
 	{
 		super();
 		dg = dungeonCrawlerSoon3D;

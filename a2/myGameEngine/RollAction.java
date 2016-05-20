@@ -9,8 +9,8 @@ public class RollAction extends AbstractInputAction
 {
 	protected ICamera camera;
 	protected float rotationRateDeg;
-	
 	protected int timeSinceLastRollMS;
+	private boolean isEnabled;
 	
 	public RollAction(ICamera c, float rotRateDeg)
 	{
@@ -19,6 +19,7 @@ public class RollAction extends AbstractInputAction
 		rotationRateDeg = (float) 20;
 		
 		timeSinceLastRollMS = 0;
+		isEnabled = true;
 	}
 	
 	
@@ -28,4 +29,13 @@ public class RollAction extends AbstractInputAction
 
 	}
 
+	public boolean isEnabled()
+	{
+		return isEnabled;
+	}
+
+	public void setEnabled(boolean enabled)
+	{
+		isEnabled = enabled;
+	}
 }
