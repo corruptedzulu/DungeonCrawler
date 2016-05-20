@@ -1,4 +1,4 @@
-package a2;
+package dcfinal;
 
 import java.io.IOException;
 
@@ -12,6 +12,6 @@ public class Starter
         // -Dsun.java2d.d3d=false sf1 57909     // server and 1 client
         // -Dsun.java2d.d3d=false offline       // no network
 
-        new DungeonCrawler3DSoonTM().start();
+        new DungeonCrawler3D().start();
     }
 }

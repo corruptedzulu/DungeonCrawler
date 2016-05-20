@@ -1,7 +1,7 @@
-package a2;
+package dcfinal;
 
-import a2.assets.AssetInfo;
-import a2.assets.ObjectNonInteractableAsset;
+import dcfinal.assets.Asset;
+import dcfinal.assets.AssetInfo;
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;
 import graphicslib3D.Quaternion;
@@ -66,14 +66,13 @@ public class ParticleSystemEngine
         }
 
 
-        public void start(Point3D startPos)
+        public void start(Asset asset, Point3D startPos, Point3D startScale, Quaternion startRot )
         {
             int pCount = random.nextInt(maxChildren);
-            int gCount = random.nextInt(maxGenerations);
+            int gCount = random.nextInt(maxGenerations); // not using yet
             for (int i = 0; i < pCount+1 ; i++)
             {
-                ObjectNonInteractableAsset barrel = assetInfo.objectNonInteractables.get("barrel");
-                SceneNode node = barrel.make(startPos, new Point3D(.4, .4, .4), new Quaternion(1, new double[]{0, 0, 0}));
+                SceneNode node = asset.make(startPos,startScale, startRot);
                 Particle p = new Particle(node,1f,.1f,1f);
                 particles.add(p);
             }
@@ -135,7 +134,6 @@ public class ParticleSystemEngine
                 float tx = (.5f - random.nextFloat())*startLinearVelocityScale;
                 float ty = (.5f - random.nextFloat())*startLinearVelocityScale;
                 float tz = (.5f - random.nextFloat())*startLinearVelocityScale;
-                System.out.println("tx: " + tx + " ty: " + ty + " tz: " + tz);
                 return new float[]{tx,ty,tz};
             }
         }

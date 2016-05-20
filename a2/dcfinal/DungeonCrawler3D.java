@@ -1,6 +1,6 @@
-package a2;
+package dcfinal;
 
-import a2.assets.*;
+import dcfinal.assets.*;
 
 import myGameEngine.Camera3PController;
 import myGameEngine.MoveBackAction;
@@ -18,6 +18,8 @@ import sage.audio.*;
 import sage.display.*;
 import sage.event.EventManager;
 import sage.event.IEventManager;
+import sage.physics.IPhysicsEngine;
+import sage.physics.PhysicsEngineFactory;
 import sage.scene.*;
 import sage.scene.shape.*;
 import sage.input.*;
@@ -44,25 +46,24 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
+
 
 import javax.script.*;
 
-public class DungeonCrawler3DSoonTM extends BaseGame
+public class DungeonCrawler3D extends BaseGame
 {
     private final double TILE_SIZE = 2.0;
-    private final double TS = TILE_SIZE;
     private final double TILE_HALF_SIZE = TILE_SIZE * .5f;
-    private final Point3D TILE_SCALE = new Point3D(1.32,1.32,1.32); // 1.32
+    private final Point3D TILE_SCALE = new Point3D(1.32, 1.32, 1.32); // 1.32
 
     private final Quaternion ROT_E = new Quaternion(); // default model orientation
-    private final Quaternion ROT_NE = new Quaternion(1, new double[]{0,45,0});
-    private final Quaternion ROT_N = new Quaternion(1, new double[]{0,90,0});
-    private final Quaternion ROT_NW = new Quaternion(1, new double[]{0,135,0});
-    private final Quaternion ROT_W = new Quaternion(1, new double[]{0,180,0});
-    private final Quaternion ROT_SW = new Quaternion(1, new double[]{0,225,0});
-    private final Quaternion ROT_S = new Quaternion(1, new double[]{0,270,0});
-    private final Quaternion ROT_SE = new Quaternion(1, new double[]{0,315,0});
+    private final Quaternion ROT_NE = new Quaternion(1, new double[]{0, 45, 0});
+    private final Quaternion ROT_N = new Quaternion(1, new double[]{0, 90, 0});
+    private final Quaternion ROT_NW = new Quaternion(1, new double[]{0, 135, 0});
+    private final Quaternion ROT_W = new Quaternion(1, new double[]{0, 180, 0});
+    private final Quaternion ROT_SW = new Quaternion(1, new double[]{0, 225, 0});
+    private final Quaternion ROT_S = new Quaternion(1, new double[]{0, 270, 0});
+    private final Quaternion ROT_SE = new Quaternion(1, new double[]{0, 315, 0});
     private final Quaternion COLUMN_ROT_NE = ROT_E;
     private final Quaternion COLUMN_ROT_NW = ROT_N;
     private final Quaternion COLUMN_ROT_SW = ROT_W;
@@ -85,7 +86,9 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private final float TERRAIN_HILL_MAX_RADIUS = 20f;
     private final double TERRAIN_SIZE_MINUS_TILE = TERRAIN_SIZE - TILE_SIZE * 1.5f;
 
-    private String googleDrivePath = "C:\\Users\\Zagak\\Google Drive\\CSC165\\DungeonCrawler\\assets\\"; //todo not hard code
+    //"C:\\Users\\Zagak\\Google Drive\\CSC165\\DungeonCrawler\\assets\\";
+
+    private String googleDrivePath =  System.getProperty("user.dir") + "\\assets\\";
     private AssetInfo assetInfo;
     private TileAsset tileAsset;
     private WallAsset wallAsset;
@@ -97,7 +100,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private ObjectInteractableAsset coinAsset;
     private ObjectNonInteractableAsset barrelAsset;
     private ObjectInteractableAsset chestAsset;
-    private String terrainTexture = googleDrivePath + "SkyBoxes\\_countrypaths_1\\down.jpg"; // http://www.farmpeeps.com/fp_skyboxes.html
+    private String terrainTexture =
+            googleDrivePath + "SkyBoxes\\_countrypaths_1\\down.jpg"; // http://www.farmpeeps.com/fp_skyboxes.html
     private String soundsPath = googleDrivePath + "Sounds\\";
 
     private BlendState rsBlendTransparent;
@@ -115,6 +119,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private TerrainBlock theTerrain;
     private ScriptEngine scriptEngine;
     private File scriptFile;
+    private ParticleSystemEngine particleSystemEngine;
 
 
     private AudioResource gruntAudioResource;
@@ -130,24 +135,29 @@ public class DungeonCrawler3DSoonTM extends BaseGame
 
     private HUDString playerClassHUD;
 
+    // pretend network validation
     private boolean isDemoDoRegardless = true;
+
     // network state
     private String hasPickedCharacter = "";
     private boolean connected;
     private boolean isReady = false;
     private boolean isYourTurn = false;
     private String send;
-    private String options[] = {"yourMove","Move","StandardAction","End Turn"};
+    private String options[] = {"yourMove", "Move", "StandardAction", "End Turn"};
     private boolean isMoveQued;
     private Vector3D moveQue;
     private Quaternion rotQue;
 
 
+    // may not need all or any
+    private ArrayList<SceneNode> gameWorld;
     private Group room1;
     private Group goblinsSound;
-    private Group player;  // may not need
+    private Group player;
     private Group animateGroup;
     private Group chestGroup;
+    private ParticleSystemEngine.ParticleSystem coinsPS;
 
     private String kbName, gpName;
     private MoveForwardAction mvFwdActionPOne;
@@ -158,8 +168,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private YawLeftAction yawLeftActionPOne;
 
 
-
-    public DungeonCrawler3DSoonTM()
+    public DungeonCrawler3D()
     {
         super();
     }
@@ -167,6 +176,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     protected void initSystem()
     {
         //System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        System.out.println(googleDrivePath);
         //display = createDisplaySystem();
         //setDisplaySystem(display);
         display = new MyDisplaySystem(1092, 768, 24, 20, false, "sage.renderer.jogl.JOGLRenderer");
@@ -178,7 +188,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         im = new InputManager();
         setInputManager(im);
 
-        ArrayList<SceneNode> gameWorld = new ArrayList<>();
+
+        gameWorld = new ArrayList<>();
         setGameWorld(gameWorld);
         //super.initSystem();
     }
@@ -188,6 +199,14 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         renderer = display.getRenderer();
         eventManager = EventManager.getInstance();
         assetInfo = new AssetInfo(googleDrivePath);
+
+        String engine = "sage.physics.JBullet.JBulletPhysicsEngine";
+        IPhysicsEngine physicsEngine = PhysicsEngineFactory.createPhysicsEngine(engine);
+        physicsEngine.initSystem();
+        float[] gravity = {0, -1f, 0};
+        physicsEngine.setGravity(gravity);
+        particleSystemEngine = new ParticleSystemEngine(assetInfo, physicsEngine, gameWorld,random);
+        coinsPS = particleSystemEngine.getSystem("coins", 10, 2, 10000);
 
         initWorldEnvironment();
         try
@@ -211,36 +230,47 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private void addObjectsToWorld() throws Exception
     {
 
-        // testing transparency
-        //ObjectNonInteractableAsset treeAsset = assetInfo.objectNonInteractables.get("tree");
-        //for (int i = 0 ; i < 20 ; i++)
-        //    makeTreeAtRandomLocation(treeAsset);
+        // MISC OBJECTS FOR SAKE OF DEMO
+        ObjectInteractableAsset testBoxAsset = assetInfo.objectInteractables.get("transtest");
+        SceneNode transparentBox = testBoxAsset
+                .make(new Point3D(6, 0, 6), new Point3D(2, 2, 2), new Quaternion(1, new double[]{0, 0, 0}));
+        enableTransparency(transparentBox);
+        addGameWorldObject(transparentBox);
+        barrelAsset = assetInfo.objectNonInteractables.get("barrel");
+        addGameWorldObject(barrelAsset.make(new Point3D(2, 0, 4), new Point3D(2, .2, 2), new Quaternion(1, new double[]{0, 0, 0})));
 
-        // PLAYERS
-        //SceneNode cleric = assetInfo.playables.get("cleric")
-        //        .make(new Point3D(0, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
-        //addGameWorldObject(cleric);
-        //SceneNode wizard = assetInfo.playables.get("wizard")
-        //        .make(new Point3D(2, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
-        //addGameWorldObject(wizard);
-        //SceneNode rogue = assetInfo.playables.get("rogue")
-        //        .make(new Point3D(4, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
-        //addGameWorldObject(rogue);
-        //SceneNode fighter = assetInfo.playables.get("fighter")
-        //        .make(new Point3D(6, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
-        //addGameWorldObject(fighter);
+        // animation objects
+        animateGroup = new Group("animateGroup");
+        ObjectInteractableAsset chest = assetInfo.objectInteractables.get("chest");
+        chestGroup = chest
+                .makeAni(new Point3D(4, -.2, 2), new Point3D(.03, .03, .03), new Quaternion(1, new double[]{0, 0, 0}));
+        animateGroup.addChild(chestGroup);
+        addGameWorldObject(animateGroup);
 
+        // coin for physics
         coinAsset = assetInfo.objectInteractables.get("coin");
-        SceneNode coin = coinAsset.make(new Point3D(0, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
-        addGameWorldObject(coin);
+        for (int i = 0; i < 5;i++)
+            addGameWorldObject(coinAsset.make(new Point3D(1.5+(i*.2), 1+(i*.1), 1.5), new Point3D(.8,.8, .8),
+                                          new Quaternion(1, new double[]{90, 0, 0})));
 
-        room1 = constructRoom(0, 8, 8, 0, 0); // 8x8 with
-        addDoorToRoom(room1,0,5,7);                  // door at 5 7, but zero index so 7+1=8
-        addEnemyToRoom(room1,0,0,5);
-        addEnemyToRoom(room1,1,2,5);
-        addEnemyToRoom(room1,2,4,5);
+
+        // HARDCODED - SUPPOSE TO BE PARSED AND TRANSLATE FROM THE SERVER FIRST
+        room1 = constructRoom(0, 8, 8, 0, 0);
+        addDoorToRoom(room1, 0, 5, 7);
+        addEnemyToRoom(room1, 0, 0, 5);
+        addEnemyToRoom(room1, 1, 2, 5);
+        addEnemyToRoom(room1, 2, 4, 5);
         addGameWorldObject(room1);
+        // MISC OBJECTS FOR SAKE OF DEMO END ONLY
 
+
+
+        // Trees
+        ObjectNonInteractableAsset treeAsset = assetInfo.objectNonInteractables.get("tree");
+        for (int i = 0 ; i < 20 ; i++)
+            makeTreeAtRandomLocation(treeAsset);
+
+        // initial character before it picks a class and connects to server
         avatarOne = assetInfo.playables.get("man")
                 .make(new Point3D(0, 0, 0), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
         camera = new JOGLCamera(renderer);
@@ -269,22 +299,22 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         switch (classChoice)
         {
             case "Fighter":
-                ((TriMesh)avatarOne).setTexture(assetInfo.playables.get("fighter").giveMeTexture());
+                ((TriMesh) avatarOne).setTexture(assetInfo.playables.get("fighter").giveMeTexture());
                 playerClassHUD.setText(classChoice);
                 playerClassHUD.setColor(Color.RED);
                 break;
             case "Wizard":
-                ((TriMesh)avatarOne).setTexture(assetInfo.playables.get("wizard").giveMeTexture());
+                ((TriMesh) avatarOne).setTexture(assetInfo.playables.get("wizard").giveMeTexture());
                 playerClassHUD.setText(classChoice);
                 playerClassHUD.setColor(Color.BLUE);
                 break;
             case "Cleric":
-                ((TriMesh)avatarOne).setTexture(assetInfo.playables.get("cleric").giveMeTexture());
+                ((TriMesh) avatarOne).setTexture(assetInfo.playables.get("cleric").giveMeTexture());
                 playerClassHUD.setText(classChoice);
                 playerClassHUD.setColor(Color.YELLOW);
                 break;
             case "Rogue":
-                ((TriMesh)avatarOne).setTexture(assetInfo.playables.get("rogue").giveMeTexture());
+                ((TriMesh) avatarOne).setTexture(assetInfo.playables.get("rogue").giveMeTexture());
                 playerClassHUD.setText(classChoice);
                 playerClassHUD.setColor(Color.gray);
                 break;
@@ -299,16 +329,16 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         }
 
         Vector3D cur = avatarOne.getLocalTranslation().getCol(3);
-        float tx = (float) (posY*TILE_SIZE - cur.getX());
-        float ty = (float) (posX*TILE_SIZE - cur.getZ());
-        avatarOne.translate(tx,0f,ty);
+        float tx = (float) (posY * TILE_SIZE - cur.getX());
+        float ty = (float) (posX * TILE_SIZE - cur.getZ());
+        avatarOne.translate(tx, 0f, ty);
 
         player = new Group(classChoice);
         player.setParent(avatarOne);
         PlayableAsset hpAsset = assetInfo.playables.get("hp");
         PlayableAsset hpBorder = assetInfo.playables.get("hpborder");
-        SceneNode snhp = hpAsset.make(new Point3D(0,0,0), TILE_SCALE, ROT_E);
-        SceneNode snhpBorder = hpBorder.make(new Point3D(0,0,0), TILE_SCALE, ROT_E);
+        SceneNode snhp = hpAsset.make(new Point3D(0, 0, 0), TILE_SCALE, ROT_E);
+        SceneNode snhpBorder = hpBorder.make(new Point3D(0, 0, 0), TILE_SCALE, ROT_E);
         player.addChild(snhp);
         player.addChild(snhpBorder);
         addGameWorldObject(player);
@@ -322,12 +352,13 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         theTerrain = initTerrain();
         addGameWorldObject(theTerrain);
 
-        initWorldAxes();
+        //initWorldAxes();
     }
 
     private TerrainBlock initTerrain()
     {
-        HillHeightMap myHillHeightMap = new HillHeightMap(TERRAIN_SIZE, TERRAIN_ITERATIONS, TERRAIN_HILL_MIN_RADIUS, TERRAIN_HILL_MAX_RADIUS, (byte) 2, TERRAIN_SEED);
+        HillHeightMap myHillHeightMap = new HillHeightMap(TERRAIN_SIZE, TERRAIN_ITERATIONS, TERRAIN_HILL_MIN_RADIUS,
+                                                          TERRAIN_HILL_MAX_RADIUS, (byte) 2, TERRAIN_SEED);
         myHillHeightMap.setHeightScale(0.1f);
         TerrainBlock hillTerrain = createTerBlock(myHillHeightMap);
         Texture groundTexture = TextureManager.loadTexture2D(terrainTexture);
@@ -353,17 +384,21 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     private void initAudio()
     {
         audioManager = AudioManagerFactory.createAudioManager("sage.audio.joal.JOALAudioManager");
-        if(!audioManager.initialize())
+        if (!audioManager.initialize())
         {
             System.out.println("Audio Manager failed to initialize!");
             return;
         }
 
-        doorAudioResource = audioManager.createAudioResource(soundsPath + "dooropen.wav", AudioResourceType.AUDIO_SAMPLE);
+        doorAudioResource = audioManager.createAudioResource(soundsPath + "dooropen.wav",
+                                                             AudioResourceType.AUDIO_SAMPLE);
         gruntAudioResource = audioManager.createAudioResource(soundsPath + "grunt.wav", AudioResourceType.AUDIO_SAMPLE);
-        fireballAudioResource = audioManager.createAudioResource(soundsPath + "fireball.wav", AudioResourceType.AUDIO_SAMPLE);
-        footstepsAudioResource = audioManager.createAudioResource(soundsPath + "footsteps1.wav", AudioResourceType.AUDIO_SAMPLE);
-        swordclashAudioResource = audioManager.createAudioResource(soundsPath + "swordclash.wav", AudioResourceType.AUDIO_SAMPLE);
+        fireballAudioResource = audioManager.createAudioResource(soundsPath + "fireball.wav",
+                                                                 AudioResourceType.AUDIO_SAMPLE);
+        footstepsAudioResource = audioManager.createAudioResource(soundsPath + "footsteps1.wav",
+                                                                  AudioResourceType.AUDIO_SAMPLE);
+        swordclashAudioResource = audioManager.createAudioResource(soundsPath + "swordclash.wav",
+                                                                   AudioResourceType.AUDIO_SAMPLE);
         doorSound = new Sound(doorAudioResource, SoundType.SOUND_EFFECT, 20, false);
         gruntSound = new Sound(gruntAudioResource, SoundType.SOUND_EFFECT, 20, false);
         fireballSound = new Sound(fireballAudioResource, SoundType.SOUND_EFFECT, 20, false);
@@ -458,16 +493,36 @@ public class DungeonCrawler3DSoonTM extends BaseGame
 
         // pickCharacter > Cleric | Wizard | Rogue | Fighter
         im.associateAction(kbName, Component.Identifier.Key._1, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { pickCharacter("Cleric");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   pickCharacter("Cleric");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, Component.Identifier.Key._2, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { pickCharacter("Wizard");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   pickCharacter("Wizard");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, Component.Identifier.Key._3, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { pickCharacter("Rogue");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   pickCharacter("Rogue");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, Component.Identifier.Key._4, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { pickCharacter("Fighter");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   pickCharacter("Fighter");
+                               }
+                           }
                 , ATpressOnly);
 
         //QUIT
@@ -500,31 +555,31 @@ public class DungeonCrawler3DSoonTM extends BaseGame
                            mvBackActionPOne,
                            ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.S,
-                           mvBackActionPOne,ATrepeat);
+                           mvBackActionPOne, ATrepeat);
         //MOVE LEFT
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.A,
-                           mvLeftActionPOne,ATpressOnly);
-        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.A,
-                           mvLeftActionPOne,ATrepeat);
+                           mvLeftActionPOne, ATpressOnly);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.A,
+                           mvLeftActionPOne, ATrepeat);
         //MOVE RIGHT
-        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.D,
-                           mvRightActionPOne,ATpressOnly);
-        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.D,
-                           mvRightActionPOne,ATrepeat);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.D,
+                           mvRightActionPOne, ATpressOnly);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.D,
+                           mvRightActionPOne, ATrepeat);
         //YAW
         //ROTATE LEFT
-        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.Q,
-                           yawLeftActionPOne,ATpressOnly);
-        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.Q,
-                           yawLeftActionPOne,ATrepeat);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.Q,
+                           yawLeftActionPOne, ATpressOnly);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.Q,
+                           yawLeftActionPOne, ATrepeat);
         //ROTATE RIGHT
-        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.E,
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.E,
                            yawRightActionPOne, ATpressOnly);
-        im.associateAction(kbName,net.java.games.input.Component.Identifier.Key.E,
-                           yawRightActionPOne,ATrepeat);
+        im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.E,
+                           yawRightActionPOne, ATrepeat);
 
 
-        // OPEN CHEST trigger testing
+        // OPEN CHEST/COINS trigger testing AND PHYSICS SPAM FOR COINS
         //IInputManager.INPUT_ACTION_TYPE ATpressOnly = IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY;
         im.associateAction(kbName,
                            net.java.games.input.Component.Identifier.Key.G,
@@ -532,7 +587,12 @@ public class DungeonCrawler3DSoonTM extends BaseGame
                            {
                                public void performAction(float v, Event event)
                                {
-                                   /*
+                                   // physics
+                                   coinsPS.start(coinAsset,
+                                                 new Point3D(2, 2, 2),
+                                                 new Point3D(.8, .8, .8),
+                                                 new Quaternion(1, new double[]{90, 0, 0}));
+
                                    Iterator<SceneNode> itr = chestGroup.getChildren();
                                    while (itr.hasNext())
                                    {
@@ -542,12 +602,12 @@ public class DungeonCrawler3DSoonTM extends BaseGame
                                            mesh.startAnimation("my_animation");
                                        }
                                    }
-                                   */
+
                                }
                            },
                            ATpressOnly);
 
-        // Script trigger testing
+        // Script trigger testing only works once per adjustment of script
         //IInputManager.INPUT_ACTION_TYPE ATpressOnly = IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY;
         im.associateAction(kbName,
                            net.java.games.input.Component.Identifier.Key.T,
@@ -555,11 +615,11 @@ public class DungeonCrawler3DSoonTM extends BaseGame
                            {
                                public void performAction(float v, Event event)
                                {
-                                   Invocable invocableEngine = (Invocable)scriptEngine;
+                                   Invocable invocableEngine = (Invocable) scriptEngine;
                                    String newTexture = "";
                                    try
                                    {
-                                       newTexture = (String)invocableEngine.invokeFunction("getWallTexture");
+                                       newTexture = (String) invocableEngine.invokeFunction("getWallTexture");
                                    }
                                    catch (ScriptException e)
                                    {
@@ -570,7 +630,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
                                        e.printStackTrace();
                                    }
 
-                                   System.out.println(newTexture);
+
                                    Iterator<SceneNode> children = room1.getChildren();
                                    while (children.hasNext())
                                    {
@@ -582,12 +642,11 @@ public class DungeonCrawler3DSoonTM extends BaseGame
                                            {
                                                Texture t = tileAsset.giveMeTexture(newTexture);
                                                if (t != null)
-                                                    ((TriMesh) obj).setTexture(t);
+                                                   ((TriMesh) obj).setTexture(t);
                                                else
-                                                   ((TriMesh)obj).setTexture(tileAsset.giveMeTexture());
-                                           }
-                                            else
-                                               ((TriMesh)obj).setTexture(tileAsset.giveMeTexture());
+                                                   ((TriMesh) obj).setTexture(tileAsset.giveMeTexture());
+                                           } else
+                                               ((TriMesh) obj).setTexture(tileAsset.giveMeTexture());
                                        }
                                    }
 
@@ -608,108 +667,236 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         IInputManager.INPUT_ACTION_TYPE ATpressOnly = IInputManager.INPUT_ACTION_TYPE.ON_PRESS_ONLY;
 
 
-
-
         // yourMove+End Turn > [end]
         im.associateAction(kbName, Component.Identifier.Key.NUMPADENTER, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestEndTurn();} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestEndTurn();
+                               }
+                           }
                 , ATpressOnly);
 
         // yourMove+StandardAction > [standard]
         im.associateAction(kbName, Component.Identifier.Key.NUMPADENTER, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestStandardAction();} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestStandardAction();
+                               }
+                           }
                 , ATpressOnly);
 
         // StandardActionType > [attack]
         im.associateAction(kbName, Component.Identifier.Key.NUMPADENTER, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestStandardType();} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestStandardType();
+                               }
+                           }
                 , ATpressOnly);
 
         // attackType > [range]
         im.associateAction(kbName, Component.Identifier.Key.NUMPADENTER, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestAttack(); } }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestAttack();
+                               }
+                           }
                 , ATpressOnly);
 
         // yourMove+Move > [move]
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD5, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestMove();} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestMove();
+                               }
+                           }
                 , ATpressOnly);
 
         // moveDirection > N | NE | E | SE | S | SW | W | NW
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD7, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("NW");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("NW");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD8, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("N");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("N");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD9, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("NE");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("NE");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD4, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("W");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("W");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD6, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("E");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("E");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD1, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("SW");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("SW");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD2, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("S");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("S");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.NUMPAD3, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("SE");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("SE");
+                               }
+                           }
                 , ATpressOnly);
 
         // moveDirection > N | NE | E | SE | S | SW | W | NW
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.I, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("NW");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("NW");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.O, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("N");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("N");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.P, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("NE");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("NE");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.J, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("W");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("W");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.L, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("E");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("E");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.N, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("SW");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("SW");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.M, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("S");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("S");
+                               }
+                           }
                 , ATpressOnly);
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.COMMA, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { tryMoveNumpad("SE");} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   tryMoveNumpad("SE");
+                               }
+                           }
                 , ATpressOnly);
 
         // yourMove+End Turn > [end]
         im.associateAction(kbName, Component.Identifier.Key.END, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestEndTurn();} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestEndTurn();
+                               }
+                           }
                 , ATpressOnly);
 
         // yourMove+StandardAction > [standard]
         im.associateAction(kbName, Component.Identifier.Key.H, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestStandardAction();} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestStandardAction();
+                               }
+                           }
                 , ATpressOnly);
 
         // StandardActionType > [attack]
         im.associateAction(kbName, Component.Identifier.Key.F, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestStandardType();} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestStandardType();
+                               }
+                           }
                 , ATpressOnly);
 
         // attackType > [range]
         im.associateAction(kbName, Component.Identifier.Key.G, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestAttack(); } }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestAttack();
+                               }
+                           }
                 , ATpressOnly);
 
         // yourMove+Move > [move]
         im.associateAction(kbName, net.java.games.input.Component.Identifier.Key.K, new AbstractInputAction()
-                           { public void performAction(float v, Event event)  { requestMove();} }
+                           {
+                               public void performAction(float v, Event event)
+                               {
+                                   requestMove();
+                               }
+                           }
                 , ATpressOnly);
 
     }
@@ -723,11 +910,9 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         if (isDemoDoRegardless)
         {
             setPlayerClass(classChoice, 3, 5);
-            // do game world
             initPlayerOneControlsPostConnection();
         }
     }
-
 
     private void requestStandardAction()
     {
@@ -749,14 +934,14 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     {
         if (isDemoDoRegardless)
         {
-            int select =  random.nextInt(goblinsSound.getNumberOfChildren());
+            int select = random.nextInt(goblinsSound.getNumberOfChildren());
             SceneNode gob = ((Group) goblinsSound.getChild(0 + "Goblin" + select)).getChild("g" + select);
             if (gob != null)
             {
                 Vector3D pos = gob.getLocalTranslation().getCol(3);
-                gruntSound.setLocation(new Point3D(pos.getX(),pos.getY(),pos.getZ()));
+                gruntSound.setLocation(new Point3D(pos.getX(), pos.getY(), pos.getZ()));
                 gruntSound.play();
-                System.out.println("attacking #"+select+" goblin at "+ pos);
+                System.out.println("attacking #" + select + " goblin at " + pos);
             }
         }
 
@@ -778,7 +963,7 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     {
         if (!isYourTurn && send != "")
             return;
-        if(Arrays.asList(options).contains("Move"))
+        if (Arrays.asList(options).contains("Move"))
             send = "move";
     }
 
@@ -836,10 +1021,10 @@ public class DungeonCrawler3DSoonTM extends BaseGame
             footstepsSound.setLocation(new Point3D(pos.getX(), pos.getY(), pos.getZ()));
             footstepsSound.play();
 
-            avatarOne.translate((float)moveQue.getX(),0f,(float)moveQue.getZ());
+            avatarOne.translate((float) moveQue.getX(), 0f, (float) moveQue.getZ());
 
             Matrix3D rot = new Matrix3D();
-            rot.rotate(rotQue.getAngleAxis()[1],rotQue.getAngleAxis()[2],rotQue.getAngleAxis()[3]);
+            rot.rotate(rotQue.getAngleAxis()[1], rotQue.getAngleAxis()[2], rotQue.getAngleAxis()[3]);
             avatarOne.setLocalRotation(rot);
         }
     }
@@ -857,24 +1042,24 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     {
         Matrix3D avDir = (Matrix3D) (avatarOne.getWorldRotation().clone());
         float camAz = camController.getCameraAzimuth();
-        avDir.rotateY(180.0f-camAz);
-        Vector3D dir = new Vector3D(0,0,1);
+        avDir.rotateY(180.0f - camAz);
+        Vector3D dir = new Vector3D(0, 0, 1);
         dir = dir.mult(avDir);
         audioManager.getEar().setLocation(camera.getLocation());
-        audioManager.getEar().setOrientation(dir,new Vector3D(0,1,0));
+        audioManager.getEar().setOrientation(dir, new Vector3D(0, 1, 0));
     }
 
     public void update(float elapsedTimeMS)
     {
-        //updateAnimations(elapsedTimeMS);
+        coinsPS.update(elapsedTimeMS);
+        updateAnimations(elapsedTimeMS);
 
-        // TODO STUFF BELOW + SCRIPT + PHYSICS + FIX FSEM + ZIP + REPORT
+        // TODO PARSE SERVER(DUNGEON MASTER) SEE  outputLog.txt in DungeonMasert/src
         //if charactersAvailable:Cleric;Fighter;Rogue;Wizard;$$ and pickCharacter
         //      initPlayerOneControlsPostConnection();
 
         // if (PlayerCharacter12:XY 0,0;HPMaxHP 44,44;$$)
         //      setPlayerClass(hasPickedCharacter,0,0); // hp starts 100 //snhp1.getLocalScale().setElementAt(0,0,0); figure out later // for hp
-
 
         // if (reportReadyToProceed)
         //      send
@@ -901,19 +1086,16 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         Iterator<SceneNode> groups = animateGroup.getChildren();
         while (groups.hasNext())
         {
-            Iterator<SceneNode> children = ((Group)groups.next()).getChildren();
+            Iterator<SceneNode> children = ((Group) groups.next()).getChildren();
             while (children.hasNext())
             {
                 Model3DTriMesh submesh = (Model3DTriMesh) children.next();
                 if (submesh.isAnimating())
                 {
-                    if (submesh.getCurrentAnimationTime() < 3.33f)   // unique to chest
-                    {
+                    if (submesh.getCurrentAnimationTime() < 3.2f)   // unique to chest
                         submesh.updateAnimation(elapsedTimeMS);
-
-
-                        // remove from animation group add to gw ?
-                    }
+                    else
+                        submesh.stopAnimation();
                 }
             }
         }
@@ -949,13 +1131,13 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     {
         Vector3D pos = node.getLocalTranslation().getCol(3);
         if (pos.getX() < TILE_HALF_SIZE)
-            node.getLocalTranslation().setElementAt(0,3,TILE_HALF_SIZE);
+            node.getLocalTranslation().setElementAt(0, 3, TILE_HALF_SIZE);
         if (pos.getZ() < TILE_HALF_SIZE)
-            node.getLocalTranslation().setElementAt(2,3,TILE_HALF_SIZE);
+            node.getLocalTranslation().setElementAt(2, 3, TILE_HALF_SIZE);
         if (pos.getX() > TERRAIN_SIZE_MINUS_TILE)
-            node.getLocalTranslation().setElementAt(0,3,TERRAIN_SIZE_MINUS_TILE);
+            node.getLocalTranslation().setElementAt(0, 3, TERRAIN_SIZE_MINUS_TILE);
         if (pos.getZ() > TERRAIN_SIZE_MINUS_TILE)
-            node.getLocalTranslation().setElementAt(2,3,TERRAIN_SIZE_MINUS_TILE);
+            node.getLocalTranslation().setElementAt(2, 3, TERRAIN_SIZE_MINUS_TILE);
     }
 
     private void makeTreeAtRandomLocation(Asset asset)
@@ -963,20 +1145,21 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         double scaleMax = 2.5;
         double scaleMin = 2.0;
         double skew = 0.2;
-        double scaleX = scaleMin + (scaleMax-scaleMin)*random.nextDouble();
-        double scaleY = scaleX + ((0.5 - random.nextFloat())*2.0)*skew;
-        double scaleZ = scaleX + ((0.5 - random.nextFloat())*2.0)*skew;
+        double scaleX = scaleMin + (scaleMax - scaleMin) * random.nextDouble();
+        double scaleY = scaleX + ((0.5 - random.nextFloat()) * 2.0) * skew;
+        double scaleZ = scaleX + ((0.5 - random.nextFloat()) * 2.0) * skew;
 
-        double posX = random.nextDouble()*(TERRAIN_SIZE_MINUS_TILE-TILE_HALF_SIZE) + TILE_HALF_SIZE;
-        double posZ = random.nextDouble()*(TERRAIN_SIZE_MINUS_TILE-TILE_HALF_SIZE) + TILE_HALF_SIZE;
-        double posY =  theTerrain.getHeight((float)posX,(float)posZ) - (.5f*scaleY);
+        double posX = random.nextDouble() * (TERRAIN_SIZE_MINUS_TILE - TILE_HALF_SIZE) + TILE_HALF_SIZE;
+        double posZ = random.nextDouble() * (TERRAIN_SIZE_MINUS_TILE - TILE_HALF_SIZE) + TILE_HALF_SIZE;
+        double posY = theTerrain.getHeight((float) posX, (float) posZ) - (.5f * scaleY);
 
         double rotMax = 4;
         double rotY = 360.0 * random.nextDouble();
-        double rotX = ((0.5 - random.nextDouble())*2.0)*rotMax;
-        double rotZ = ((0.5 - random.nextDouble())*2.0)*rotMax;
+        double rotX = ((0.5 - random.nextDouble()) * 2.0) * rotMax;
+        double rotZ = ((0.5 - random.nextDouble()) * 2.0) * rotMax;
 
-        SceneNode tree = asset.make(new Point3D(posX, posY, posZ), new Point3D(scaleX,scaleY,scaleZ), new Quaternion(1, new double[] {rotX,rotY,rotZ}));
+        SceneNode tree = asset.make(new Point3D(posX, posY, posZ), new Point3D(scaleX, scaleY, scaleZ),
+                                    new Quaternion(1, new double[]{rotX, rotY, rotZ}));
         enableTransparency(tree);
         addGameWorldObject(tree);
     }
@@ -984,8 +1167,8 @@ public class DungeonCrawler3DSoonTM extends BaseGame
     public void initScriptEngines()
     {
         ScriptEngineManager factory = new ScriptEngineManager();
-        scriptEngine= factory.getEngineByName("js");
-        scriptFile = new File(googleDrivePath+"textureScript.js");
+        scriptEngine = factory.getEngineByName("js");
+        scriptFile = new File(googleDrivePath + "textureScript.js");
         try
         {
             FileReader fileReader = new FileReader(scriptFile);
@@ -993,13 +1176,21 @@ public class DungeonCrawler3DSoonTM extends BaseGame
             fileReader.close();
         }
         catch (FileNotFoundException e1)
-        { System.out.println(scriptFile + " not found " + e1); }
+        {
+            System.out.println(scriptFile + " not found " + e1);
+        }
         catch (IOException e2)
-        { System.out.println("IO problem with " + scriptFile + e2); }
+        {
+            System.out.println("IO problem with " + scriptFile + e2);
+        }
         catch (ScriptException e3)
-        { System.out.println("ScriptException in " + scriptFile + e3); }
+        {
+            System.out.println("ScriptException in " + scriptFile + e3);
+        }
         catch (NullPointerException e4)
-        { System.out.println ("Null ptr exception reading " + scriptFile + e4); }
+        {
+            System.out.println("Null ptr exception reading " + scriptFile + e4);
+        }
     }
 
     private void executeScript(ScriptEngine engine, String scriptFileName)
@@ -1041,7 +1232,6 @@ public class DungeonCrawler3DSoonTM extends BaseGame
             wallAsset = assetInfo.walls.get("wall");
         if (columnAsset == null)
             columnAsset = assetInfo.walls.get("column");
-
 
 
         // tiles
@@ -1104,17 +1294,16 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         String target = "";
         Matrix3D tarRot = null;
         Iterator<SceneNode> iterator = room.iterator();
-        int tarZ = (int)(posX*TILE_SIZE);
-        int tarX = (int)(posY*TILE_SIZE);
-        while ( iterator.hasNext())
+        int tarZ = (int) (posX * TILE_SIZE);
+        int tarX = (int) (posY * TILE_SIZE);
+        while (iterator.hasNext())
         {
             SceneNode node = iterator.next();
             Vector3D pos = node.getLocalTranslation().getCol(3);
-            if (tarZ == pos.getZ() &&  tarX== pos.getX() && node.getName().contains("Wall"))
+            if (tarZ == pos.getZ() && tarX == pos.getX() && node.getName().contains("Wall"))
             {
                 target = node.getName();
                 tarRot = node.getLocalRotation();
-                System.out.println(target);
                 break;
             }
         }
@@ -1122,8 +1311,10 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         {
             String roomNumber = room.getName().split(" ")[1];
             room.removeChild(room.getChild(target));
-            SceneNode door = doorAsset.make(roomNumber + " Door " + number, new Point3D(tarX,0,tarZ), TILE_SCALE, new Quaternion());
-            SceneNode woodDoor = woodDoorAsset.make(roomNumber + " WoodDoor " + number, new Point3D(tarX,0,tarZ), TILE_SCALE, new Quaternion());
+            SceneNode door = doorAsset.make(roomNumber + " Door " + number, new Point3D(tarX, 0, tarZ), TILE_SCALE,
+                                            new Quaternion());
+            SceneNode woodDoor = woodDoorAsset.make(roomNumber + " WoodDoor " + number, new Point3D(tarX, 0, tarZ),
+                                                    TILE_SCALE, new Quaternion());
             door.setLocalRotation(tarRot);
             woodDoor.setLocalRotation(tarRot);
             room.addChild(door);
@@ -1141,8 +1332,10 @@ public class DungeonCrawler3DSoonTM extends BaseGame
 
         String roomNumber = room.getName().split(" ")[1];
         Group goblin = new Group(roomNumber + "Goblin" + number);
-        goblin.addChild(goblinAsset.make("g"+ number,new Point3D(posY*TILE_SIZE,0,posX*TILE_SIZE), TILE_SCALE, ROT_E));
-        goblin.addChild(gobSword.make("s"+number,new Point3D(posY*TILE_SIZE,0,posX*TILE_SIZE), TILE_SCALE, ROT_E));
+        goblin.addChild(
+                goblinAsset.make("g" + number, new Point3D(posY * TILE_SIZE, 0, posX * TILE_SIZE), TILE_SCALE, ROT_E));
+        goblin.addChild(
+                gobSword.make("s" + number, new Point3D(posY * TILE_SIZE, 0, posX * TILE_SIZE), TILE_SCALE, ROT_E));
         room.addChild(goblin);
 
         if (goblinsSound == null)
@@ -1160,28 +1353,5 @@ public class DungeonCrawler3DSoonTM extends BaseGame
         if (select == 2)
             return ROT_S;
         return ROT_W;
-    }
-
-    public void unusedStuff() throws Exception
-    {
-        // testing transparency
-        ObjectInteractableAsset testBoxAsset = assetInfo.objectInteractables.get("transtest");
-        SceneNode transparentBox = testBoxAsset
-                .make(new Point3D(0, 0, 1), new Point3D(1, 1, 1), new Quaternion(1, new double[]{0, 0, 0}));
-        enableTransparency(transparentBox);
-        addGameWorldObject(transparentBox);
-
-        // MISC
-        barrelAsset = assetInfo.objectNonInteractables.get("barrel");
-        addGameWorldObject(barrelAsset.make(new Point3D(0, 0, 1.5), new Point3D(.95, .95, .95), new Quaternion(1, new double[]{0, 0, 0})));
-
-        // animation objects
-        animateGroup = new Group("animateGroup");
-
-        chestAsset = assetInfo.objectInteractables.get("chest");
-        chestGroup = chestAsset
-                .makeAni(new Point3D(0, 0, 0), new Point3D(.01, .01, .01), new Quaternion(1, new double[]{0, 0, 0}));
-        animateGroup.addChild(chestGroup);
-        addGameWorldObject(animateGroup);
     }
 }

@@ -1,11 +1,10 @@
-package a2.assets;
+package dcfinal.assets;
 
-public class SkyboxAsset extends Asset
+public class WallAsset extends Asset
 {
-
-    public SkyboxAsset(String[] s)
+    public WallAsset(String[] s)
     {
-        super.setFileName(String.join("_",s) +"\\");
+        super.setFileName(String.join("_",s));
         super.setName(s[1]);
         super.setVersion(Integer.parseInt(s[2]));
     }

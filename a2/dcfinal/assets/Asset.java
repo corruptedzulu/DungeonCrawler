@@ -1,4 +1,4 @@
-package a2.assets;
+package dcfinal.assets;
 
 import graphicslib3D.Matrix3D;
 import graphicslib3D.Point3D;

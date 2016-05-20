@@ -1,11 +1,10 @@
-package a2.assets;
+package dcfinal.assets;
 
-
-public class NPCEnemyAsset extends Asset
+public class ObjectInteractableAsset extends Asset
 {
     //
 
-    public NPCEnemyAsset(String[] s)
+    public ObjectInteractableAsset(String[] s)
     {
         super.setFileName(String.join("_",s));
         super.setName(s[1]);
